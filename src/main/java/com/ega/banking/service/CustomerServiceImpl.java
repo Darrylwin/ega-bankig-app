@@ -28,17 +28,17 @@ public class CustomerServiceImpl implements CustomerService {
     public Customer createCustomer(Customer customer) {
         // Vérification : l'email doit être unique
         if (customerRepository.existsByEmail(customer.getEmail())) {
-            throw new RuntimeException("Email already exists: " + customer.getEmail());
+            throw new com.ega.banking.exception.DuplicateResourceException("Email", customer.getEmail());
         }
 
         // Vérification : le téléphone doit être unique
         if (customerRepository.existsByPhoneNumber(customer.getPhoneNumber())) {
-            throw new RuntimeException("Phone number already exists: " + customer.getPhoneNumber());
+            throw new com.ega.banking.exception.DuplicateResourceException("Phone number", customer.getPhoneNumber());
         }
 
         // Vérification : le client doit avoir au moins 18 ans
         if (customer.getAge() < 18) {
-            throw new RuntimeException("Customer must be at least 18 years old");
+            throw new com.ega.banking.exception.InvalidOperationException("Customer must be at least 18 years old");
         }
 
         // Sauvegarde en base de données
@@ -62,7 +62,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Transactional(readOnly = true)
     public Customer getCustomerById(Long id) {
         return customerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Customer not found with id: " + id));
+                .orElseThrow(() -> new com.ega.banking.exception.ResourceNotFoundException("Customer", "id", id));
     }
 
     /**
@@ -76,18 +76,18 @@ public class CustomerServiceImpl implements CustomerService {
         // Vérification : si l'email change, il doit rester unique
         if (!existingCustomer.getEmail().equals(customer.getEmail()) &&
                 customerRepository.existsByEmail(customer.getEmail())) {
-            throw new RuntimeException("Email already exists: " + customer.getEmail());
+            throw new com.ega.banking.exception.DuplicateResourceException("Email", customer.getEmail());
         }
 
         // Vérification : si le téléphone change, il doit rester unique
         if (!existingCustomer.getPhoneNumber().equals(customer.getPhoneNumber()) &&
                 customerRepository.existsByPhoneNumber(customer.getPhoneNumber())) {
-            throw new RuntimeException("Phone number already exists: " + customer.getPhoneNumber());
+            throw new com.ega.banking.exception.DuplicateResourceException("Phone number", customer.getPhoneNumber());
         }
 
         // Vérification : l'âge doit rester >= 18 ans
         if (customer.getAge() < 18) {
-            throw new RuntimeException("Customer must be at least 18 years old");
+            throw new com.ega.banking.exception.InvalidOperationException("Customer must be at least 18 years old");
         }
 
         // Mise à jour des champs (on garde l'ID et la date de création)
@@ -123,6 +123,6 @@ public class CustomerServiceImpl implements CustomerService {
     @Transactional(readOnly = true)
     public Customer getCustomerByEmail(String email) {
         return customerRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Customer not found with email: " + email));
+                .orElseThrow(() -> new com.ega.banking.exception.ResourceNotFoundException("Customer", "email", email));
     }
 }

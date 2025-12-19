@@ -8,8 +8,4 @@ public class AccountNotActiveException extends RuntimeException {
     public AccountNotActiveException(String accountNumber) {
         super(String.format("Account is not active: %s", accountNumber));
     }
-
-    public AccountNotActiveException(String message) {
-        super(message);
-    }
 }

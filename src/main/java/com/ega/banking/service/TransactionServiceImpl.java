@@ -70,8 +70,8 @@ public class TransactionServiceImpl implements TransactionService {
 
         // Vérifie que le solde est suffisant
         if (!account.hasSufficientBalance(amount)) {
-            throw new RuntimeException("Insufficient balance. Available: " +
-                    account.getBalance() + ", Required: " + amount);
+            throw new com.ega.banking.exception.InsufficientBalanceException(
+                    account.getBalance(), amount);
         }
 
         // Enregistre le solde avant la transaction
@@ -106,7 +106,8 @@ public class TransactionServiceImpl implements TransactionService {
 
         // Validation : les comptes doivent être différents
         if (sourceAccountId.equals(destinationAccountId)) {
-            throw new RuntimeException("Source and destination accounts must be different");
+            throw new com.ega.banking.exception.InvalidOperationException(
+                    "Source and destination accounts must be different");
         }
 
         // Récupère les deux comptes
@@ -119,8 +120,8 @@ public class TransactionServiceImpl implements TransactionService {
 
         // Vérifie que le compte source a assez d'argent
         if (!sourceAccount.hasSufficientBalance(amount)) {
-            throw new RuntimeException("Insufficient balance in source account. Available: " +
-                    sourceAccount.getBalance() + ", Required: " + amount);
+            throw new com.ega.banking.exception.InsufficientBalanceException(
+                    sourceAccount.getBalance(), amount);
         }
 
         // Enregistre les soldes avant la transaction
@@ -174,7 +175,8 @@ public class TransactionServiceImpl implements TransactionService {
 
         // Validation : la date de début doit être avant la date de fin
         if (startDate.isAfter(endDate)) {
-            throw new RuntimeException("Start date must be before end date");
+            throw new com.ega.banking.exception.InvalidOperationException(
+                    "Start date must be before end date");
         }
 
         return transactionRepository.findByAccountAndDateBetween(accountId, startDate, endDate);
@@ -187,7 +189,8 @@ public class TransactionServiceImpl implements TransactionService {
     @Transactional(readOnly = true)
     public Transaction getTransactionById(Long id) {
         return transactionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Transaction not found with id: " + id));
+                .orElseThrow(() -> new com.ega.banking.exception.ResourceNotFoundException(
+                        "Transaction", "id", id));
     }
 
     /**
@@ -195,7 +198,7 @@ public class TransactionServiceImpl implements TransactionService {
      */
     private void validateAmount(BigDecimal amount) {
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new RuntimeException("Amount must be greater than 0");
+            throw new com.ega.banking.exception.InvalidOperationException("Amount must be greater than 0");
         }
     }
 
@@ -204,7 +207,7 @@ public class TransactionServiceImpl implements TransactionService {
      */
     private void validateAccountIsActive(Account account) {
         if (!account.isActive()) {
-            throw new RuntimeException("Account is not active: " + account.getAccountNumber());
+            throw new com.ega.banking.exception.AccountNotActiveException(account.getAccountNumber());
         }
     }
 }
