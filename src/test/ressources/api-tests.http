@@ -1,0 +1,157 @@
+### Variables
+@baseUrl = http://localhost:8080/api
+@token =
+
+### ========================================
+### 1. AUTHENTIFICATION
+### ========================================
+
+### 1.1 Login Admin (compte créé automatiquement)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin123"
+}
+
+### 1.2 Inscription nouvel utilisateur
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "username": "john_doe",
+  "email": "john@example.com",
+  "password": "password123"
+}
+
+### ========================================
+### 2. CLIENTS (ADMIN uniquement)
+### ========================================
+
+### 2.1 Créer un client
+POST {{baseUrl}}/customers
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "lastName": "Doe",
+  "firstName": "John",
+  "dateOfBirth": "1990-01-15",
+  "gender": "MALE",
+  "address": "123 Main Street, Paris",
+  "phoneNumber": "+33612345678",
+  "email": "john.customer@example.com",
+  "nationality": "French"
+}
+
+### 2.2 Récupérer tous les clients
+GET {{baseUrl}}/customers
+Authorization: Bearer {{token}}
+
+### 2.3 Récupérer un client par ID
+GET {{baseUrl}}/customers/1
+Authorization: Bearer {{token}}
+
+### 2.4 Modifier un client
+PUT {{baseUrl}}/customers/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "lastName": "Doe Updated",
+  "firstName": "John",
+  "dateOfBirth": "1990-01-15",
+  "gender": "MALE",
+  "address": "456 New Street, Paris",
+  "phoneNumber": "+33612345678",
+  "email": "john.customer@example.com",
+  "nationality": "French"
+}
+
+### 2.5 Supprimer un client
+DELETE {{baseUrl}}/customers/1
+Authorization: Bearer {{token}}
+
+### ========================================
+### 3. COMPTES
+### ========================================
+
+### 3.1 Créer un compte
+POST {{baseUrl}}/accounts
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "customerId": 1,
+  "accountType": "SAVINGS",
+  "currency": "EUR"
+}
+
+### 3.2 Récupérer tous les comptes
+GET {{baseUrl}}/accounts
+Authorization: Bearer {{token}}
+
+### 3.3 Récupérer un compte par ID
+GET {{baseUrl}}/accounts/1
+Authorization: Bearer {{token}}
+
+### 3.4 Récupérer les comptes d'un client
+GET {{baseUrl}}/accounts/customer/1
+Authorization: Bearer {{token}}
+
+### ========================================
+### 4. TRANSACTIONS
+### ========================================
+
+### 4.1 Faire un dépôt
+POST {{baseUrl}}/transactions/deposit
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "accountId": 1,
+  "amount": 1000.00,
+  "description": "Initial deposit"
+}
+
+### 4.2 Faire un retrait
+POST {{baseUrl}}/transactions/withdraw
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "accountId": 1,
+  "amount": 200.00,
+  "description": "ATM withdrawal"
+}
+
+### 4.3 Faire un virement
+POST {{baseUrl}}/transactions/transfer
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "sourceAccountId": 1,
+  "destinationAccountId": 2,
+  "amount": 500.00,
+  "description": "Transfer to friend"
+}
+
+### 4.4 Récupérer les transactions d'un compte
+GET {{baseUrl}}/transactions/account/1
+Authorization: Bearer {{token}}
+
+### 4.5 Récupérer les transactions par période
+GET {{baseUrl}}/transactions/account/1/period?startDate=2026-01-01T00:00:00&endDate=2026-12-31T23:59:59
+Authorization: Bearer {{token}}
+
+### ========================================
+### 5. SWAGGER
+### ========================================
+
+### 5.1 API Docs JSON
+GET http://localhost:8080/v3/api-docs
+
+### 5.2 Swagger UI
+# Ouvrir dans le navigateur : http://localhost:8080/swagger-ui/index.html

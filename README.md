@@ -185,32 +185,60 @@ openssl rand -base64 64
 
 ## 🎯 Lancement de l'application
 
-### Méthode 1 : Avec Maven Wrapper
+### Démarrer l'application
 
 ```bash
 ./mvnw spring-boot:run
 ```
 
-### Méthode 2 : Avec Maven installé
-
+Ou avec Maven installé :
 ```bash
 mvn spring-boot:run
 ```
 
-### Méthode 3 : Depuis votre IDE
+### Premier lancement - Création du compte Admin
 
-Exécutez la classe `EgaApplication.java`
+Au **premier démarrage**, l'application détecte qu'aucun administrateur n'existe et lance un **script interactif en console** :
 
-### Vérification
+```
+========================================
+⚠️  Aucun compte administrateur trouvé !
+========================================
 
-L'application démarre sur **http://localhost:8080**
+╔════════════════════════════════════════╗
+║   CRÉATION DU COMPTE ADMINISTRATEUR   ║
+╚════════════════════════════════════════╝
 
-Vous devriez voir dans la console :
+👤 Nom d'utilisateur (min 3 caractères) : admin
+📧 Email : admin@ega-bank.com
+🔒 Mot de passe (min 6 caractères) : ********
+🔒 Confirmer le mot de passe : ********
+
+╔════════════════════════════════════════╗
+║    ✅ ADMINISTRATEUR CRÉÉ AVEC SUCCÈS  ║
+╚════════════════════════════════════════╝
+
+📋 Informations du compte :
+   Username : admin
+   Email    : admin@ega-bank.com
+   Rôles    : ADMIN, USER
+
+🔐 Conservez ces informations en lieu sûr !
+========================================
+```
+
+### Lancements suivants
+
+Si un administrateur existe déjà, l'application démarre normalement :
+
 ```
 ========================================
 🚀 EGA Banking Application Started!
 📍 API: http://localhost:8080/api
-📚 Swagger: http://localhost:8080/swagger-ui.html
+📚 Swagger: http://localhost:8080/swagger-ui/index.html
+========================================
+✅ Compte administrateur déjà existant
+✅ Initialisation terminée !
 ========================================
 ```
 
@@ -262,7 +290,30 @@ Vous devriez voir dans la console :
 
 ## 📮 Tests avec Postman
 
-### 1. Inscription d'un utilisateur
+### Connexion avec le compte admin créé
+
+**POST** `http://localhost:8080/api/auth/login`
+
+```json
+{
+  "username": "admin",
+  "password": "votre_mot_de_passe"
+}
+```
+
+**Réponse** :
+```json
+{
+  "token": "eyJhbGciOiJIUzUxMiJ9...",
+  "type": "Bearer",
+  "id": 1,
+  "username": "admin",
+  "email": "admin@ega-bank.com",
+  "roles": ["ROLE_ADMIN", "ROLE_USER"]
+}
+```
+
+### Inscription d'un utilisateur simple
 
 **POST** `http://localhost:8080/api/auth/register`
 

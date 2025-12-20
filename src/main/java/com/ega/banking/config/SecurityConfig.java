@@ -45,7 +45,6 @@ public class SecurityConfig {
     /**
      * Provider d'authentification qui utilise UserDetailsService
      * Dans Spring Security 7+, le UserDetailsService est passé directement au constructeur
-     * Configure l'authentification avec notre service personnalisé
      */
     @Bean
     public AuthenticationProvider authenticationProvider() {
@@ -83,9 +82,16 @@ public class SecurityConfig {
 
                 // Définit les autorisations
                 .authorizeHttpRequests(auth -> auth
-                        // URLs publiques (accessibles sans authentification)
+                        // URLs publiques - Authentification
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+
+                        // URLs publiques - Swagger/OpenAPI Documentation (TOUT OUVRIR)
+                        .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("/swagger-ui.html").permitAll()
+                        .requestMatchers("/v3/**").permitAll()
+                        .requestMatchers("/swagger-resources/**").permitAll()
+                        .requestMatchers("/webjars/**").permitAll()
+                        .requestMatchers("/configuration/**").permitAll()
 
                         // Toutes les autres URLs nécessitent une authentification
                         .anyRequest().authenticated()
