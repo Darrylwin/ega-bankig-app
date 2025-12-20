@@ -44,11 +44,13 @@ public class SecurityConfig {
 
     /**
      * Provider d'authentification qui utilise UserDetailsService
-     * Dans Spring Security 7+, le UserDetailsService est passé directement au constructeur
+     * Note : Dans Spring Security 6+, on passe directement le UserDetailsService
+     * via le constructeur au lieu de setUserDetailsService()
      */
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
