@@ -117,10 +117,20 @@ cd ega-banking-app
 Connectez-vous à MySQL et exécutez :
 
 ```sql
+-- Créez la base de données
 CREATE DATABASE ega_bank;
+
+-- Créez l'utilisateur
 CREATE USER 'ega_user'@'localhost' IDENTIFIED BY 'ega_password';
+
+-- Donnez tous les droits sur la base de données
 GRANT ALL PRIVILEGES ON ega_bank.* TO 'ega_user'@'localhost';
+
+-- Appliquez les changements
 FLUSH PRIVILEGES;
+
+-- Vérifiez
+SHOW GRANTS FOR 'ega_user'@'localhost';
 ```
 
 ### 3. Installer les dépendances
