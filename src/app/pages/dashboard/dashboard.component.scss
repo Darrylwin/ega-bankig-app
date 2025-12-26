@@ -1,16 +1,151 @@
-@import '../../@theme/styles/themes';
-@import 'bootstrap/scss/mixins/breakpoints';
-@import '@nebular/theme/styles/global/breakpoints';
-
-@include nb-install-component() {
-  .solar-card nb-card-header {
-    border: none;
-    padding-bottom: 0;
+// src/app/pages/dashboard/dashboard.component.scss
+.dashboard-container {
+  padding: 1.5rem;
+  
+  .dashboard-header {
+    h2 {
+      font-weight: 600;
+      color: #333;
+    }
   }
 
-  @include media-breakpoint-down(sm) {
-    ngx-traffic {
-      display: none;
+  // Cartes de statistiques
+  nb-card {
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+    height: 100%;
+    
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    nb-card-header {
+      background: transparent;
+      border-bottom: 1px solid #f0f0f0;
+      padding: 1.25rem 1.5rem;
+      
+      h5 {
+        font-weight: 600;
+        color: #333;
+        margin: 0;
+      }
+      
+      .stat-icon {
+        font-size: 1.5rem;
+        margin-right: 0.75rem;
+        vertical-align: middle;
+      }
+      
+      .badge {
+        font-size: 0.875rem;
+        padding: 0.375rem 0.75rem;
+      }
+    }
+
+    nb-card-body {
+      padding: 1.5rem;
+      
+      .display-4 {
+        font-weight: 700;
+        color: #333;
+        line-height: 1.2;
+      }
+    }
+  }
+
+  // Cartes d'activité
+  .activity-card {
+    border-radius: 8px;
+    background: #f8f9fa;
+    transition: background 0.2s;
+    
+    &:hover {
+      background: #e9ecef;
+    }
+    
+    .activity-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: white;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    h2 {
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 0.25rem;
+    }
+    
+    small {
+      color: #6c757d;
+      font-size: 0.875rem;
+    }
+  }
+
+  // Barres de progression
+  nb-progress-bar {
+    margin-bottom: 1rem;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  // Actions rapides
+  .d-grid {
+    display: grid;
+    gap: 0.75rem;
+    
+    button {
+      padding: 0.75rem;
+      font-weight: 500;
+      border-radius: 8px;
+      
+      nb-icon {
+        font-size: 1.25rem;
+      }
+    }
+  }
+
+  // Graphiques
+  .chart-container {
+    height: 300px;
+    width: 100%;
+  }
+
+  // Animation du spinner
+  .spin {
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 1rem;
+    
+    .activity-card {
+      padding: 1.5rem !important;
+      
+      .activity-icon {
+        width: 60px;
+        height: 60px;
+      }
+    }
+    
+    .display-4 {
+      font-size: 2.5rem;
     }
   }
 }

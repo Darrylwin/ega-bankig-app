@@ -9,9 +9,9 @@ const routes: Routes = [
     children: [
       // DASHBOARD - Page principale
       {
-        path: "dashboard",
-        loadChildren: () =>
-          import("./dashboard/dashboard.module").then((m) => m.DashboardModule),
+        path: 'dashboard',
+        loadChildren: () => import('./dashboard/dashboard.module')
+          .then(m => m.DashboardModule),
       },
 
       // GESTION CLIENTS
@@ -48,10 +48,10 @@ const routes: Routes = [
 
       // AUTHENTIFICATION (gardé pour les pages de profil, etc.)
       {
-        path: "auth",
-        loadChildren: () =>
-          import("./auth/auth.module").then((m) => m.AuthModule),
-      },
+        path: 'auth',
+        loadChildren: () => import('./auth/auth.module')
+          .then(m => m.AuthModule),
+      }
 
       // PAGES DIVERSES (404, aide, etc.)
       {
