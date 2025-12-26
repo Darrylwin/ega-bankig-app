@@ -1,10 +1,13 @@
 package com.ega.banking.repository;
 
 import com.ega.banking.entity.Account;
+import com.ega.banking.entity.AccountType;
 import com.ega.banking.entity.Customer;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,4 +49,15 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
      * @return true si le numéro existe, false sinon
      */
     boolean existsByAccountNumber(String accountNumber);
+
+    /**
+     * Compte le nombre de comptes par type
+     */
+    Long countByAccountType(AccountType accountType);
+
+    /**
+     * Calcule la somme totale des soldes de tous les comptes
+     */
+    @Query("SELECT SUM(a.balance) FROM Account a")
+    BigDecimal sumAllBalances();
 }

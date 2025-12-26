@@ -55,6 +55,15 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     /**
+     * Récupère tous les clients avec pagination
+     */
+    @Transactional(readOnly = true)
+    @Override
+    public org.springframework.data.domain.Page<Customer> getAllCustomers(org.springframework.data.domain.Pageable pageable) {
+        return customerRepository.findAll(pageable);
+    }
+
+    /**
      * Récupère un client par son ID
      * Lance une exception si non trouvé
      */

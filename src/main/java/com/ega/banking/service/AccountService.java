@@ -2,6 +2,8 @@ package com.ega.banking.service;
 
 import com.ega.banking.entity.Account;
 import com.ega.banking.entity.AccountType;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -23,10 +25,17 @@ public interface AccountService {
     Account createAccount(Long customerId, AccountType accountType, String currency);
 
     /**
-     * Récupère tous les comptes
+     * Récupère tous les comptes (sans pagination)
      * @return Liste de tous les comptes
      */
     List<Account> getAllAccounts();
+
+    /**
+     * Récupère tous les comptes avec pagination
+     * @param pageable Paramètres de pagination
+     * @return Page de comptes
+     */
+    Page<Account> getAllAccounts(Pageable pageable);
 
     /**
      * Récupère un compte par son ID

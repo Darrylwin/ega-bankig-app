@@ -43,16 +43,30 @@ public class CustomerController {
 
     /**
      * GET /api/customers
-     * Récupère tous les clients
+     * Récupère tous les clients avec pagination
+     * Query params: page (0-based), size (défaut: 10), sort (ex: lastName,asc)
      * Accessible uniquement aux ADMIN
      */
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<CustomerDTO>> getAllCustomers() {
-        List<Customer> customers = customerService.getAllCustomers();
-        List<CustomerDTO> response = customers.stream()
-                .map(customerMapper::toDTO)
-                .collect(Collectors.toList());
+    public ResponseEntity<org.springframework.data.domain.Page<CustomerDTO>> getAllCustomers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id,asc") String[] sort) {
+
+        // Créer l'objet Pageable
+        org.springframework.data.domain.Sort.Direction direction = sort[1].equalsIgnoreCase("desc")
+                ? org.springframework.data.domain.Sort.Direction.DESC
+                : org.springframework.data.domain.Sort.Direction.ASC;
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(
+                page, size, org.springframework.data.domain.Sort.by(direction, sort[0]));
+
+        // Récupérer la page de clients
+        org.springframework.data.domain.Page<Customer> customersPage = customerService.getAllCustomers(pageable);
+
+        // Convertir en DTOs
+        org.springframework.data.domain.Page<CustomerDTO> response = customersPage.map(customerMapper::toDTO);
+
         return ResponseEntity.ok(response);
     }
 

@@ -1,6 +1,8 @@
 package com.ega.banking.service;
 
 import com.ega.banking.entity.Customer;
+import org.springframework.data.domain.Page;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -25,6 +27,9 @@ public interface CustomerService {
      * @return Liste de tous les clients
      */
     List<Customer> getAllCustomers();
+
+    @Transactional(readOnly = true)
+    Page<Customer> getAllCustomers(org.springframework.data.domain.Pageable pageable);
 
     /**
      * Récupère un client par son ID

@@ -72,4 +72,21 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             "OR t.destinationAccount.id = :accountId " +
             "ORDER BY t.transactionDate DESC")
     List<Transaction> findAllByAccountId(@Param("accountId") Long accountId);
+    /**
+     * Compte le nombre de transactions depuis une certaine date
+     */
+    @Query("SELECT COUNT(t) FROM Transaction t WHERE t.transactionDate >= :startDate")
+    Long countSinceDate(@Param("startDate") LocalDateTime startDate);
+
+    /**
+     * Calcule le total des dépôts depuis une certaine date
+     */
+    @Query("SELECT COALESCE(SUM(t.amount), 0) FROM Transaction t WHERE t.transactionType = 'DEPOSIT' AND t.transactionDate >= :startDate")
+    java.math.BigDecimal sumDepositsSinceDate(@Param("startDate") LocalDateTime startDate);
+
+    /**
+     * Calcule le total des retraits depuis une certaine date
+     */
+    @Query("SELECT COALESCE(SUM(t.amount), 0) FROM Transaction t WHERE t.transactionType IN ('WITHDRAWAL', 'TRANSFER') AND t.transactionDate >= :startDate")
+    java.math.BigDecimal sumWithdrawalsSinceDate(@Param("startDate") LocalDateTime startDate);
 }

@@ -46,16 +46,30 @@ public class AccountController {
 
     /**
      * GET /api/accounts
-     * Récupère tous les comptes
+     * Récupère tous les comptes avec pagination
+     * Query params: page, size, sort
      * Accessible uniquement aux ADMIN
      */
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<AccountDTO>> getAllAccounts() {
-        List<Account> accounts = accountService.getAllAccounts();
-        List<AccountDTO> response = accounts.stream()
-                .map(accountMapper::toDTO)
-                .collect(Collectors.toList());
+    public ResponseEntity<org.springframework.data.domain.Page<AccountDTO>> getAllAccounts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id,asc") String[] sort) {
+
+        // Créer l'objet Pageable
+        org.springframework.data.domain.Sort.Direction direction = sort[1].equalsIgnoreCase("desc")
+                ? org.springframework.data.domain.Sort.Direction.DESC
+                : org.springframework.data.domain.Sort.Direction.ASC;
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(
+                page, size, org.springframework.data.domain.Sort.by(direction, sort[0]));
+
+        // Récupérer la page de comptes
+        org.springframework.data.domain.Page<Account> accountsPage = accountService.getAllAccounts(pageable);
+
+        // Convertir en DTOs
+        org.springframework.data.domain.Page<AccountDTO> response = accountsPage.map(accountMapper::toDTO);
+
         return ResponseEntity.ok(response);
     }
 

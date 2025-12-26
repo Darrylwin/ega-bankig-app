@@ -61,12 +61,23 @@ public class AccountServiceImpl implements AccountService {
     }
 
     /**
+     * Récupère tous les comptes avec pagination
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public org.springframework.data.domain.Page<Account> getAllAccounts(org.springframework.data.domain.Pageable pageable) {
+        return accountRepository.findAll(pageable);
+    }
+
+    /**
      * Récupère un compte par son ID
      */
     @Override
     @Transactional(readOnly = true)
     public Account getAccountById(Long id) {
-        return accountRepository.findById(id).orElseThrow(() -> new com.ega.banking.exception.ResourceNotFoundException("Account", "id", id));
+        return accountRepository.findById(id)
+                .orElseThrow(() -> new com.ega.banking.exception.ResourceNotFoundException(
+                        "Account", "id", id));
     }
 
     /**
@@ -75,7 +86,9 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional(readOnly = true)
     public Account getAccountByAccountNumber(String accountNumber) {
-        return accountRepository.findByAccountNumber(accountNumber).orElseThrow(() -> new com.ega.banking.exception.ResourceNotFoundException("Account", "accountNumber", accountNumber));
+        return accountRepository.findByAccountNumber(accountNumber)
+                .orElseThrow(() -> new com.ega.banking.exception.ResourceNotFoundException(
+                        "Account", "accountNumber", accountNumber));
     }
 
     /**
@@ -112,18 +125,21 @@ public class AccountServiceImpl implements AccountService {
         do {
             // Génère un IBAN français aléatoire
             // Format : FR + 2 chiffres de contrôle + 23 chiffres
-            iban = new Iban.Builder().countryCode(CountryCode.FR)  // Code pays : France
+            iban = new Iban.Builder()
+                    .countryCode(CountryCode.FR)  // Code pays : France
                     .bankCode("12345")  // Code banque (5 chiffres)
                     .branchCode("67890")  // Code guichet (5 chiffres)
                     .accountNumber(String.format("%011d", (long) (Math.random() * 100000000000L)))  // 11 chiffres
                     .nationalCheckDigit(String.format("%02d", (int) (Math.random() * 100)))  // 2 chiffres
-                    .build().toString();
+                    .build()
+                    .toString();
 
             attempts++;
 
             // Sécurité : évite une boucle infinie
             if (attempts >= maxAttempts) {
-                throw new com.ega.banking.exception.InvalidOperationException("Unable to generate unique IBAN after " + maxAttempts + " attempts");
+                throw new com.ega.banking.exception.InvalidOperationException(
+                        "Unable to generate unique IBAN after " + maxAttempts + " attempts");
             }
 
         } while (accountRepository.existsByAccountNumber(iban));  // Vérifie l'unicité

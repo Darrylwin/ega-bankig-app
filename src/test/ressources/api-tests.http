@@ -15,21 +15,11 @@ Content-Type: application/json
   "password": "votre_mot_de_passe"
 }
 
-### 1.2 Inscription nouvel utilisateur
-POST {{baseUrl}}/auth/register
-Content-Type: application/json
-
-{
-  "username": "john_doe",
-  "email": "john@example.com",
-  "password": "password123"
-}
-
-### 1.3 Récupérer son profil (/me)
+### 1.2 Récupérer son profil (/me)
 GET {{baseUrl}}/auth/me
 Authorization: Bearer {{token}}
 
-### 1.4 Changer son mot de passe
+### 1.3 Changer son mot de passe
 PUT {{baseUrl}}/auth/change-password
 Authorization: Bearer {{token}}
 Content-Type: application/json
@@ -71,8 +61,8 @@ Content-Type: application/json
   "nationality": "French"
 }
 
-### 2.2 Récupérer tous les clients
-GET {{baseUrl}}/customers
+### 2.2 Récupérer tous les clients (avec pagination)
+GET {{baseUrl}}/customers?page=0&size=10&sort=lastName,asc
 Authorization: Bearer {{token}}
 
 ### 2.3 Récupérer un client par ID
@@ -114,8 +104,8 @@ Content-Type: application/json
   "currency": "EUR"
 }
 
-### 3.2 Récupérer tous les comptes
-GET {{baseUrl}}/accounts
+### 3.2 Récupérer tous les comptes (avec pagination)
+GET {{baseUrl}}/accounts?page=0&size=10&sort=createdAt,desc
 Authorization: Bearer {{token}}
 
 ### 3.3 Récupérer un compte par ID
@@ -173,7 +163,23 @@ GET {{baseUrl}}/transactions/account/1/period?startDate=2026-01-01T00:00:00&endD
 Authorization: Bearer {{token}}
 
 ### ========================================
-### 5. SWAGGER
+### 5. RELEVÉS BANCAIRES
+### ========================================
+
+### 5.1 Générer un relevé PDF pour un compte
+GET {{baseUrl}}/statements/account/1?startDate=2026-01-01T00:00:00&endDate=2026-12-31T23:59:59
+Authorization: Bearer {{token}}
+
+### ========================================
+### 6. DASHBOARD STATS
+### ========================================
+
+### 6.1 Récupérer les statistiques du dashboard
+GET {{baseUrl}}/dashboard/stats
+Authorization: Bearer {{token}}
+
+### ========================================
+### 7. SWAGGER
 ### ========================================
 
 ### 5.1 API Docs JSON
