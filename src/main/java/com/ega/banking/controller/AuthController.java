@@ -21,16 +21,6 @@ public class AuthController {
     private final AuthService authService;
 
     /**
-     * POST /api/auth/register
-     * Inscrit un nouvel utilisateur (ROLE_USER uniquement)
-     */
-    @PostMapping("/register")
-    public ResponseEntity<AuthResponseDTO> register(@Valid @RequestBody RegisterRequestDTO registerRequest) {
-        AuthResponseDTO response = authService.register(registerRequest);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
-    }
-
-    /**
      * POST /api/auth/login
      * Connecte un utilisateur par EMAIL + PASSWORD
      */

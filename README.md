@@ -250,7 +250,6 @@ Si un administrateur existe déjà, l'application démarre normalement :
 
 | Méthode | Endpoint | Description | Auth requise |
 |---------|----------|-------------|--------------|
-| POST | `/api/auth/register` | Inscription | Non |
 | POST | `/api/auth/login` | Connexion | Non |
 
 ### 👥 Clients (`/api/customers`)
@@ -313,42 +312,7 @@ Si un administrateur existe déjà, l'application démarre normalement :
 }
 ```
 
-### Inscription d'un utilisateur simple
-
-**POST** `http://localhost:8080/api/auth/register`
-
-```json
-{
-  "username": "john_doe",
-  "email": "john@example.com",
-  "password": "password123"
-}
-```
-
-**Réponse** :
-```json
-{
-  "token": "eyJhbGciOiJIUzUxMiJ9...",
-  "type": "Bearer",
-  "id": 1,
-  "username": "john_doe",
-  "email": "john@example.com",
-  "roles": ["ROLE_USER"]
-}
-```
-
-### 2. Connexion
-
-**POST** `http://localhost:8080/api/auth/login`
-
-```json
-{
-  "username": "john_doe",
-  "password": "password123"
-}
-```
-
-### 3. Utiliser le token
+### 2. Utiliser le token
 
 Pour toutes les requêtes protégées, ajoutez le header :
 
@@ -356,7 +320,7 @@ Pour toutes les requêtes protégées, ajoutez le header :
 Authorization: Bearer eyJhbGciOiJIUzUxMiJ9...
 ```
 
-### 4. Créer un client (ADMIN uniquement)
+### 3. Créer un client (ADMIN uniquement)
 
 **POST** `http://localhost:8080/api/customers`
 
@@ -375,7 +339,7 @@ Authorization: Bearer eyJhbGciOiJIUzUxMiJ9...
 }
 ```
 
-### 5. Créer un compte
+### 4. Créer un compte
 
 **POST** `http://localhost:8080/api/accounts`
 
@@ -387,7 +351,7 @@ Authorization: Bearer eyJhbGciOiJIUzUxMiJ9...
 }
 ```
 
-### 6. Faire un dépôt
+### 5. Faire un dépôt
 
 **POST** `http://localhost:8080/api/transactions/deposit`
 
@@ -399,7 +363,7 @@ Authorization: Bearer eyJhbGciOiJIUzUxMiJ9...
 }
 ```
 
-### 7. Faire un retrait
+### 6. Faire un retrait
 
 **POST** `http://localhost:8080/api/transactions/withdraw`
 
@@ -411,7 +375,7 @@ Authorization: Bearer eyJhbGciOiJIUzUxMiJ9...
 }
 ```
 
-### 8. Faire un virement
+### 7. Faire un virement
 
 **POST** `http://localhost:8080/api/transactions/transfer`
 
