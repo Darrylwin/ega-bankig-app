@@ -1,21 +1,13 @@
-// src/app/pages/customers/customers.component.ts
-import { Component, OnInit, ViewChild } from "@angular/core";
-import { Router } from "@angular/router";
-import { NbDialogService, NbToastrService } from "@nebular/theme";
-import { LocalDataSource } from "ng2-smart-table";
-import {
-  Customer,
-  Page,
-  PaginationParams,
-} from "../../@core/data/models/index";
-import { CustomerApiService } from "../../@core/data/api/index";
-import { ConfirmDialogComponent } from "../../../@core/components/confirm-dialog/confirm-dialog.component";
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
+import { NbDialogService, NbToastrService } from '@nebular/theme';
+import { LocalDataSource } from 'ng2-smart-table';
 
 @Component({
-  selector: "ngx-customers",
-  templateUrl: "./customers.component.html",
-  styleUrls: ["./customers.component.scss"],
-})
+  selector: 'ngx-customers',
+  templateUrl: './customers.component.html',
+  styleUrls: ['./customers.component.scss'],
+});
 export class CustomersComponent implements OnInit {
   // Tableau
   settings = {

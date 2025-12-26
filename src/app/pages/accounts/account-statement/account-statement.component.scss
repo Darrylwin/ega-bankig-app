@@ -1,0 +1,97 @@
+.account-statement-container {
+  padding: 1.5rem;
+
+  .account-statement-header {
+    h2 {
+      font-weight: 600;
+      color: #333;
+    }
+  }
+
+  // Périodes rapides
+  .d-flex.flex-wrap {
+    gap: 0.5rem;
+    
+    button {
+      padding: 0.375rem 0.75rem;
+      font-size: 0.875rem;
+      
+      &:hover {
+        transform: translateY(-1px);
+      }
+    }
+  }
+
+  // Aperçu
+  .statement-preview {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 10px;
+    border: 2px dashed #dee2e6;
+    
+    .preview-icon {
+      nb-icon {
+        font-size: 3rem;
+      }
+    }
+    
+    h6 {
+      font-weight: 600;
+      color: #495057;
+    }
+    
+    .preview-details {
+      background: white;
+      border-radius: 6px;
+      padding: 1rem;
+      margin-top: 1rem;
+      border: 1px solid #e9ecef;
+    }
+  }
+
+  // Actions
+  .btn-pulse {
+    position: relative;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      top: -4px;
+      left: -4px;
+      right: -4px;
+      bottom: -4px;
+      border-radius: 8px;
+      background: rgba(54, 102, 255, 0.2);
+      animation: pulse 1.5s infinite;
+    }
+  }
+}
+
+// Animation du spinner
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .account-statement-container {
+    padding: 1rem;
+    
+    .d-flex.flex-wrap {
+      button {
+        flex: 1;
+        min-width: calc(50% - 0.5rem);
+      }
+    }
+  }
+}

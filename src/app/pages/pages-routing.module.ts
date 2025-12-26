@@ -37,21 +37,12 @@ const routes: Routes = [
           ),
       },
 
-      // RELEVÉS
-      {
-        path: "statements",
-        loadChildren: () =>
-          import("./statements/statements.module").then(
-            (m) => m.StatementsModule
-          ),
-      },
-
       // AUTHENTIFICATION (gardé pour les pages de profil, etc.)
       {
         path: 'auth',
         loadChildren: () => import('./auth/auth.module')
           .then(m => m.AuthModule),
-      }
+      },
 
       // PAGES DIVERSES (404, aide, etc.)
       {

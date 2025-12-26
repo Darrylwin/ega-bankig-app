@@ -1,0 +1,138 @@
+.account-form-container {
+  padding: 1.5rem;
+
+  .account-form-header {
+    h2 {
+      font-weight: 600;
+      color: #333;
+    }
+  }
+
+  // Types de compte
+  .account-type-card {
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+    
+    nb-icon {
+      color: #6c757d;
+      transition: color 0.3s;
+    }
+    
+    h5 {
+      color: #495057;
+      transition: color 0.3s;
+    }
+    
+    &:hover {
+      background: #e9ecef;
+      border-color: #ced4da;
+      
+      nb-icon, h5 {
+        color: #212529;
+      }
+    }
+    
+    &.selected {
+      background: #e7f1ff;
+      border-color: #0066cc;
+      
+      nb-icon {
+        color: #0066cc;
+      }
+      
+      h5 {
+        color: #0066cc;
+        font-weight: 600;
+      }
+    }
+  }
+
+  // Section titles
+  .section-title {
+    font-weight: 600;
+    color: #495057;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+
+    nb-icon {
+      vertical-align: middle;
+    }
+  }
+
+  // Form labels
+  .form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #495057;
+
+    &.required::after {
+      content: ' *';
+      color: #dc3545;
+    }
+  }
+
+  // Validation
+  .text-danger {
+    font-size: 0.875rem;
+  }
+
+  // Actions
+  .btn-pulse {
+    position: relative;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      top: -4px;
+      left: -4px;
+      right: -4px;
+      bottom: -4px;
+      border-radius: 8px;
+      background: rgba(54, 102, 255, 0.2);
+      animation: pulse 1.5s infinite;
+    }
+  }
+
+  nb-alert {
+    ul {
+      margin-bottom: 0;
+      padding-left: 1.25rem;
+      
+      li {
+        margin-bottom: 0.25rem;
+      }
+    }
+  }
+}
+
+// Animation du spinner
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+// Responsive
+@media (max-width: 992px) {
+  .account-form-container {
+    padding: 1rem;
+    
+    .account-type-card {
+      padding: 1.5rem !important;
+      margin-bottom: 1rem;
+    }
+  }
+}

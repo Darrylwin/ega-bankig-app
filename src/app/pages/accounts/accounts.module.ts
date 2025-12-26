@@ -1,4 +1,3 @@
-// src/app/pages/customers/customers.module.ts
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -13,37 +12,42 @@ import {
   NbDatepickerModule,
   NbSpinnerModule,
   NbAlertModule,
-  NbDialogModule,      // ← IMPORTANT pour les dialogs
+  NbDialogModule,
   NbTooltipModule,
   NbBadgeModule,
   NbTabsetModule,
   NbListModule,
-  NbActionsModule
+  NbActionsModule,
+  NbProgressBarModule,
+  NbRadioModule,
+  NbCheckboxModule
 } from '@nebular/theme';
 
 // Tableau intelligent
 import { Ng2SmartTableModule } from 'ng2-smart-table';
 
-import { CustomersRoutingModule } from './customers-routing.module';
-import { CustomersComponent } from './customers.component';
-import { CustomerFormComponent } from './customer-form/customer-form.component';
-import { CustomerDetailComponent } from './customer-detail/customer-detail.component';
+import { AccountsRoutingModule } from './accounts-routing.module';
+import { AccountsComponent } from './accounts.component';
+import { AccountFormComponent } from './account-form/account-form.component';
+import { AccountDetailComponent } from './account-detail/account-detail.component';
+import { AccountStatementComponent } from './account-statement/account-statement.component';
 
-// Importe le composant de dialog
+// Pour les confirmations
 import { ConfirmDialogComponent } from '../../@core/components/confirm-dialog.component';
 
 @NgModule({
   declarations: [
-    CustomersComponent,
-    CustomerFormComponent,
-    CustomerDetailComponent,
-    ConfirmDialogComponent,
+    AccountsComponent,
+    AccountFormComponent,
+    AccountDetailComponent,
+    AccountStatementComponent,
+    ConfirmDialogComponent
   ],
   imports: [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    CustomersRoutingModule,
+    AccountsRoutingModule,
     
     // Modules Nebular UI
     NbCardModule,
@@ -54,16 +58,19 @@ import { ConfirmDialogComponent } from '../../@core/components/confirm-dialog.co
     NbDatepickerModule,
     NbSpinnerModule,
     NbAlertModule,
-    NbDialogModule.forChild(), // ← CONFIGURE le module dialog
+    NbDialogModule.forChild(),
     NbTooltipModule,
     NbBadgeModule,
     NbTabsetModule,
     NbListModule,
     NbActionsModule,
+    NbProgressBarModule,
+    NbRadioModule,
+    NbCheckboxModule,
     
     // Tableau intelligent
     Ng2SmartTableModule
   ],
-  entryComponents: [ConfirmDialogComponent] // ← IMPORTANT pour les dialogs
+  entryComponents: [ConfirmDialogComponent]
 })
-export class CustomersModule { }
+export class AccountsModule { }

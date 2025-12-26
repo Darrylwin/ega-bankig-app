@@ -1,0 +1,254 @@
+<div class="account-statement-container">
+  <!-- En-tête -->
+  <div class="account-statement-header mb-4">
+    <div class="row align-items-center">
+      <div class="col-md-8">
+        <h2>Génération de Relevé Bancaire</h2>
+        <p class="text-muted mb-0">Générez et téléchargez un relevé de compte</p>
+      </div>
+      <div class="col-md-4 text-end">
+        <button nbButton ghost size="small" [routerLink]="['/pages/accounts/detail', accountId]" class="mb-3">
+          <nb-icon icon="arrow-back-outline" class="me-2"></nb-icon>
+          Retour au compte
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-8">
+      <nb-card>
+        <nb-card-header>
+          <h4 class="mb-0">
+            <nb-icon icon="file-text-outline" class="me-2"></nb-icon>
+            Paramètres du Relevé
+          </h4>
+        </nb-card-header>
+        <nb-card-body>
+          <form (ngSubmit)="generateStatement()" #statementForm="ngForm">
+            <!-- Période -->
+            <div class="row mb-4">
+              <div class="col-12">
+                <h5 class="mb-3">Période</h5>
+              </div>
+              
+              <div class="col-md-6 mb-3">
+                <label for="startDate" class="form-label required">Date de début</label>
+                <input
+                  type="date"
+                  id="startDate"
+                  name="startDate"
+                  [(ngModel)]="startDate"
+                  nbInput
+                  fullWidth
+                  required>
+                <small class="text-muted">Date de début de la période</small>
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label for="endDate" class="form-label required">Date de fin</label>
+                <input
+                  type="date"
+                  id="endDate"
+                  name="endDate"
+                  [(ngModel)]="endDate"
+                  nbInput
+                  fullWidth
+                  required>
+                <small class="text-muted">Date de fin de la période</small>
+              </div>
+
+              <!-- Périodes prédéfinies -->
+              <div class="col-12 mb-4">
+                <label class="form-label mb-2">Périodes rapides</label>
+                <div class="d-flex flex-wrap gap-2">
+                  <button
+                    nbButton
+                    size="small"
+                    ghost
+                    type="button"
+                    (click)="setLastMonth()">
+                    Dernier mois
+                  </button>
+                  <button
+                    nbButton
+                    size="small"
+                    ghost
+                    type="button"
+                    (click)="setCurrentMonth()">
+                    Ce mois
+                  </button>
+                  <button
+                    nbButton
+                    size="small"
+                    ghost
+                    type="button"
+                    (click)="setLast30Days()">
+                    30 derniers jours
+                  </button>
+                  <button
+                    nbButton
+                    size="small"
+                    ghost
+                    type="button"
+                    (click)="setLast90Days()">
+                    90 derniers jours
+                  </button>
+                  <button
+                    nbButton
+                    size="small"
+                    ghost
+                    type="button"
+                    (click)="setLastYear()">
+                    Dernière année
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Options -->
+            <div class="row mb-4">
+              <div class="col-12">
+                <h5 class="mb-3">Options</h5>
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Format</label>
+                <nb-select fullWidth [(ngModel)]="format" name="format">
+                  <nb-option value="pdf">PDF (Recommandé)</nb-option>
+                  <nb-option value="csv">CSV (Excel)</nb-option>
+                  <nb-option value="html">HTML</nb-option>
+                </nb-select>
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Inclure</label>
+                <div class="d-flex flex-column gap-2">
+                  <nb-checkbox [(ngModel)]="includeLogo" name="includeLogo">
+                    Logo de la banque
+                  </nb-checkbox>
+                  <nb-checkbox [(ngModel)]="includeAllTransactions" name="includeAllTransactions" checked>
+                    Toutes les transactions
+                  </nb-checkbox>
+                  <nb-checkbox [(ngModel)]="includeSummary" name="includeSummary" checked>
+                    Résumé détaillé
+                  </nb-checkbox>
+                </div>
+              </div>
+            </div>
+
+            <!-- Boutons -->
+            <div class="row">
+              <div class="col-12">
+                <div class="d-flex justify-content-end gap-2">
+                  <button
+                    nbButton
+                    status="basic"
+                    type="button"
+                    [routerLink]="['/pages/accounts/detail', accountId]"
+                    [disabled]="isGenerating">
+                    Annuler
+                  </button>
+                  
+                  <button
+                    nbButton
+                    status="primary"
+                    type="submit"
+                    [disabled]="isGenerating || !startDate || !endDate"
+                    [class.btn-pulse]="isGenerating">
+                    
+                    <span *ngIf="!isGenerating">
+                      <nb-icon icon="download-outline" class="me-2"></nb-icon>
+                      Générer le relevé
+                    </span>
+                    
+                    <span *ngIf="isGenerating">
+                      <nb-icon icon="sync-outline" class="spin me-2"></nb-icon>
+                      Génération en cours...
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </nb-card-body>
+      </nb-card>
+    </div>
+
+    <!-- Informations -->
+    <div class="col-lg-4">
+      <nb-card class="mb-4">
+        <nb-card-header>
+          <h5 class="mb-0">
+            <nb-icon icon="info-circle-outline" class="me-2"></nb-icon>
+            Informations
+          </h5>
+        </nb-card-header>
+        <nb-card-body>
+          <div class="mb-3">
+            <h6>Format PDF</h6>
+            <ul class="text-muted small">
+              <li>Format standard pour les relevés</li>
+              <li>Peut être imprimé ou sauvegardé</li>
+              <li>Signature numérique incluse</li>
+              <li>Conforme aux normes bancaires</li>
+            </ul>
+          </div>
+          
+          <div class="mb-3">
+            <h6>Format CSV</h6>
+            <ul class="text-muted small">
+              <li>Idéal pour l'analyse dans Excel</li>
+              <li>Inclut toutes les colonnes de données</li>
+              <li>Peut être importé dans d'autres logiciels</li>
+            </ul>
+          </div>
+          
+          <div>
+            <h6>Format HTML</h6>
+            <ul class="text-muted small">
+              <li>Affichage direct dans le navigateur</li>
+              <li>Facile à consulter en ligne</li>
+              <li>Peut être sauvegardé au format web</li>
+            </ul>
+          </div>
+        </nb-card-body>
+      </nb-card>
+
+      <!-- Aperçu -->
+      <nb-card>
+        <nb-card-header>
+          <h5 class="mb-0">
+            <nb-icon icon="eye-outline" class="me-2"></nb-icon>
+            Aperçu
+          </h5>
+        </nb-card-header>
+        <nb-card-body>
+          <div class="statement-preview text-center p-4">
+            <div class="preview-icon mb-3">
+              <nb-icon icon="file-text-outline" size="giant" class="text-primary"></nb-icon>
+            </div>
+            <h6>Relevé Bancaire</h6>
+            <p class="text-muted small mb-2">
+              Période du {{ formatDateDisplay(startDate) }} au {{ formatDateDisplay(endDate) }}
+            </p>
+            <div class="preview-details">
+              <div class="d-flex justify-content-between small mb-1">
+                <span>Compte :</span>
+                <span class="fw-bold">#{{ accountId }}</span>
+              </div>
+              <div class="d-flex justify-content-between small mb-1">
+                <span>Format :</span>
+                <span class="fw-bold">{{ format.toUpperCase() }}</span>
+              </div>
+              <div class="d-flex justify-content-between small">
+                <span>Transactions :</span>
+                <span class="fw-bold">Toutes incluses</span>
+              </div>
+            </div>
+          </div>
+        </nb-card-body>
+      </nb-card>
+    </div>
+  </div>
+</div>
