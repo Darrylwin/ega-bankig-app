@@ -1,0 +1,242 @@
+<div class="history-container">
+  <!-- En-tête -->
+  <div class="history-header mb-4">
+    <div class="row align-items-center">
+      <div class="col-md-8">
+        <h2>Historique des Transactions</h2>
+        <p class="text-muted mb-0">Consultez l'historique complet des opérations</p>
+      </div>
+      <div class="col-md-4 text-end">
+        <button nbButton ghost size="small" [routerLink]="['/pages/transactions']" class="mb-3">
+          <nb-icon icon="arrow-back-outline" class="me-2"></nb-icon>
+          Retour aux opérations
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtres -->
+  <nb-card class="mb-4">
+    <nb-card-body>
+      <div class="row">
+        <!-- Compte -->
+        <div class="col-md-3 mb-3">
+          <label class="form-label">Compte</label>
+          <nb-select
+            fullWidth
+            [(ngModel)]="selectedAccountId"
+            (ngModelChange)="loadTransactions()">
+            <nb-option value="ALL">Tous les comptes</nb-option>
+            <nb-option *ngFor="let account of accounts" [value]="account.id">
+              {{ formatAccountNumber(account.accountNumber) }} - {{ account.customerFullName }}
+            </nb-option>
+          </nb-select>
+        </div>
+
+        <!-- Type -->
+        <div class="col-md-2 mb-3">
+          <label class="form-label">Type</label>
+          <nb-select
+            fullWidth
+            [(ngModel)]="selectedType"
+            (ngModelChange)="applyFilters()">
+            <nb-option *ngFor="let type of filterOptions.accountTypes" [value]="type.value">
+              {{ type.label }}
+            </nb-option>
+          </nb-select>
+        </div>
+
+        <!-- Date début -->
+        <div class="col-md-2 mb-3">
+          <label class="form-label">Date début</label>
+          <input
+            type="date"
+            nbInput
+            fullWidth
+            [(ngModel)]="startDate"
+            (change)="loadTransactions()">
+        </div>
+
+        <!-- Date fin -->
+        <div class="col-md-2 mb-3">
+          <label class="form-label">Date fin</label>
+          <input
+            type="date"
+            nbInput
+            fullWidth
+            [(ngModel)]="endDate"
+            (change)="loadTransactions()">
+        </div>
+
+        <!-- Recherche -->
+        <div class="col-md-3 mb-3">
+          <label class="form-label">Recherche</label>
+          <div class="input-group">
+            <input
+              type="text"
+              nbInput
+              fullWidth
+              placeholder="Référence, description..."
+              [(ngModel)]="searchTerm"
+              (keyup.enter)="applyFilters()">
+            <button nbButton ghost (click)="applyFilters()">
+              <nb-icon icon="search-outline"></nb-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Périodes rapides -->
+      <div class="row">
+        <div class="col-12">
+          <label class="form-label small mb-2">Périodes rapides</label>
+          <div class="d-flex flex-wrap gap-2">
+            <button
+              nbButton
+              size="small"
+              ghost
+              type="button"
+              (click)="setLast30Days()">
+              30 derniers jours
+            </button>
+            <button
+              nbButton
+              size="small"
+              ghost
+              type="button"
+              (click)="setCurrentMonth()">
+              Ce mois
+            </button>
+            <button
+              nbButton
+              size="small"
+              ghost
+              type="button"
+              (click)="setLastMonth()">
+              Dernier mois
+            </button>
+            <button
+              nbButton
+              size="small"
+              ghost
+              type="button"
+              (click)="resetFilters()">
+              <nb-icon icon="refresh-outline" class="me-1"></nb-icon>
+              Réinitialiser
+            </button>
+          </div>
+        </div>
+      </div>
+    </nb-card-body>
+  </nb-card>
+
+  <!-- Statistiques -->
+  <div class="row mb-4" *ngIf="transactions.length > 0">
+    <div class="col-12">
+      <nb-card>
+        <nb-card-body>
+          <div class="row text-center">
+            <div class="col-md-3 mb-3 mb-md-0">
+              <div class="stat-item">
+                <h3 class="mb-1">{{ transactions.length }}</h3>
+                <p class="text-muted mb-0">Transactions totales</p>
+              </div>
+            </div>
+            <div class="col-md-3 mb-3 mb-md-0">
+              <div class="stat-item">
+                <h3 class="mb-1 text-success">
+                  {{ transactions.filter(t => t.transactionType === 'DEPOSIT').length }}
+                </h3>
+                <p class="text-muted mb-0">Dépôts</p>
+              </div>
+            </div>
+            <div class="col-md-3 mb-3 mb-md-0">
+              <div class="stat-item">
+                <h3 class="mb-1 text-danger">
+                  {{ transactions.filter(t => t.transactionType === 'WITHDRAWAL').length }}
+                </h3>
+                <p class="text-muted mb-0">Retraits</p>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="stat-item">
+                <h3 class="mb-1 text-primary">
+                  {{ transactions.filter(t => t.transactionType === 'TRANSFER').length }}
+                </h3>
+                <p class="text-muted mb-0">Virements</p>
+              </div>
+            </div>
+          </div>
+        </nb-card-body>
+      </nb-card>
+    </div>
+  </div>
+
+  <!-- Chargement -->
+  <div *ngIf="isLoading" class="text-center py-5">
+    <nb-spinner size="giant" status="primary"></nb-spinner>
+    <p class="mt-3">Chargement de l'historique...</p>
+  </div>
+
+  <!-- Historique -->
+  <div *ngIf="!isLoading">
+    <nb-card>
+      <nb-card-header class="d-flex justify-content-between align-items-center">
+        <div>
+          <h5 class="mb-0">Transactions</h5>
+          <small class="text-muted">
+            {{ transactions.length }} transaction{{ transactions.length > 1 ? 's' : '' }} trouvée{{ transactions.length > 1 ? 's' : '' }}
+          </small>
+        </div>
+        <div>
+          <button nbButton status="info" size="small" (click)="exportToCSV()">
+            <nb-icon icon="download-outline" class="me-2"></nb-icon>
+            Exporter CSV
+          </button>
+        </div>
+      </nb-card-header>
+      
+      <nb-card-body>
+        <div class="table-responsive">
+          <ng2-smart-table
+            [settings]="settings"
+            [source]="source">
+          </ng2-smart-table>
+        </div>
+      </nb-card-body>
+
+      <!-- Informations -->
+      <nb-card-footer>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="legend">
+              <small class="text-muted">Légende :</small>
+              <span class="badge badge-success ms-2">Dépôt</span>
+              <span class="badge badge-danger ms-2">Retrait</span>
+              <span class="badge badge-primary ms-2">Virement</span>
+              <span class="badge badge-success ms-2">Succès</span>
+              <span class="badge badge-warning ms-2">En attente</span>
+              <span class="badge badge-danger ms-2">Échoué</span>
+            </div>
+          </div>
+          <div class="col-md-6 text-end">
+            <small class="text-muted">
+              Dernière mise à jour : {{ today | date:'dd/MM/yyyy HH:mm' }}
+            </small>
+          </div>
+        </div>
+      </nb-card-footer>
+    </nb-card>
+  </div>
+
+  <!-- Aucune donnée -->
+  <div *ngIf="!isLoading && transactions.length === 0" class="text-center py-5">
+    <nb-icon icon="archive-outline" size="giant" class="text-muted mb-3"></nb-icon>
+    <h4>Aucune transaction trouvée</h4>
+    <p class="text-muted mb-4">Aucune transaction ne correspond à vos critères de recherche</p>
+    <button nbButton status="primary" size="large" (click)="resetFilters()">
+      <nb-icon icon="refresh-outline" class="me-2"></nb-icon>
+      Réinitialiser les filtres
+    </button>
+  </div>
+</div>

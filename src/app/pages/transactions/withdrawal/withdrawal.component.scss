@@ -1,0 +1,183 @@
+.withdrawal-container {
+  padding: 1.5rem;
+
+  .withdrawal-header {
+    h2 {
+      font-weight: 600;
+      color: #333;
+    }
+  }
+
+  // Sections
+  .section-title {
+    font-weight: 600;
+    color: #495057;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+
+    nb-icon {
+      vertical-align: middle;
+    }
+  }
+
+  // Vérification sécurité
+  .verification-card {
+    background: #f8f9fa;
+    border-color: #dee2e6 !important;
+    
+    h6 {
+      color: #495057;
+      font-weight: 600;
+      
+      nb-icon {
+        vertical-align: middle;
+      }
+    }
+    
+    nb-checkbox {
+      ::ng-deep .label {
+        font-weight: 500;
+      }
+    }
+  }
+
+  // Barre de progression
+  nb-progress-bar {
+    margin-top: 0.5rem;
+    
+    ::ng-deep .progress-container {
+      height: 8px;
+      border-radius: 4px;
+    }
+    
+    ::ng-deep .progress-value {
+      border-radius: 4px;
+    }
+  }
+
+  // Récapitulatif selon le pourcentage
+  nb-card[status="success"] {
+    border-color: #28a745;
+    
+    nb-card-header {
+      background-color: rgba(40, 167, 69, 0.1);
+      border-bottom-color: rgba(40, 167, 69, 0.2);
+      color: #155724;
+    }
+  }
+  
+  nb-card[status="warning"] {
+    border-color: #ffc107;
+    
+    nb-card-header {
+      background-color: rgba(255, 193, 7, 0.1);
+      border-bottom-color: rgba(255, 193, 7, 0.2);
+      color: #856404;
+    }
+  }
+  
+  nb-card[status="danger"] {
+    border-color: #dc3545;
+    
+    nb-card-header {
+      background-color: rgba(220, 53, 69, 0.1);
+      border-bottom-color: rgba(220, 53, 69, 0.2);
+      color: #721c24;
+    }
+  }
+
+  // Badges
+  .badge {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: 6px;
+    
+    &[status="success"] {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    
+    &[status="primary"] {
+      background-color: #cce5ff;
+      color: #004085;
+    }
+    
+    &[status="danger"] {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+  }
+
+  // Alertes
+  .alert {
+    border-radius: 8px;
+    padding: 1rem;
+    
+    &.alert-warning {
+      background-color: #fff3cd;
+      border-color: #ffeaa7;
+      color: #856404;
+    }
+    
+    &.alert-info {
+      background-color: #d1ecf1;
+      border-color: #bee5eb;
+      color: #0c5460;
+    }
+    
+    nb-icon {
+      vertical-align: middle;
+    }
+    
+    p.small {
+      font-size: 0.875rem;
+      line-height: 1.4;
+    }
+  }
+
+  // Actions
+  .btn-pulse {
+    position: relative;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      top: -4px;
+      left: -4px;
+      right: -4px;
+      bottom: -4px;
+      border-radius: 8px;
+      background: rgba(220, 53, 69, 0.2);
+      animation: pulse 1.5s infinite;
+    }
+  }
+}
+
+// Animation du spinner
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+// Responsive
+@media (max-width: 992px) {
+  .withdrawal-container {
+    padding: 1rem;
+    
+    .verification-card {
+      padding: 1.5rem !important;
+    }
+  }
+}

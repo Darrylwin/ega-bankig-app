@@ -1,0 +1,379 @@
+<div class="withdrawal-container">
+  <!-- En-tête -->
+  <div class="withdrawal-header mb-4">
+    <div class="row align-items-center">
+      <div class="col-md-8">
+        <h2>Retrait Bancaire</h2>
+        <p class="text-muted mb-0">Retirer des fonds d'un compte</p>
+      </div>
+      <div class="col-md-4 text-end">
+        <button nbButton ghost size="small" (click)="onCancel()">
+          <nb-icon icon="arrow-back-outline" class="me-2"></nb-icon>
+          Retour aux opérations
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chargement -->
+  <div *ngIf="isLoading" class="text-center py-5">
+    <nb-spinner size="giant" status="primary"></nb-spinner>
+    <p class="mt-3">Chargement des comptes...</p>
+  </div>
+
+  <!-- Formulaire -->
+  <div *ngIf="!isLoading">
+    <div class="row">
+      <div class="col-lg-8">
+        <nb-card>
+          <nb-card-body>
+            <form [formGroup]="withdrawalForm" (ngSubmit)="onSubmit()" novalidate>
+              <!-- Étape 1 : Sélection du compte -->
+              <div class="row mb-4">
+                <div class="col-12">
+                  <h4 class="section-title mb-3">
+                    <nb-icon icon="credit-card-outline" class="me-2"></nb-icon>
+                    1. Sélection du Compte
+                  </h4>
+                </div>
+
+                <div class="col-12 mb-4">
+                  <label for="accountId" class="form-label required">Compte à débiter</label>
+                  <nb-select
+                    id="accountId"
+                    fullWidth
+                    formControlName="accountId"
+                    placeholder="Sélectionnez un compte..."
+                    [status]="f.accountId.invalid && f.accountId.touched ? 'danger' : 'basic'"
+                    (selectedChange)="onAccountSelect()">
+                    
+                    <nb-option *ngFor="let account of accounts" [value]="account.id">
+                      {{ formatAccountNumber(account.accountNumber) }} - {{ account.customerFullName }}
+                      ({{ formatCurrency(account.balance) }})
+                    </nb-option>
+                  </nb-select>
+                  
+                  <div *ngIf="f.accountId.invalid && f.accountId.touched" class="text-danger mt-1 small">
+                    <span *ngIf="f.accountId.errors?.['required']">
+                      La sélection d'un compte est obligatoire
+                    </span>
+                  </div>
+                  
+                  <!-- Info compte sélectionné -->
+                  <div *ngIf="selectedAccount" class="mt-3">
+                    <nb-alert status="info" size="small">
+                      <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                          <strong>Compte sélectionné :</strong>
+                          {{ formatAccountNumber(selectedAccount.accountNumber) }}
+                          <br>
+                          <small class="text-muted">
+                            Solde disponible : {{ formatCurrency(selectedAccount.balance) }} | 
+                            Maximum retirable : {{ formatCurrency(maxWithdrawalAmount) }}
+                          </small>
+                        </div>
+                        <div>
+                          <nb-badge [text]="selectedAccount.accountType === 'SAVINGS' ? 'Épargne' : 'Courant'"
+                                   [status]="selectedAccount.accountType === 'SAVINGS' ? 'success' : 'primary'">
+                          </nb-badge>
+                          <nb-badge [text]="selectedAccount.status === 'ACTIVE' ? 'Actif' : 'Bloqué'"
+                                   [status]="selectedAccount.status === 'ACTIVE' ? 'success' : 'danger'"
+                                   class="ms-2">
+                          </nb-badge>
+                        </div>
+                      </div>
+                    </nb-alert>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Étape 2 : Montant et vérification -->
+              <div class="row mb-4">
+                <div class="col-12">
+                  <h4 class="section-title mb-3">
+                    <nb-icon icon="cash-outline" class="me-2"></nb-icon>
+                    2. Montant et Vérification
+                  </h4>
+                </div>
+
+                <!-- Montant -->
+                <div class="col-md-6 mb-4">
+                  <label for="amount" class="form-label required">Montant du retrait (€)</label>
+                  <input
+                    type="number"
+                    id="amount"
+                    nbInput
+                    fullWidth
+                    formControlName="amount"
+                    placeholder="0.00"
+                    step="0.01"
+                    min="0.01"
+                    [attr.max]="maxWithdrawalAmount"
+                    [status]="f.amount.invalid && f.amount.touched ? 'danger' : 'basic'">
+                  
+                  <div *ngIf="f.amount.invalid && f.amount.touched" class="text-danger mt-1 small">
+                    <span *ngIf="f.amount.errors?.['required']">
+                      Le montant est obligatoire
+                    </span>
+                    <span *ngIf="f.amount.errors?.['min']">
+                      Le montant minimum est 0.01 €
+                    </span>
+                    <span *ngIf="f.amount.errors?.['max']">
+                      Maximum : {{ formatCurrency(maxWithdrawalAmount) }}
+                    </span>
+                  </div>
+                  
+                  <!-- Barre de progression -->
+                  <div *ngIf="f.amount.value && maxWithdrawalAmount > 0" class="mt-3">
+                    <div class="d-flex justify-content-between mb-1">
+                      <small class="text-muted">Pourcentage du maximum</small>
+                      <small class="fw-bold">{{ calculateWithdrawalPercentage() | number:'1.0-0' }}%</small>
+                    </div>
+                    <nb-progress-bar [value]="calculateWithdrawalPercentage()"
+                                     [status]="calculateWithdrawalPercentage() > 90 ? 'danger' : calculateWithdrawalPercentage() > 70 ? 'warning' : 'success'">
+                    </nb-progress-bar>
+                  </div>
+                </div>
+
+                <!-- Motif du retrait -->
+                <div class="col-md-6 mb-4">
+                  <label for="reason" class="form-label required">Motif du retrait</label>
+                  <nb-select
+                    id="reason"
+                    fullWidth
+                    formControlName="reason"
+                    [status]="f.reason.invalid && f.reason.touched ? 'danger' : 'basic'">
+                    
+                    <nb-option *ngFor="let reason of withdrawalReasons" [value]="reason.value">
+                      {{ reason.label }}
+                    </nb-option>
+                  </nb-select>
+                  
+                  <div *ngIf="f.reason.invalid && f.reason.touched" class="text-danger mt-1 small">
+                    <span *ngIf="f.reason.errors?.['required']">
+                      Le motif est obligatoire
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Vérification identité -->
+                <div class="col-12 mb-4">
+                  <div class="verification-card p-4 border rounded">
+                    <h6 class="mb-3">
+                      <nb-icon icon="shield-outline" class="me-2 text-primary"></nb-icon>
+                      Vérification de Sécurité
+                    </h6>
+                    
+                    <div class="mb-3">
+                      <nb-checkbox formControlName="idVerified">
+                        <strong>Pièce d'identité vérifiée</strong>
+                      </nb-checkbox>
+                      <small class="text-muted d-block mt-1">
+                        La pièce d'identité originale du titulaire du compte a été présentée et vérifiée.
+                      </small>
+                    </div>
+                    
+                    <div *ngIf="f.idVerified.invalid && f.idVerified.touched" class="text-danger small">
+                      <span *ngIf="f.idVerified.errors?.['required']">
+                        La vérification d'identité est obligatoire pour tout retrait
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Description -->
+                <div class="col-12 mb-4">
+                  <label for="description" class="form-label">Description</label>
+                  <textarea
+                    id="description"
+                    nbInput
+                    fullWidth
+                    rows="2"
+                    formControlName="description"
+                    placeholder="Informations complémentaires..."
+                    maxlength="200"></textarea>
+                  <small class="text-muted">Optionnel - pour votre référence</small>
+                </div>
+              </div>
+
+              <!-- Récapitulatif -->
+              <div class="row mb-4" *ngIf="selectedAccount && f.amount.value && f.amount.valid">
+                <div class="col-12">
+                  <nb-card [status]="calculateWithdrawalPercentage() > 90 ? 'danger' : calculateWithdrawalPercentage() > 70 ? 'warning' : 'success'">
+                    <nb-card-header>
+                      <h5 class="mb-0">
+                        <nb-icon icon="alert-circle-outline" class="me-2"></nb-icon>
+                        Récapitulatif du Retrait
+                      </h5>
+                    </nb-card-header>
+                    <nb-card-body>
+                      <div class="row">
+                        <div class="col-md-6">
+                          <div class="mb-2">
+                            <small class="text-muted">Compte débité</small>
+                            <div class="fw-bold">{{ formatAccountNumber(selectedAccount.accountNumber) }}</div>
+                          </div>
+                          <div class="mb-2">
+                            <small class="text-muted">Client</small>
+                            <div class="fw-bold">{{ selectedAccount.customerFullName }}</div>
+                          </div>
+                          <div class="mb-2">
+                            <small class="text-muted">Type de compte</small>
+                            <div class="fw-bold">
+                              <nb-badge [text]="selectedAccount.accountType === 'SAVINGS' ? 'Épargne' : 'Courant'"
+                                       [status]="selectedAccount.accountType === 'SAVINGS' ? 'success' : 'primary'">
+                              </nb-badge>
+                            </div>
+                          </div>
+                          <div class="mb-2">
+                            <small class="text-muted">Motif</small>
+                            <div class="fw-bold">
+                              {{ withdrawalReasons.find(r => r.value === f.reason.value)?.label }}
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <div class="mb-2">
+                            <small class="text-muted">Montant du retrait</small>
+                            <div class="fw-bold h4 text-danger">{{ formatCurrency(f.amount.value) }}</div>
+                          </div>
+                          <div class="mb-2">
+                            <small class="text-muted">Nouveau solde</small>
+                            <div class="fw-bold h5">
+                              {{ formatCurrency(selectedAccount.balance - f.amount.value) }}
+                            </div>
+                          </div>
+                          <div class="mb-2">
+                            <small class="text-muted">Limite utilisée</small>
+                            <div class="fw-bold">
+                              {{ calculateWithdrawalPercentage() | number:'1.0-0' }}%
+                              <nb-progress-bar [value]="calculateWithdrawalPercentage()" size="tiny"
+                                               [status]="calculateWithdrawalPercentage() > 90 ? 'danger' : calculateWithdrawalPercentage() > 70 ? 'warning' : 'success'"
+                                               class="mt-1">
+                              </nb-progress-bar>
+                            </div>
+                          </div>
+                          <div class="mb-2">
+                            <small class="text-muted">Vérification ID</small>
+                            <div class="fw-bold" [class.text-success]="f.idVerified.value" [class.text-danger]="!f.idVerified.value">
+                              <nb-icon [icon]="f.idVerified.value ? 'checkmark-circle-outline' : 'close-circle-outline'" class="me-1"></nb-icon>
+                              {{ f.idVerified.value ? 'Validée' : 'En attente' }}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </nb-card-body>
+                  </nb-card>
+                </div>
+              </div>
+
+              <!-- Actions -->
+              <div class="row">
+                <div class="col-12">
+                  <div class="d-flex justify-content-end gap-2">
+                    <button
+                      nbButton
+                      status="basic"
+                      type="button"
+                      (click)="onCancel()"
+                      [disabled]="isSubmitting">
+                      Annuler
+                    </button>
+                    
+                    <button
+                      nbButton
+                      status="danger"
+                      type="submit"
+                      [disabled]="withdrawalForm.invalid || isSubmitting || !f.idVerified.value"
+                      [class.btn-pulse]="isSubmitting">
+                      
+                      <span *ngIf="!isSubmitting">
+                        <nb-icon icon="checkmark-outline" class="me-2"></nb-icon>
+                        Confirmer le retrait
+                      </span>
+                      
+                      <span *ngIf="isSubmitting">
+                        <nb-icon icon="sync-outline" class="spin me-2"></nb-icon>
+                        Traitement en cours...
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </nb-card-body>
+        </nb-card>
+      </div>
+
+      <!-- Informations -->
+      <div class="col-lg-4">
+        <nb-card class="mb-4">
+          <nb-card-header>
+            <h5 class="mb-0">
+              <nb-icon icon="shield-outline" class="me-2"></nb-icon>
+              Sécurité
+            </h5>
+          </nb-card-header>
+          <nb-card-body>
+            <div class="mb-3">
+              <h6>Limites de Retrait</h6>
+              <ul class="text-muted small">
+                <li>Compte épargne : solde disponible uniquement</li>
+                <li>Compte courant : solde + découvert autorisé</li>
+                <li>Maximum journalier : 1 000 €</li>
+                <li>Maximum mensuel : 5 000 €</li>
+              </ul>
+            </div>
+            
+            <div class="mb-3">
+              <h6>Vérifications Obligatoires</h6>
+              <ul class="text-muted small">
+                <li>Pièce d'identité originale</li>
+                <li>Signature du titulaire</li>
+                <li>Vérification des signatures</li>
+                <li>Contrôle anti-fraude</li>
+              </ul>
+            </div>
+            
+            <div>
+              <h6>Règlement Intérieur</h6>
+              <ul class="text-muted small">
+                <li>Les retraits sont définitifs</li>
+                <li>Justificatif délivré systématiquement</li>
+                <li>Délai de réflexion : aucune</li>
+                <li>Droit de rétractation : aucun</li>
+              </ul>
+            </div>
+          </nb-card-body>
+        </nb-card>
+
+        <!-- Alertes -->
+        <nb-card>
+          <nb-card-header>
+            <h5 class="mb-0">
+              <nb-icon icon="alert-triangle-outline" class="me-2"></nb-icon>
+              Alertes Sécurité
+            </h5>
+          </nb-card-header>
+          <nb-card-body>
+            <div class="alert alert-warning mb-3">
+              <nb-icon icon="alert-circle-outline" class="me-2"></nb-icon>
+              <strong>Attention aux arnaques</strong>
+              <p class="small mb-0 mt-1">
+                Ne communiquez jamais vos codes confidentiels. La banque ne vous les demandera jamais.
+              </p>
+            </div>
+            
+            <div class="alert alert-info">
+              <nb-icon icon="info-outline" class="me-2"></nb-icon>
+              <strong>Protection des retraits</strong>
+              <p class="small mb-0 mt-1">
+                Tous les retraits sont tracés et enregistrés pour votre sécurité.
+              </p>
+            </div>
+          </nb-card-body>
+        </nb-card>
+      </div>
+    </div>
+  </div>
+</div>

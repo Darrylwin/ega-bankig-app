@@ -1,0 +1,131 @@
+<!-- src/app/pages/transactions/transactions.component.html -->
+<div class="transactions-container">
+  <!-- En-tête -->
+  <div class="transactions-header mb-4">
+    <div class="row align-items-center">
+      <div class="col-md-8">
+        <h2>Opérations Bancaires</h2>
+        <p class="text-muted mb-0">Effectuez et gérez les transactions bancaires</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistiques rapides -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <nb-card>
+        <nb-card-body>
+          <div class="row">
+            <div class="col-xl-3 col-lg-6 col-md-6 mb-3" *ngFor="let stat of quickStats">
+              <div class="quick-stat">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div>
+                    <h5 class="mb-1">{{ stat.value }}</h5>
+                    <p class="text-muted small mb-0">{{ stat.label }}</p>
+                  </div>
+                  <span class="badge" [ngClass]="{
+                    'bg-success': stat.change.startsWith('+'),
+                    'bg-danger': stat.change.startsWith('-'),
+                    'bg-info': !stat.change.startsWith('+') && !stat.change.startsWith('-')
+                  }">
+                    {{ stat.change }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </nb-card-body>
+      </nb-card>
+    </div>
+  </div>
+
+  <!-- Opérations -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <h4 class="mb-3">Opérations Disponibles</h4>
+    </div>
+    
+    <div class="col-xl-3 col-lg-6 col-md-6 mb-4" *ngFor="let op of operations">
+      <nb-card class="operation-card" [status]="op.color" (click)="navigateTo(op.route)">
+        <nb-card-header>
+          <div class="d-flex align-items-center">
+            <div class="operation-icon me-3">
+              <nb-icon [icon]="op.icon" [status]="op.color"></nb-icon>
+            </div>
+            <div>
+              <h5 class="mb-0">{{ op.title }}</h5>
+              <small class="text-muted">{{ op.description }}</small>
+            </div>
+          </div>
+        </nb-card-header>
+        <nb-card-body>
+          <ul class="features-list mb-0">
+            <li *ngFor="let feature of op.features">
+              <nb-icon icon="checkmark-circle-outline" class="text-success me-2"></nb-icon>
+              {{ feature }}
+            </li>
+          </ul>
+        </nb-card-body>
+        <nb-card-footer class="text-center">
+          <button nbButton [status]="op.color" fullWidth>
+            <nb-icon icon="arrow-forward-outline" class="me-2"></nb-icon>
+            Accéder
+          </button>
+        </nb-card-footer>
+      </nb-card>
+    </div>
+  </div>
+
+  <!-- Transactions récentes -->
+  <div class="row">
+    <div class="col-12">
+      <nb-card>
+        <nb-card-header>
+          <h4 class="mb-0">Transactions Récentes</h4>
+        </nb-card-header>
+        <nb-card-body>
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Heure</th>
+                  <th>Type</th>
+                  <th>Client</th>
+                  <th>Compte</th>
+                  <th>Montant</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let tx of recentTransactions">
+                  <td>{{ tx.time }}</td>
+                  <td>
+                    <nb-badge [text]="tx.type === 'deposit' ? 'Dépôt' : tx.type === 'withdrawal' ? 'Retrait' : 'Virement'"
+                             [status]="getTransactionColor(tx.type)" class="me-2">
+                    </nb-badge>
+                  </td>
+                  <td>{{ tx.client }}</td>
+                  <td class="font-monospace">{{ tx.account | slice:0:8 }}...</td>
+                  <td [class]="tx.type === 'deposit' ? 'text-success' : 'text-danger'">
+                    {{ formatCurrency(tx.amount) }}
+                  </td>
+                  <td>
+                    <button nbButton size="small" ghost status="basic">
+                      <nb-icon icon="eye-outline"></nb-icon>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </nb-card-body>
+        <nb-card-footer class="text-center">
+          <button nbButton status="primary" routerLink="/pages/transactions/history">
+            <nb-icon icon="list-outline" class="me-2"></nb-icon>
+            Voir tout l'historique
+          </button>
+        </nb-card-footer>
+      </nb-card>
+    </div>
+  </div>
+</div>

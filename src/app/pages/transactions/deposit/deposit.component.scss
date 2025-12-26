@@ -1,0 +1,127 @@
+.deposit-container {
+  padding: 1.5rem;
+
+  .deposit-header {
+    h2 {
+      font-weight: 600;
+      color: #333;
+    }
+  }
+
+  // Sections
+  .section-title {
+    font-weight: 600;
+    color: #495057;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+
+    nb-icon {
+      vertical-align: middle;
+    }
+  }
+
+  // Form labels
+  .form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #495057;
+
+    &.required::after {
+      content: ' *';
+      color: #dc3545;
+    }
+  }
+
+  // Alerts
+  nb-alert {
+    border-radius: 8px;
+    
+    &[status="info"] {
+      background-color: #e7f1ff;
+      border-color: #cce5ff;
+      color: #004085;
+    }
+  }
+
+  // Badges
+  .badge {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: 6px;
+    
+    &[status="success"] {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    
+    &[status="primary"] {
+      background-color: #cce5ff;
+      color: #004085;
+    }
+  }
+
+  // Récapitulatif
+  nb-card[status="success"] {
+    border-color: #28a745;
+    
+    nb-card-header {
+      background-color: rgba(40, 167, 69, 0.1);
+      border-bottom-color: rgba(40, 167, 69, 0.2);
+      color: #155724;
+    }
+    
+    nb-card-body {
+      background-color: rgba(40, 167, 69, 0.05);
+    }
+    
+    .h4.text-success {
+      font-weight: 700;
+    }
+  }
+
+  // Actions
+  .btn-pulse {
+    position: relative;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      top: -4px;
+      left: -4px;
+      right: -4px;
+      bottom: -4px;
+      border-radius: 8px;
+      background: rgba(40, 167, 69, 0.2);
+      animation: pulse 1.5s infinite;
+    }
+  }
+}
+
+// Animation du spinner
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+// Responsive
+@media (max-width: 992px) {
+  .deposit-container {
+    padding: 1rem;
+    
+    .section-title {
+      font-size: 1.25rem;
+    }
+  }
+}

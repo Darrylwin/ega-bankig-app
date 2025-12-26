@@ -1,0 +1,258 @@
+.transactions-container {
+  padding: 1.5rem;
+
+  .transactions-header {
+    h2 {
+      font-weight: 600;
+      color: #333;
+    }
+  }
+
+  // Statistiques rapides
+  .quick-stat {
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    transition: all 0.3s;
+    
+    &:hover {
+      background: #e9ecef;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    }
+    
+    h5 {
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 0.25rem;
+    }
+    
+    .badge {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.5rem;
+      
+      &.bg-success {
+        background-color: #28a745 !important;
+      }
+      
+      &.bg-danger {
+        background-color: #dc3545 !important;
+      }
+      
+      &.bg-info {
+        background-color: #17a2b8 !important;
+      }
+    }
+  }
+
+  // Cartes d'opérations
+  .operation-card {
+    cursor: pointer;
+    transition: all 0.3s;
+    height: 100%;
+    
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    nb-card-header {
+      background: transparent;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      padding: 1.25rem;
+      
+      .operation-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 102, 204, 0.1);
+        
+        nb-icon {
+          font-size: 1.5rem;
+        }
+        
+        &[status="success"] {
+          background: rgba(40, 167, 69, 0.1);
+        }
+        
+        &[status="danger"] {
+          background: rgba(220, 53, 69, 0.1);
+        }
+        
+        &[status="primary"] {
+          background: rgba(0, 102, 204, 0.1);
+        }
+        
+        &[status="info"] {
+          background: rgba(23, 162, 184, 0.1);
+        }
+      }
+      
+      h5 {
+        font-weight: 600;
+        margin: 0;
+      }
+      
+      small {
+        font-size: 0.875rem;
+      }
+    }
+    
+    nb-card-body {
+      padding: 1.25rem;
+      
+      .features-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        
+        li {
+          padding: 0.375rem 0;
+          color: #495057;
+          font-size: 0.875rem;
+          display: flex;
+          align-items: center;
+          
+          nb-icon {
+            font-size: 0.875rem;
+            flex-shrink: 0;
+          }
+        }
+      }
+    }
+    
+    nb-card-footer {
+      background: transparent;
+      border-top: 1px solid rgba(0, 0, 0, 0.05);
+      padding: 1rem 1.25rem;
+    }
+  }
+
+  // Table des transactions récentes
+  nb-card {
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    
+    nb-card-header {
+      background-color: #f8f9fa;
+      border-bottom: 1px solid #e9ecef;
+      
+      h4 {
+        font-weight: 600;
+        margin: 0;
+      }
+    }
+    
+    nb-card-body {
+      padding: 0;
+      
+      .table-responsive {
+        overflow-x: auto;
+        
+        table {
+          margin: 0;
+          
+          thead {
+            background-color: #f8f9fa;
+            
+            th {
+              font-weight: 600;
+              color: #495057;
+              border-bottom: 2px solid #dee2e6;
+              padding: 1rem;
+              white-space: nowrap;
+            }
+          }
+          
+          tbody {
+            tr {
+              transition: background-color 0.2s;
+              
+              &:hover {
+                background-color: #f8f9fa;
+              }
+              
+              td {
+                padding: 0.75rem 1rem;
+                vertical-align: middle;
+                border-bottom: 1px solid #e9ecef;
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    nb-card-footer {
+      background-color: #f8f9fa;
+      border-top: 1px solid #e9ecef;
+      padding: 1rem;
+      
+      button {
+        min-width: 200px;
+      }
+    }
+  }
+
+  // Badges
+  .badge {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 4px;
+    
+    &[status="success"] {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    
+    &[status="danger"] {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    
+    &[status="primary"] {
+      background-color: #cce5ff;
+      color: #004085;
+    }
+    
+    &[status="info"] {
+      background-color: #d1ecf1;
+      color: #0c5460;
+    }
+  }
+
+  // Format monétaire
+  .text-success {
+    color: #28a745 !important;
+    font-weight: 600;
+  }
+  
+  .text-danger {
+    color: #dc3545 !important;
+    font-weight: 600;
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .transactions-container {
+    padding: 1rem;
+    
+    .quick-stat {
+      margin-bottom: 1rem;
+    }
+    
+    .operation-card {
+      margin-bottom: 1rem;
+    }
+    
+    .table-responsive {
+      font-size: 0.875rem;
+    }
+  }
+}
