@@ -70,7 +70,7 @@ class AuthServiceTest {
         registerRequest.setPassword("password123");
 
         loginRequest = new LoginRequestDTO();
-        loginRequest.setUsername("testuser");
+        loginRequest.setEmail("testuser@email.com");
         loginRequest.setPassword("password123");
 
         userRole = new Role();

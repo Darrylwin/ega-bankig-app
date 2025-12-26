@@ -87,29 +87,10 @@ public class DataInitializer {
             System.out.println("║   CRÉATION DU COMPTE ADMINISTRATEUR   ║");
             System.out.println("╚════════════════════════════════════════╝\n");
 
-            // Demander le nom d'utilisateur
-            String username;
-            while (true) {
-                System.out.print("👤 Nom d'utilisateur (min 3 caractères) : ");
-                username = scanner.nextLine().trim();
-
-                if (username.length() < 3) {
-                    System.out.println("❌ Le nom d'utilisateur doit contenir au moins 3 caractères.");
-                    continue;
-                }
-
-                if (userRepository.existsByUsername(username)) {
-                    System.out.println("❌ Ce nom d'utilisateur existe déjà.");
-                    continue;
-                }
-
-                break;
-            }
-
             // Demander l'email
             String email;
             while (true) {
-                System.out.print("📧 Email : ");
+                System.out.print("📧 Email (utilisé pour la connexion) : ");
                 email = scanner.nextLine().trim();
 
                 if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
@@ -119,6 +100,25 @@ public class DataInitializer {
 
                 if (userRepository.existsByEmail(email)) {
                     System.out.println("❌ Cet email existe déjà.");
+                    continue;
+                }
+
+                break;
+            }
+
+            // Demander le nom d'utilisateur (optionnel, juste pour l'affichage)
+            String username;
+            while (true) {
+                System.out.print("👤 Nom d'utilisateur (pour l'affichage, min 3 caractères) : ");
+                username = scanner.nextLine().trim();
+
+                if (username.length() < 3) {
+                    System.out.println("❌ Le nom d'utilisateur doit contenir au moins 3 caractères.");
+                    continue;
+                }
+
+                if (userRepository.existsByUsername(username)) {
+                    System.out.println("❌ Ce nom d'utilisateur existe déjà.");
                     continue;
                 }
 
@@ -165,8 +165,8 @@ public class DataInitializer {
             System.out.println("║    ✅ ADMINISTRATEUR CRÉÉ AVEC SUCCÈS  ║");
             System.out.println("╚════════════════════════════════════════╝");
             System.out.println("\n📋 Informations du compte :");
-            System.out.println("   Username : " + username);
             System.out.println("   Email    : " + email);
+            System.out.println("   Username : " + username);
             System.out.println("   Rôles    : ADMIN, USER");
             System.out.println("\n🔐 Conservez ces informations en lieu sûr !");
             System.out.println("========================================\n");
