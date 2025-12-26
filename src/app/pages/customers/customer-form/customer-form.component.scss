@@ -1,0 +1,109 @@
+.customer-form-container {
+  padding: 1.5rem;
+
+  .customer-form-header {
+    h2 {
+      font-weight: 600;
+      color: #333;
+    }
+  }
+
+  nb-card {
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+
+    nb-card-body {
+      padding: 2rem;
+
+      .section-title {
+        font-weight: 600;
+        color: #495057;
+        border-bottom: 2px solid #e9ecef;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1.5rem;
+
+        nb-icon {
+          vertical-align: middle;
+        }
+      }
+
+      .form-label {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        color: #495057;
+
+        &.required::after {
+          content: ' *';
+          color: #dc3545;
+        }
+      }
+
+      // Validation
+      .text-danger {
+        font-size: 0.875rem;
+        
+        nb-icon {
+          font-size: 0.75rem;
+        }
+      }
+
+      // Info âge
+      small {
+        display: inline-flex;
+        align-items: center;
+        
+        &.text-success {
+          color: #28a745 !important;
+        }
+        
+        &.text-danger {
+          color: #dc3545 !important;
+        }
+      }
+
+      // Actions
+      .btn-pulse {
+        position: relative;
+        
+        &::after {
+          content: '';
+          position: absolute;
+          top: -4px;
+          left: -4px;
+          right: -4px;
+          bottom: -4px;
+          border-radius: 8px;
+          background: rgba(54, 102, 255, 0.2);
+          animation: pulse 1.5s infinite;
+        }
+      }
+    }
+  }
+}
+
+// Animation du spinner
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .customer-form-container {
+    padding: 1rem;
+    
+    nb-card-body {
+      padding: 1.5rem !important;
+    }
+  }
+}

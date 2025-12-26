@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { DashboardApiService, DashboardStats } from '../../../@core/data/api';
+import { DashboardApiService } from '../../@core/data/api/index';
+import { DashboardStats } from '../../@core/data/models/index';
 import { NbToastrService } from '@nebular/theme';
 import { catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';

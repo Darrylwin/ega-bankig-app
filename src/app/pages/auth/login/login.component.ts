@@ -1,8 +1,9 @@
+import { LoginRequest,  } from './../../../@core/data/models/auth.models';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NbToastrService } from '@nebular/theme';
-import { AuthApiService, LoginRequest } from '../../../@core/data/api';
+import { AuthApiService } from '../../../@core/data/api';
 
 @Component({
   selector: 'ngx-login',
