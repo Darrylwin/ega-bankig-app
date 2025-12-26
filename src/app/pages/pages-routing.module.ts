@@ -1,88 +1,88 @@
-import { RouterModule, Routes } from '@angular/router';
-import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from "@angular/router";
+import { NgModule } from "@angular/core";
+import { PagesComponent } from "./pages.component";
 
-import { PagesComponent } from './pages.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
-import { ECommerceComponent } from './e-commerce/e-commerce.component';
-import { NotFoundComponent } from './miscellaneous/not-found/not-found.component';
+const routes: Routes = [
+  {
+    path: "",
+    component: PagesComponent,
+    children: [
+      // DASHBOARD - Page principale
+      {
+        path: "dashboard",
+        loadChildren: () =>
+          import("./dashboard/dashboard.module").then((m) => m.DashboardModule),
+      },
 
-const routes: Routes = [{
-  path: '',
-  component: PagesComponent,
-  children: [
-    {
-      path: 'dashboard',
-      component: ECommerceComponent,
-    },
-    {
-      path: 'iot-dashboard',
-      component: DashboardComponent,
-    },
-    {
-      path: 'layout',
-      loadChildren: () => import('./layout/layout.module')
-        .then(m => m.LayoutModule),
-    },
-    {
-      path: 'forms',
-      loadChildren: () => import('./forms/forms.module')
-        .then(m => m.FormsModule),
-    },
-    {
-      path: 'ui-features',
-      loadChildren: () => import('./ui-features/ui-features.module')
-        .then(m => m.UiFeaturesModule),
-    },
-    {
-      path: 'modal-overlays',
-      loadChildren: () => import('./modal-overlays/modal-overlays.module')
-        .then(m => m.ModalOverlaysModule),
-    },
-    {
-      path: 'extra-components',
-      loadChildren: () => import('./extra-components/extra-components.module')
-        .then(m => m.ExtraComponentsModule),
-    },
-    {
-      path: 'maps',
-      loadChildren: () => import('./maps/maps.module')
-        .then(m => m.MapsModule),
-    },
-    {
-      path: 'charts',
-      loadChildren: () => import('./charts/charts.module')
-        .then(m => m.ChartsModule),
-    },
-    {
-      path: 'editors',
-      loadChildren: () => import('./editors/editors.module')
-        .then(m => m.EditorsModule),
-    },
-    {
-      path: 'tables',
-      loadChildren: () => import('./tables/tables.module')
-        .then(m => m.TablesModule),
-    },
-    {
-      path: 'miscellaneous',
-      loadChildren: () => import('./miscellaneous/miscellaneous.module')
-        .then(m => m.MiscellaneousModule),
-    },
-    {
-      path: '',
-      redirectTo: 'dashboard',
-      pathMatch: 'full',
-    },
-    {
-      path: '**',
-      component: NotFoundComponent,
-    },
-  ],
-}];
+      // GESTION CLIENTS
+      {
+        path: "customers",
+        loadChildren: () =>
+          import("./customers/customers.module").then((m) => m.CustomersModule),
+      },
+
+      // GESTION COMPTES
+      {
+        path: "accounts",
+        loadChildren: () =>
+          import("./accounts/accounts.module").then((m) => m.AccountsModule),
+      },
+
+      // TRANSACTIONS
+      {
+        path: "transactions",
+        loadChildren: () =>
+          import("./transactions/transactions.module").then(
+            (m) => m.TransactionsModule
+          ),
+      },
+
+      // RELEVÉS
+      {
+        path: "statements",
+        loadChildren: () =>
+          import("./statements/statements.module").then(
+            (m) => m.StatementsModule
+          ),
+      },
+
+      // AUTHENTIFICATION (gardé pour les pages de profil, etc.)
+      {
+        path: "auth",
+        loadChildren: () =>
+          import("./auth/auth.module").then((m) => m.AuthModule),
+      },
+
+      // PAGES DIVERSES (404, aide, etc.)
+      {
+        path: "miscellaneous",
+        loadChildren: () =>
+          import("./miscellaneous/miscellaneous.module").then(
+            (m) => m.MiscellaneousModule
+          ),
+      },
+
+      // REDIRECTION PAR DÉFAUT
+      {
+        path: "",
+        redirectTo: "dashboard",
+        pathMatch: "full",
+      },
+
+      // PAGE 404
+      {
+        path: "**",
+        loadChildren: () =>
+          import("./miscellaneous/miscellaneous.module").then(
+            (m) => m.MiscellaneousModule
+          ),
+      },
+    ],
+  },
+];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class PagesRoutingModule {
-}
+export class PagesRoutingModule {}

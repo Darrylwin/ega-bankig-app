@@ -21,6 +21,7 @@
         "name": "tslint-language-service"
       }
     ],
-    "useDefineForClassFields": false
+    "useDefineForClassFields": false,
+    "ignoreDeprecations": "6.0"
   }
 }
