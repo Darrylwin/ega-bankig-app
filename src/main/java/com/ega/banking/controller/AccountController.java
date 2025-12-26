@@ -5,13 +5,18 @@ import com.ega.banking.dto.AccountMapper;
 import com.ega.banking.dto.AccountRequestDTO;
 import com.ega.banking.entity.Account;
 import com.ega.banking.service.AccountService;
+import com.ega.banking.service.StatementService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,6 +31,7 @@ public class AccountController {
 
     private final AccountService accountService;
     private final AccountMapper accountMapper;
+    private final StatementService statementService;
 
     /**
      * POST /api/accounts
@@ -124,5 +130,33 @@ public class AccountController {
     public ResponseEntity<Void> deleteAccount(@PathVariable Long id) {
         accountService.deleteAccount(id);
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * GET /api/accounts/{accountId}/statement
+     * Génère et télécharge un relevé bancaire au format PDF
+     * Query params: startDate et endDate au format ISO (2026-01-01T00:00:00)
+     * Accessible aux ADMIN et USER (propriétaire du compte)
+     */
+    @GetMapping("/{accountId}/statement")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    public ResponseEntity<byte[]> generateStatement(
+            @PathVariable Long accountId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) {
+
+        // Génère le PDF
+        byte[] pdfBytes = statementService.generateStatementPdf(accountId, startDate, endDate);
+
+        // Prépare les headers pour le téléchargement
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData("attachment",
+                "releve_" + accountId + "_" + System.currentTimeMillis() + ".pdf");
+        headers.setContentLength(pdfBytes.length);
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(pdfBytes);
     }
 }

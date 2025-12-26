@@ -167,7 +167,7 @@ Authorization: Bearer {{token}}
 ### ========================================
 
 ### 5.1 Générer un relevé PDF pour un compte
-GET {{baseUrl}}/statements/account/1?startDate=2026-01-01T00:00:00&endDate=2026-12-31T23:59:59
+GET {{baseUrl}}/accounts/1/statement?startDate=2026-01-01T00:00:00&endDate=2026-12-31T23:59:59
 Authorization: Bearer {{token}}
 
 ### ========================================
