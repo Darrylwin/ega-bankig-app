@@ -1,3 +1,4 @@
+import { CoreModule } from './../../@core/core.module';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -47,13 +48,13 @@ import { ConfirmDialogComponent } from '../../@core/components/confirm-dialog.co
     WithdrawalComponent,
     TransferComponent,
     HistoryComponent,
-    ConfirmDialogComponent
   ],
   imports: [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
     TransactionsRoutingModule,
+    CoreModule,
     
     // Modules Nebular UI
     NbCardModule,

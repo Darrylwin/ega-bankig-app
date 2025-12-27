@@ -28,7 +28,7 @@ import { ErrorInterceptor } from "./data/interceptors/error.interceptor";
       multi: true,
     },
   ],
-  exports: [ConfirmDialogComponent], // Rien à exporter, c'est un module de services
+  exports: [ConfirmDialogComponent],
 })
 export class CoreModule {
   // Garantir que CoreModule n'est importé qu'une fois (dans AppModule)

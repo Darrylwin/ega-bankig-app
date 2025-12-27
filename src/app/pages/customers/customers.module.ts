@@ -28,22 +28,20 @@ import { CustomersRoutingModule } from './customers-routing.module';
 import { CustomersComponent } from './customers.component';
 import { CustomerFormComponent } from './customer-form/customer-form.component';
 import { CustomerDetailComponent } from './customer-detail/customer-detail.component';
-
-// Importe le composant de dialog
-// import { ConfirmDialogComponent } from '../../@core/components/confirm-dialog.component';
+import { CoreModule } from './../../@core/core.module';
 
 @NgModule({
   declarations: [
     CustomersComponent,
     CustomerFormComponent,
     CustomerDetailComponent,
-    // ConfirmDialogComponent,
   ],
   imports: [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
     CustomersRoutingModule,
+    CoreModule,
     
     // Modules Nebular UI
     NbCardModule,

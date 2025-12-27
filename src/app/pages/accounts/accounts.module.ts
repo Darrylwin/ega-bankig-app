@@ -1,3 +1,4 @@
+import { CoreModule } from './../../@core/core.module';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -40,14 +41,14 @@ import { ConfirmDialogComponent } from '../../@core/components/confirm-dialog.co
     AccountsComponent,
     AccountFormComponent,
     AccountDetailComponent,
-    AccountStatementComponent,
-    ConfirmDialogComponent
+    AccountStatementComponent
   ],
   imports: [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
     AccountsRoutingModule,
+    CoreModule,
     
     // Modules Nebular UI
     NbCardModule,
