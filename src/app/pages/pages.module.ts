@@ -4,7 +4,7 @@ import { RouterModule, Routes } from "@angular/router";
 
 // Importe les modules de chaque page
 import { DashboardModule } from "./dashboard/dashboard.module";
-import { CustomersModule } from "./customers/customers.module";
+import { CustomersModule } from "./customers/customers.module"
 import { AccountsModule } from "./accounts/accounts.module";
 import { TransactionsModule } from "./transactions/transactions.module";
 

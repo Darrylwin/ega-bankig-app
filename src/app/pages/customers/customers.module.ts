@@ -30,14 +30,14 @@ import { CustomerFormComponent } from './customer-form/customer-form.component';
 import { CustomerDetailComponent } from './customer-detail/customer-detail.component';
 
 // Importe le composant de dialog
-import { ConfirmDialogComponent } from '../../@core/components/confirm-dialog.component';
+// import { ConfirmDialogComponent } from '../../@core/components/confirm-dialog.component';
 
 @NgModule({
   declarations: [
     CustomersComponent,
     CustomerFormComponent,
     CustomerDetailComponent,
-    ConfirmDialogComponent,
+    // ConfirmDialogComponent,
   ],
   imports: [
     CommonModule,
@@ -64,6 +64,7 @@ import { ConfirmDialogComponent } from '../../@core/components/confirm-dialog.co
     // Tableau intelligent
     Ng2SmartTableModule
   ],
-  entryComponents: [ConfirmDialogComponent] // ← IMPORTANT pour les dialogs
+  // entryComponents: [ConfirmDialogComponent] // ← IMPORTANT pour les dialogs
+  CoreModule,
 })
 export class CustomersModule { }
