@@ -14,7 +14,7 @@ import { Account, TransferRequest } from "../../../@core/data/models/index";
   styleUrls: ["./transfer.component.scss"],
 })
 export class TransferComponent implements OnInit {
-  transferForm:  FormGroup;
+  transferForm: FormGroup;
   isLoading = false;
   isSubmitting = false;
   accounts: Account[] = [];
@@ -40,7 +40,7 @@ export class TransferComponent implements OnInit {
     private fb: FormBuilder,
     private router: Router,
     private transactionApi: TransactionApiService,
-    private accountApi:  AccountApiService,
+    private accountApi: AccountApiService,
     private toastr: NbToastrService
   ) {
     this.transferForm = this.createForm();
@@ -66,12 +66,12 @@ export class TransferComponent implements OnInit {
     this.isLoading = true;
 
     this.accountApi
-      . getAccounts({ page: 0, size: 200, sort: "accountNumber,asc" })
+      .getAccounts({ page: 0, size: 200, sort: "accountNumber,asc" })
       .subscribe({
         next: (response) => {
           this.accounts = response.content;
-          this.sourceAccounts = [... this.accounts];
-          this. destinationAccounts = [...this. accounts];
+          this.sourceAccounts = [...this.accounts];
+          this.destinationAccounts = [...this.accounts];
           this.isLoading = false;
         },
         error: (error) => {
@@ -101,7 +101,7 @@ export class TransferComponent implements OnInit {
     );
 
     if (this.transferForm.get("destinationAccountId")?.value === accountId) {
-      this.transferForm. patchValue({ destinationAccountId: "" });
+      this.transferForm.patchValue({ destinationAccountId: "" });
       this.selectedDestAccount = null;
     }
   }
@@ -145,7 +145,7 @@ export class TransferComponent implements OnInit {
    * Soumission du formulaire
    */
   onSubmit(): void {
-    if (this.transferForm. invalid) {
+    if (this.transferForm.invalid) {
       this.markFormGroupTouched(this.transferForm);
       return;
     }
@@ -154,13 +154,13 @@ export class TransferComponent implements OnInit {
       return;
     }
 
-    this. isSubmitting = true;
+    this.isSubmitting = true;
 
     const transferData: TransferRequest = {
       sourceAccountId: this.transferForm.value.sourceAccountId,
-      destinationAccountId: this.transferForm.value. destinationAccountId,
-      amount: this.transferForm.value. amount,
-      description: this.transferForm.value. description || undefined,
+      destinationAccountId: this.transferForm.value.destinationAccountId,
+      amount: this.transferForm.value.amount,
+      description: this.transferForm.value.description || undefined,
     };
 
     this.transactionApi.transfer(transferData).subscribe({
@@ -221,11 +221,21 @@ export class TransferComponent implements OnInit {
   }
 
   private markFormGroupTouched(formGroup: FormGroup): void {
-    Object.values(formGroup. controls).forEach((control) => {
+    Object.values(formGroup.controls).forEach((control) => {
       control.markAsTouched();
       if (control instanceof FormGroup) {
         this.markFormGroupTouched(control);
       }
     });
+  }
+
+  /**
+   * Retourne le label du type de virement sélectionné
+   */
+  getSelectedTransferTypeLabel(): string {
+    const type = this.transferTypes.find(
+      (t) => t.value === this.f.transferType.value
+    );
+    return type ? type.label : "";
   }
 }

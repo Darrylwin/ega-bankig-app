@@ -186,4 +186,12 @@ export class DepositComponent implements OnInit {
       }
     });
   }
+
+  /**
+   * Retourne le label du mode de paiement sélectionné
+   */
+  getSelectedPaymentMethodLabel(): string {
+    const method = this.paymentMethods. find(m => m.value === this.f.paymentMethod.value);
+    return method ? method.label : '';
+  }
 }

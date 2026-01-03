@@ -1,5 +1,5 @@
 .accounts-container {
-  padding: 1. 5rem;
+  padding: 1 5rem;
 
   .accounts-header {
     h2 {
@@ -19,13 +19,13 @@
 
     .input-group {
       display: flex;
-      
+
       input {
         border-top-right-radius: 0;
         border-bottom-right-radius: 0;
         border-right: none;
       }
-      
+
       button {
         border-radius: 0;
         border: 1px solid #e4e9f2;
@@ -49,29 +49,29 @@
     nb-card-header {
       background-color: #f8f9fa;
       border-bottom: 1px solid #e9ecef;
-      padding:  1.25rem 1.5rem;
-      
+      padding: 1.25rem 1.5rem;
+
       h5 {
         font-weight: 600;
         color: #333;
-        margin:  0;
+        margin: 0;
       }
     }
 
     nb-card-body {
       padding: 0;
-      
+
       .table-responsive {
         overflow-x: auto;
-        
+
         ng2-smart-table {
-          margin:  0;
-          
+          margin: 0;
+
           ::ng-deep {
             // En-têtes du tableau
             thead {
               background-color: #f8f9fa;
-              
+
               th {
                 font-weight: 600;
                 color: #495057;
@@ -80,17 +80,17 @@
                 white-space: nowrap;
               }
             }
-            
+
             // Lignes du tableau
             tbody {
               tr {
                 transition: background-color 0.2s;
-                
+
                 &:hover {
                   background-color: #f8f9fa;
                   cursor: pointer;
                 }
-                
+
                 td {
                   padding: 0.75rem 1rem;
                   vertical-align: middle;
@@ -98,70 +98,70 @@
                 }
               }
             }
-            
+
             // Badges de statut
             .badge {
               padding: 0.25rem 0.5rem;
-              font-size:  0.75rem;
-              font-weight:  600;
+              font-size: 0.75rem;
+              font-weight: 600;
               border-radius: 4px;
-              
+
               &.badge-success {
                 background-color: #d4edda;
-                color:  #155724;
+                color: #155724;
               }
-              
+
               &.badge-danger {
                 background-color: #f8d7da;
                 color: #721c24;
               }
-              
+
               &.badge-warning {
                 background-color: #fff3cd;
                 color: #856404;
               }
             }
-            
+
             // Actions
             .ng2-smart-actions {
               text-align: center;
               width: 120px;
-              
+
               a {
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
                 width: 36px;
                 height: 36px;
-                border-radius:  6px;
+                border-radius: 6px;
                 margin: 0 3px;
                 transition: all 0.2s;
-                
+
                 &:hover {
                   transform: translateY(-2px);
                   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                 }
-                
+
                 &.ng2-smart-action-edit-edit {
-                  background-color:  #e7f1ff;
+                  background-color: #e7f1ff;
                   color: #0066cc;
-                  
+
                   &:hover {
                     background-color: #d0e3ff;
                   }
                 }
-                
+
                 &.ng2-smart-action-delete-delete {
-                  background-color:  #ffeaea;
+                  background-color: #ffeaea;
                   color: #dc3545;
-                  
+
                   &:hover {
                     background-color: #ffd6d6;
                   }
                 }
-                
+
                 i {
-                  font-size:  1.25rem;
+                  font-size: 1.25rem;
                 }
               }
             }
@@ -172,14 +172,14 @@
 
     nb-card-footer {
       background-color: #f8f9fa;
-      border-top:  1px solid #e9ecef;
+      border-top: 1px solid #e9ecef;
       padding: 1rem 1.5rem;
-      
+
       button {
         min-width: 36px;
         height: 36px;
         padding: 0;
-        
+
         &:disabled {
           opacity: 0.5;
           cursor: not-allowed;
@@ -199,26 +199,26 @@
       box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 
       &[status="success"] {
-        border-left-color: #00D68F;
+        border-left-color: #00d68f;
       }
 
       &[status="danger"] {
-        border-left-color: #FF3D71;
+        border-left-color: #ff3d71;
       }
 
       &[status="warning"] {
-        border-left-color: #FFAA00;
+        border-left-color: #ffaa00;
       }
 
       &:hover {
         transform: translateY(-8px);
-        box-shadow:  0 8px 25px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
       }
 
       nb-card-header {
-        background:  linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
         padding: 1rem 1.25rem;
-        border-bottom:  1px solid #e9ecef;
+        border-bottom: 1px solid #e9ecef;
 
         .account-type {
           display: flex;
@@ -228,7 +228,7 @@
 
           .type-icon {
             font-size: 1.25rem;
-            color: #3366FF;
+            color: #3366ff;
           }
         }
       }
@@ -252,9 +252,9 @@
 
           .balance-amount {
             font-weight: 700;
-            color: #3366FF;
+            color: #3366ff;
             font-size: 1.75rem;
-            margin:  0.5rem 0;
+            margin: 0.5rem 0;
           }
         }
 
@@ -274,7 +274,7 @@
 
         .account-date {
           padding-top: 0.5rem;
-          
+
           small {
             display: flex;
             align-items: center;
@@ -288,7 +288,7 @@
       }
 
       nb-card-footer {
-        background-color:  #f8f9fa;
+        background-color: #f8f9fa;
         border-top: 1px solid #e9ecef;
         padding: 0.75rem 1.25rem;
 
@@ -313,35 +313,39 @@
     position: relative;
 
     &::before {
-      content: '';
+      content: "";
       position: absolute;
-      top:  0;
+      top: 0;
       left: 0;
       right: 0;
       height: 4px;
-      background: linear-gradient(90deg, var(--card-color-1) 0%, var(--card-color-2) 100%);
+      background: linear-gradient(
+        90deg,
+        var(--card-color-1) 0%,
+        var(--card-color-2) 100%
+      );
     }
 
     &[status="primary"] {
-      --card-color-1: #3366FF;
-      --card-color-2: #5580FF;
+      --card-color-1: #3366ff;
+      --card-color-2: #5580ff;
     }
 
     &[status="success"] {
-      --card-color-1: #00D68F;
-      --card-color-2: #00FFA3;
+      --card-color-1: #00d68f;
+      --card-color-2: #00ffa3;
     }
 
     &[status="info"] {
-      --card-color-1: #0095FF;
-      --card-color-2: #00C8FF;
+      --card-color-1: #0095ff;
+      --card-color-2: #00c8ff;
     }
 
     &[status="warning"] {
-      --card-color-1: #FFAA00;
-      --card-color-2: #FFC800;
+      --card-color-1: #ffaa00;
+      --card-color-2: #ffc800;
     }
-    
+
     &:hover {
       transform: translateY(-8px);
       box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
@@ -357,12 +361,16 @@
       justify-content: center;
       width: 70px;
       height: 70px;
-      border-radius:  50%;
-      background: linear-gradient(135deg, rgba(51, 102, 255, 0.1) 0%, rgba(85, 128, 255, 0.2) 100%);
-      
+      border-radius: 50%;
+      background: linear-gradient(
+        135deg,
+        rgba(51, 102, 255, 0.1) 0%,
+        rgba(85, 128, 255, 0.2) 100%
+      );
+
       .stat-icon {
         font-size: 2rem;
-        color: #3366FF;
+        color: #3366ff;
       }
     }
 
@@ -404,7 +412,7 @@
     }
 
     h4 {
-      font-weight:  700;
+      font-weight: 700;
       margin: 0.5rem 0;
     }
   }
@@ -442,7 +450,7 @@
       }
 
       .fw-bold {
-        color: #3366FF;
+        color: #3366ff;
         font-size: 1.1rem;
       }
 
@@ -458,10 +466,10 @@
   // Barres de progression
   nb-progress-bar {
     height: 6px;
-    
+
     ::ng-deep .progress-value {
       border-radius: 3px;
-      background: linear-gradient(90deg, #3366FF 0%, #5580FF 100%);
+      background: linear-gradient(90deg, #3366ff 0%, #5580ff 100%);
     }
   }
 
@@ -471,15 +479,15 @@
       font-size: 4rem;
       opacity: 0.3;
     }
-    
+
     h4 {
       font-weight: 600;
-      margin:  1rem 0 0.5rem;
+      margin: 1rem 0 0.5rem;
       color: #333;
     }
-    
+
     p {
-      color:  #6c757d;
+      color: #6c757d;
     }
   }
 
@@ -489,8 +497,12 @@
   }
 
   @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
   }
 
   // Styles pour ngx-charts
@@ -501,20 +513,20 @@
         font-size: 12px;
         font-weight: 500;
       }
-      
+
       .tooltip-anchor {
         fill: #333;
       }
-      
+
       .gridline-path {
         stroke: #e9ecef;
         stroke-width: 1;
       }
-      
+
       .refline-path {
-        stroke:  #ced4da;
+        stroke: #ced4da;
       }
-      
+
       .reference-area {
         fill: #f8f9fa;
       }
@@ -523,7 +535,7 @@
       .x-axis-label,
       .y-axis-label {
         font-size: 13px;
-        font-weight:  600;
+        font-weight: 600;
         fill: #495057;
       }
 
@@ -540,11 +552,11 @@
       // Tooltips personnalisés
       .tooltip-label {
         font-weight: 600;
-        color:  #333;
+        color: #333;
       }
 
       .tooltip-val {
-        color: #3366FF;
+        color: #3366ff;
         font-weight: 700;
       }
     }
@@ -571,7 +583,7 @@
 
     .account-card {
       .balance-amount {
-        font-size: 1.5rem ! important;
+        font-size: 1.5rem !important;
       }
     }
   }
@@ -584,7 +596,7 @@
     .accounts-header {
       .d-flex {
         flex-direction: column;
-        align-items: stretch ! important;
+        align-items: stretch !important;
         gap: 0.5rem !important;
       }
     }
@@ -635,20 +647,20 @@
   .accounts-container {
     .account-card {
       .balance-amount {
-        font-size:  1.25rem !important;
+        font-size: 1.25rem !important;
       }
 
       nb-card-footer {
         button {
           font-size: 0.875rem;
-          padding: 0.5rem ! important;
+          padding: 0.5rem !important;
         }
       }
     }
 
     .chart-summary {
       .fw-bold {
-        font-size:  1.25rem;
+        font-size: 1.25rem;
       }
     }
   }

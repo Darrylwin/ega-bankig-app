@@ -4,10 +4,18 @@
     <div class="row align-items-center">
       <div class="col-md-8">
         <h2>Historique des Transactions</h2>
-        <p class="text-muted mb-0">Consultez l'historique complet des opérations</p>
+        <p class="text-muted mb-0">
+          Consultez l'historique complet des opérations
+        </p>
       </div>
       <div class="col-md-4 text-end">
-        <button nbButton ghost size="small" [routerLink]="['/pages/transactions']" class="mb-3">
+        <button
+          nbButton
+          ghost
+          size="small"
+          [routerLink]="['/pages/transactions']"
+          class="mb-3"
+        >
           <nb-icon icon="arrow-back-outline" class="me-2"></nb-icon>
           Retour aux opérations
         </button>
@@ -25,10 +33,12 @@
           <nb-select
             fullWidth
             [(ngModel)]="selectedAccountId"
-            (ngModelChange)="loadTransactions()">
+            (ngModelChange)="loadTransactions()"
+          >
             <nb-option value="ALL">Tous les comptes</nb-option>
             <nb-option *ngFor="let account of accounts" [value]="account.id">
-              {{ formatAccountNumber(account.accountNumber) }} - {{ account.customerFullName }}
+              {{ formatAccountNumber(account.accountNumber) }} -
+              {{ account.customerFullName }}
             </nb-option>
           </nb-select>
         </div>
@@ -39,8 +49,12 @@
           <nb-select
             fullWidth
             [(ngModel)]="selectedType"
-            (ngModelChange)="applyFilters()">
-            <nb-option *ngFor="let type of filterOptions.accountTypes" [value]="type.value">
+            (ngModelChange)="applyFilters()"
+          >
+            <nb-option
+              *ngFor="let type of filterOptions.accountTypes"
+              [value]="type.value"
+            >
               {{ type.label }}
             </nb-option>
           </nb-select>
@@ -54,7 +68,8 @@
             nbInput
             fullWidth
             [(ngModel)]="startDate"
-            (change)="loadTransactions()">
+            (change)="loadTransactions()"
+          />
         </div>
 
         <!-- Date fin -->
@@ -65,7 +80,8 @@
             nbInput
             fullWidth
             [(ngModel)]="endDate"
-            (change)="loadTransactions()">
+            (change)="loadTransactions()"
+          />
         </div>
 
         <!-- Recherche -->
@@ -78,7 +94,8 @@
               fullWidth
               placeholder="Référence, description..."
               [(ngModel)]="searchTerm"
-              (keyup.enter)="applyFilters()">
+              (keyup.enter)="applyFilters()"
+            />
             <button nbButton ghost (click)="applyFilters()">
               <nb-icon icon="search-outline"></nb-icon>
             </button>
@@ -96,7 +113,8 @@
               size="small"
               ghost
               type="button"
-              (click)="setLast30Days()">
+              (click)="setLast30Days()"
+            >
               30 derniers jours
             </button>
             <button
@@ -104,7 +122,8 @@
               size="small"
               ghost
               type="button"
-              (click)="setCurrentMonth()">
+              (click)="setCurrentMonth()"
+            >
               Ce mois
             </button>
             <button
@@ -112,7 +131,8 @@
               size="small"
               ghost
               type="button"
-              (click)="setLastMonth()">
+              (click)="setLastMonth()"
+            >
               Dernier mois
             </button>
             <button
@@ -120,7 +140,8 @@
               size="small"
               ghost
               type="button"
-              (click)="resetFilters()">
+              (click)="resetFilters()"
+            >
               <nb-icon icon="refresh-outline" class="me-1"></nb-icon>
               Réinitialiser
             </button>
@@ -145,7 +166,7 @@
             <div class="col-md-3 mb-3 mb-md-0">
               <div class="stat-item">
                 <h3 class="mb-1 text-success">
-                  {{ transactions.filter(t => t.transactionType === 'DEPOSIT').length }}
+                  {{ depositsCount }}
                 </h3>
                 <p class="text-muted mb-0">Dépôts</p>
               </div>
@@ -153,7 +174,7 @@
             <div class="col-md-3 mb-3 mb-md-0">
               <div class="stat-item">
                 <h3 class="mb-1 text-danger">
-                  {{ transactions.filter(t => t.transactionType === 'WITHDRAWAL').length }}
+                  {{ withdrawalsCount }}
                 </h3>
                 <p class="text-muted mb-0">Retraits</p>
               </div>
@@ -161,7 +182,7 @@
             <div class="col-md-3">
               <div class="stat-item">
                 <h3 class="mb-1 text-primary">
-                  {{ transactions.filter(t => t.transactionType === 'TRANSFER').length }}
+                  {{ transfersCount }}
                 </h3>
                 <p class="text-muted mb-0">Virements</p>
               </div>
@@ -185,7 +206,10 @@
         <div>
           <h5 class="mb-0">Transactions</h5>
           <small class="text-muted">
-            {{ transactions.length }} transaction{{ transactions.length > 1 ? 's' : '' }} trouvée{{ transactions.length > 1 ? 's' : '' }}
+            {{ transactions.length }} transaction{{
+              transactions.length > 1 ? "s" : ""
+            }}
+            trouvée{{ transactions.length > 1 ? "s" : "" }}
           </small>
         </div>
         <div>
@@ -195,12 +219,10 @@
           </button>
         </div>
       </nb-card-header>
-      
+
       <nb-card-body>
         <div class="table-responsive">
-          <ng2-smart-table
-            [settings]="settings"
-            [source]="source">
+          <ng2-smart-table [settings]="settings" [source]="source">
           </ng2-smart-table>
         </div>
       </nb-card-body>
@@ -221,7 +243,7 @@
           </div>
           <div class="col-md-6 text-end">
             <small class="text-muted">
-              Dernière mise à jour : {{ today | date:'dd/MM/yyyy HH:mm' }}
+              Dernière mise à jour : {{ today | date : "dd/MM/yyyy HH:mm" }}
             </small>
           </div>
         </div>
@@ -231,9 +253,15 @@
 
   <!-- Aucune donnée -->
   <div *ngIf="!isLoading && transactions.length === 0" class="text-center py-5">
-    <nb-icon icon="archive-outline" size="giant" class="text-muted mb-3"></nb-icon>
+    <nb-icon
+      icon="archive-outline"
+      size="giant"
+      class="text-muted mb-3"
+    ></nb-icon>
     <h4>Aucune transaction trouvée</h4>
-    <p class="text-muted mb-4">Aucune transaction ne correspond à vos critères de recherche</p>
+    <p class="text-muted mb-4">
+      Aucune transaction ne correspond à vos critères de recherche
+    </p>
     <button nbButton status="primary" size="large" (click)="resetFilters()">
       <nb-icon icon="refresh-outline" class="me-2"></nb-icon>
       Réinitialiser les filtres

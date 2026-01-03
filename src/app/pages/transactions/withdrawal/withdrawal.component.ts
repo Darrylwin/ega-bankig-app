@@ -23,8 +23,8 @@ export class WithdrawalComponent implements OnInit {
 
   // Options
   withdrawalReasons = [
-    { value:  "PERSONAL", label: "Usage personnel" },
-    { value:  "BUSINESS", label: "Affaires professionnelles" },
+    { value: "PERSONAL", label: "Usage personnel" },
+    { value: "BUSINESS", label: "Affaires professionnelles" },
     { value: "EMERGENCY", label: "Urgence" },
     { value: "OTHER", label: "Autre" },
   ];
@@ -33,7 +33,7 @@ export class WithdrawalComponent implements OnInit {
     private fb: FormBuilder,
     private router: Router,
     private transactionApi: TransactionApiService,
-    private accountApi:  AccountApiService,
+    private accountApi: AccountApiService,
     private toastr: NbToastrService
   ) {
     this.withdrawalForm = this.createForm();
@@ -61,11 +61,11 @@ export class WithdrawalComponent implements OnInit {
       .subscribe({
         next: (response) => {
           this.accounts = response.content;
-          this. isLoading = false;
+          this.isLoading = false;
         },
         error: (error) => {
           this.isLoading = false;
-          this. toastr.danger("Erreur lors du chargement des comptes", "Erreur");
+          this.toastr.danger("Erreur lors du chargement des comptes", "Erreur");
         },
       });
   }
@@ -79,7 +79,7 @@ export class WithdrawalComponent implements OnInit {
       this.accounts.find((acc) => acc.id === accountId) || null;
 
     if (this.selectedAccount) {
-      this.maxWithdrawalAmount = this. selectedAccount.balance;
+      this.maxWithdrawalAmount = this.selectedAccount.balance;
       if (this.selectedAccount.accountType === "CURRENT") {
         this.maxWithdrawalAmount += 1000;
       }
@@ -104,7 +104,7 @@ export class WithdrawalComponent implements OnInit {
       return;
     }
 
-    if (! this.withdrawalForm.value.idVerified) {
+    if (!this.withdrawalForm.value.idVerified) {
       this.toastr.warning(
         "La vérification de la pièce d'identité est obligatoire",
         "Attention"
@@ -115,7 +115,7 @@ export class WithdrawalComponent implements OnInit {
     this.isSubmitting = true;
 
     const withdrawalData: WithdrawalRequest = {
-      accountId:  this.withdrawalForm.value. accountId,
+      accountId: this.withdrawalForm.value.accountId,
       amount: this.withdrawalForm.value.amount,
       description: this.withdrawalForm.value.description || undefined,
     };
@@ -137,11 +137,11 @@ export class WithdrawalComponent implements OnInit {
         this.isSubmitting = false;
 
         if (error.status === 400) {
-          this.toastr. warning("Solde insuffisant", "Erreur");
-        } else if (error. status === 403) {
+          this.toastr.warning("Solde insuffisant", "Erreur");
+        } else if (error.status === 403) {
           this.toastr.warning("Compte bloqué ou limité", "Accès refusé");
         } else {
-          this.toastr. danger("Erreur lors du retrait", "Erreur");
+          this.toastr.danger("Erreur lors du retrait", "Erreur");
         }
       },
     });
@@ -183,11 +183,21 @@ export class WithdrawalComponent implements OnInit {
   }
 
   private markFormGroupTouched(formGroup: FormGroup): void {
-    Object.values(formGroup. controls).forEach((control) => {
+    Object.values(formGroup.controls).forEach((control) => {
       control.markAsTouched();
       if (control instanceof FormGroup) {
         this.markFormGroupTouched(control);
       }
     });
+  }
+
+  /**
+   * Retourne le label du motif de retrait sélectionné
+   */
+  getSelectedReasonLabel(): string {
+    const reason = this.withdrawalReasons.find(
+      (r) => r.value === this.f.reason.value
+    );
+    return reason ? reason.label : "";
   }
 }
