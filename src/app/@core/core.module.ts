@@ -3,6 +3,9 @@ import { NgModule, Optional, SkipSelf } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
 import { RouterModule } from "@angular/router";
+import { UsersService } from "./services/users.service";
+import { LayoutService } from "./utils/layout.service";
+import { UserData } from "./data/users";
 import { ConfirmDialogComponent } from "./components/confirm-dialog.component";
 
 // Importe les intercepteurs
@@ -30,6 +33,8 @@ import { ErrorInterceptor } from "./data/interceptors/error.interceptor";
       useClass: ErrorInterceptor,
       multi: true,
     },
+    { provide: UserData, useClass: UsersService },
+    LayoutService,
   ],
   exports: [ConfirmDialogComponent],
 })
