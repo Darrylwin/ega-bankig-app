@@ -8,18 +8,8 @@ export interface LoginRequest {
 }
 
 /**
- * Requête d'inscription
- * Envoyé à POST /api/auth/register
- */
-export interface RegisterRequest {
-  username: string;
-  email: string;
-  password: string;
-}
-
-/**
  * Réponse d'authentification
- * Reçu après login ou register
+ * Reçu après login
  */
 export interface AuthResponse {
   token: string;              // Token JWT
@@ -38,10 +28,10 @@ export interface UserProfile {
   id: number;
   username: string;
   email: string;
-  enabled: boolean;
-  createdAt: string;
+  enabled:  boolean;
+  createdAt:  string;
   roles: string[];
-  customerId?: number;        // Optionnel (? signifie nullable)
+  customerId?:  number;
 }
 
 /**
@@ -59,7 +49,7 @@ export interface ChangePasswordRequest {
  * Envoyé à POST /api/auth/admin/create
  */
 export interface CreateAdminRequest {
-  username: string;
+  username:  string;
   email: string;
   password: string;
 }

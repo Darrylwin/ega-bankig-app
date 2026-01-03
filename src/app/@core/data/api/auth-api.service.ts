@@ -4,7 +4,6 @@ import { tap } from 'rxjs/operators';
 import { ApiService } from './api.service';
 import {
   LoginRequest,
-  RegisterRequest,
   AuthResponse,
   UserProfile,
   ChangePasswordRequest,
@@ -13,7 +12,7 @@ import {
 
 /**
  * Service API pour l'authentification
- * Gère login, register, profil, changement de mot de passe
+ * Gère login, profil, changement de mot de passe
  */
 @Injectable({
   providedIn: 'root',
@@ -26,7 +25,7 @@ export class AuthApiService {
    * POST /api/auth/login
    * Connecte un utilisateur
    * 
-   * .pipe(tap(...)) permet d'exécuter du code quand on reçoit la réponse
+   * . pipe(tap(... )) permet d'exécuter du code quand on reçoit la réponse
    * sans modifier la réponse elle-même
    */
   login(credentials: LoginRequest): Observable<AuthResponse> {
@@ -36,25 +35,6 @@ export class AuthApiService {
         localStorage.setItem('token', response.token);
         
         // Stocke aussi les infos utilisateur (optionnel)
-        localStorage.setItem('user', JSON.stringify({
-          id: response.id,
-          username: response.username,
-          email: response.email,
-          roles: response.roles,
-        }));
-      }),
-    );
-  }
-
-  /**
-   * POST /api/auth/register
-   * Inscrit un nouvel utilisateur
-   */
-  register(data: RegisterRequest): Observable<AuthResponse> {
-    return this.apiService.post<AuthResponse>('/auth/register', data).pipe(
-      tap((response: AuthResponse) => {
-        // Stocke automatiquement le token après l'inscription
-        localStorage.setItem('token', response.token);
         localStorage.setItem('user', JSON.stringify({
           id: response.id,
           username: response.username,
