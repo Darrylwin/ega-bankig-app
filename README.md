@@ -1,139 +1,111 @@
-# 🏦 EGA Banking System - Backend API
+# EGA Banking System - Backend API
 
-Système de gestion bancaire développé avec **Spring Boot** et **MySQL**.  
-Projet académique pour le cours de Programmation Java EE - GLSI 2025-2026.
-
----
-
-## 📋 Table des matières
-
-- [Description](#-description)
-- [Technologies utilisées](#-technologies-utilisées)
-- [Fonctionnalités](#-fonctionnalités)
-- [Prérequis](#-prérequis)
-- [Installation](#-installation)
-- [Configuration](#-configuration)
-- [Lancement de l'application](#-lancement-de-lapplication)
-- [Endpoints API](#-endpoints-api)
-- [Tests avec Postman](#-tests-avec-postman)
-- [Structure du projet](#-structure-du-projet)
-- [Sécurité](#-sécurité)
-- [Contributeurs](#-contributeurs)
+RESTful API for banking management system built with Spring Boot and Supabase.
 
 ---
 
-## 📖 Description
+## Table of Contents
 
-EGA Banking System est une API REST complète permettant de gérer :
-- Les clients de la banque
-- Les comptes bancaires (épargne et courant)
-- Les transactions bancaires (dépôts, retraits, virements)
-- L'authentification et l'autorisation des utilisateurs
-
-Le système génère automatiquement des numéros IBAN valides et garantit la sécurité des transactions grâce à Spring Security et JWT.
+- [Description](#description)
+- [Technologies](#technologies)
+- [Features](#features)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Running the Application](#running-the-application)
+- [API Documentation](#api-documentation)
+- [Project Structure](#project-structure)
+- [Security](#security)
+- [Testing](#testing)
+- [Contributing](#contributing)
 
 ---
 
-## 🛠 Technologies utilisées
+## Description
 
-### Backend
-- **Java 17**
-- **Spring Boot 3.2.x**
-    - Spring Web (API REST)
-    - Spring Data JPA (Persistance)
-    - Spring Security (Authentification/Autorisation)
+EGA Banking System provides a complete backend solution for banking operations including customer management, account handling, and transaction processing. The system automatically generates valid IBAN account numbers and ensures transactional integrity through Spring's transaction management.
+
+---
+
+## Technologies
+
+### Core
+- Java 17
+- Spring Boot 4.0.1
+    - Spring Web (REST API)
+    - Spring Data JPA (Persistence)
+    - Spring Security (Authentication/Authorization)
     - Spring Validation
-- **MySQL 8.0** (Base de données)
-- **JWT (JSON Web Tokens)** pour l'authentification
-- **IBAN4J** pour la génération de numéros IBAN
-- **Lombok** pour réduire le code boilerplate
-- **Maven** pour la gestion des dépendances
+- Supabase PostgreSQL (Database)
 
-### Outils
-- **Postman** pour les tests API
-- **Swagger/OpenAPI** pour la documentation
-
----
-
-## ✨ Fonctionnalités
-
-### 🔐 Authentification
-- ✅ Inscription d'utilisateurs
-- ✅ Connexion avec JWT
-- ✅ Gestion des rôles (ADMIN, USER)
-- ✅ Hachage sécurisé des mots de passe (BCrypt)
-
-### 👥 Gestion des clients
-- ✅ CRUD complet (Create, Read, Update, Delete)
-- ✅ Validation des données (email unique, téléphone unique, âge ≥ 18 ans)
-- ✅ Recherche par email
-
-### 💳 Gestion des comptes
-- ✅ Création de comptes (épargne/courant)
-- ✅ Génération automatique d'IBAN unique
-- ✅ Association client-compte
-- ✅ Consultation du solde
-
-### 💰 Gestion des transactions
-- ✅ Dépôt d'argent
-- ✅ Retrait d'argent (avec vérification du solde)
-- ✅ Virement entre comptes
-- ✅ Historique des transactions
-- ✅ Filtrage par période
-- ✅ Transactions atomiques (rollback automatique en cas d'erreur)
-
-### 🛡️ Sécurité
-- ✅ Authentification JWT
-- ✅ Autorisation par rôles (@PreAuthorize)
-- ✅ Gestion globale des exceptions
-- ✅ Validation des entrées
-- ✅ Protection CORS
+### Libraries
+- JWT (JSON Web Tokens) for authentication
+- IBAN4J for IBAN generation
+- iText7 for PDF generation
+- Lombok for boilerplate reduction
+- SpringDoc OpenAPI for documentation
+- Maven for dependency management
 
 ---
 
-## 📦 Prérequis
+## Features
 
-Avant de commencer, assurez-vous d'avoir installé :
+### Authentication
+- User registration and login with JWT
+- Role-based access control (ADMIN, USER)
+- Password change functionality
+- Secure password hashing with BCrypt
+- Admin creation (by existing admins or console script)
 
-- **Java JDK 17** ou supérieur
-- **MySQL 8.0** ou supérieur
-- **Maven 3.6+** (ou utilisez le wrapper Maven inclus `./mvnw`)
-- **Git** (pour cloner le projet)
-- **Postman** (pour tester l'API)
+### Customer Management
+- Full CRUD operations
+- Data validation (unique email/phone, age verification)
+- Pagination and sorting
+- Email search
+
+### Account Management
+- Create savings and current accounts
+- Automatic IBAN generation
+- Account status management (ACTIVE, BLOCKED, CLOSED)
+- Account listing by customer
+
+### Transaction Processing
+- Deposits
+- Withdrawals (with balance verification)
+- Inter-account transfers
+- Transaction history with period filtering
+- Atomic operations with automatic rollback
+
+### Reporting
+- PDF bank statement generation
+- Dashboard statistics (daily, weekly, monthly)
+- Transaction summaries
 
 ---
 
-## 🚀 Installation
+## Prerequisites
 
-### 1. Cloner le repository
+- Java JDK 17 or higher
+- Maven 3.6+
+- Supabase account with PostgreSQL database
+- Git
+
+---
+
+## Installation
+
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/Darrylwin/ega-banking-app
 cd ega-banking-app
 ```
 
-### 2. Créer la base de données MySQL
+### 2. Configure Supabase database
 
-Connectez-vous à MySQL et exécutez :
+Create a new project in Supabase and note your connection details.
 
-```sql
--- Créez la base de données
-CREATE DATABASE ega_bank;
-
--- Créez l'utilisateur
-CREATE USER 'ega_user'@'localhost' IDENTIFIED BY 'ega_password';
-
--- Donnez tous les droits sur la base de données
-GRANT ALL PRIVILEGES ON ega_bank.* TO 'ega_user'@'localhost';
-
--- Appliquez les changements
-FLUSH PRIVILEGES;
-
--- Vérifiez
-SHOW GRANTS FOR 'ega_user'@'localhost';
-```
-
-### 3. Installer les dépendances
+### 3. Install dependencies
 
 ```bash
 ./mvnw clean install
@@ -141,374 +113,306 @@ SHOW GRANTS FOR 'ega_user'@'localhost';
 
 ---
 
-## ⚙️ Configuration
+## Configuration
 
-Le fichier de configuration se trouve dans `src/main/resources/application.properties`.
+### Database Configuration
 
-### Configuration de base
+Create `src/main/resources/application.properties`:
 
 ```properties
-# Port du serveur
+# ========================================
+# CONFIGURATION DU SERVEUR
+# ========================================
 server.port=8080
 
-# Base de données MySQL
-spring.datasource.url=jdbc:mysql://localhost:3306/ega_bank?useSSL=false&serverTimezone=UTC
-spring.datasource.username=ega_user
-spring.datasource.password=ega_password
-spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+# ========================================
+# CONFIGURATION BASE DE DONNÉES SUPABASE
+# ========================================
+# Remplacez spring.datasource.password] par le vrai mot de passe Supabase
+spring.datasource.url=jdbc:postgresql://aws-1-eu-north-1.pooler.supabase.com:5432/postgres
+spring.datasource.username=postgres.tzubemfqoiphqztmkzbb
+spring.datasource.password=[MOT-DE-PASSE-SUPABASE]
+spring.datasource.driver-class-name=org.postgresql.Driver
 
-# JPA/Hibernate
+# ========================================
+# CONFIGURATION JPA/HIBERNATE POUR POSTGRESQL
+# ========================================
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.format_sql=true
-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation=true
 
-# JWT
+# ========================================
+# CONFIGURATION JWT
+# ========================================
 jwt.secret=uneCleSecreteTresLongueEtSecuriseePourLaSignatureDesTokensJWT123456789
 jwt.expiration=86400000
 
-# CORS (pour le frontend)
+# ========================================
+# CONFIGURATION CORS
+# ========================================
 cors.allowed-origins=http://localhost:4200
 
-# Logs
-logging.level.com.ega.banking=DEBUG
-```
+# ========================================
+# CONFIGURATION SWAGGER/OPENAPI
+# ========================================
+springdoc.api-docs.enabled=true
+springdoc.api-docs.path=/v3/api-docs
+springdoc.swagger-ui.enabled=true
+springdoc.swagger-ui.path=/swagger-ui.html
+springdoc.swagger-ui.operationsSorter=method
+springdoc.swagger-ui.tagsSorter=alpha
+springdoc.swagger-ui.tryItOutEnabled=true
+springdoc.packages-to-scan=com.ega.banking.controller
+springdoc.paths-to-match=/api/**
 
-### 🔑 Important : Changez le `jwt.secret` en production !
-
-Générez une clé secrète sécurisée pour la production :
-```bash
-openssl rand -base64 64
+# ========================================
+# CONFIGURATION DES LOGS
+# ========================================
+logging.level.com.ega.banking=INFO
+logging.level.org.springframework.web=INFO
+logging.level.org.hibernate.SQL=DEBUG
 ```
 
 ---
 
-## 🎯 Lancement de l'application
+## Running the Application
 
-### Démarrer l'application
+### Development Mode
 
 ```bash
 ./mvnw spring-boot:run
 ```
 
-Ou avec Maven installé :
+### First Run - Admin Creation
+
+On first startup, the application will prompt for admin credentials in the console:
+
+```
+Creation du compte administrateur
+Email (used for login): admin@ega-bank.com
+Username (for display): admin
+Password (min 6 characters): ********
+```
+
+### Production Mode
+
 ```bash
-mvn spring-boot:run
+./mvnw clean package
+java -jar target/banking-0.0.1-SNAPSHOT.jar
 ```
 
-### Premier lancement - Création du compte Admin
-
-Au **premier démarrage**, l'application détecte qu'aucun administrateur n'existe et lance un **script interactif en console** :
-
-```
-========================================
-⚠️  Aucun compte administrateur trouvé !
-========================================
-
-╔════════════════════════════════════════╗
-║   CRÉATION DU COMPTE ADMINISTRATEUR   ║
-╚════════════════════════════════════════╝
-
-👤 Nom d'utilisateur (min 3 caractères) : admin
-📧 Email : admin@ega-bank.com
-🔒 Mot de passe (min 6 caractères) : ********
-🔒 Confirmer le mot de passe : ********
-
-╔════════════════════════════════════════╗
-║    ✅ ADMINISTRATEUR CRÉÉ AVEC SUCCÈS  ║
-╚════════════════════════════════════════╝
-
-📋 Informations du compte :
-   Username : admin
-   Email    : admin@ega-bank.com
-   Rôles    : ADMIN, USER
-
-🔐 Conservez ces informations en lieu sûr !
-========================================
-```
-
-### Lancements suivants
-
-Si un administrateur existe déjà, l'application démarre normalement :
-
-```
-========================================
-🚀 EGA Banking Application Started!
-📍 API: http://localhost:8080/api
-📚 Swagger: http://localhost:8080/swagger-ui/index.html
-========================================
-✅ Compte administrateur déjà existant
-✅ Initialisation terminée !
-========================================
-```
+The application will be available at `http://localhost:8080`
 
 ---
 
-## 🔌 Endpoints API
+## API Documentation
 
-### 🔐 Authentification (`/api/auth`)
+### Swagger UI
 
-| Méthode | Endpoint | Description | Auth requise |
-|---------|----------|-------------|--------------|
-| POST | `/api/auth/login` | Connexion | Non |
-
-### 👥 Clients (`/api/customers`)
-
-| Méthode | Endpoint | Description | Auth requise |
-|---------|----------|-------------|--------------|
-| POST | `/api/customers` | Créer un client | ADMIN |
-| GET | `/api/customers` | Liste tous les clients | ADMIN |
-| GET | `/api/customers/{id}` | Détails d'un client | ADMIN, USER |
-| PUT | `/api/customers/{id}` | Modifier un client | ADMIN |
-| DELETE | `/api/customers/{id}` | Supprimer un client | ADMIN |
-| GET | `/api/customers/email/{email}` | Rechercher par email | ADMIN |
-
-### 💳 Comptes (`/api/accounts`)
-
-| Méthode | Endpoint | Description | Auth requise |
-|---------|----------|-------------|--------------|
-| POST | `/api/accounts` | Créer un compte | ADMIN |
-| GET | `/api/accounts` | Liste tous les comptes | ADMIN |
-| GET | `/api/accounts/{id}` | Détails d'un compte | ADMIN, USER |
-| GET | `/api/accounts/number/{accountNumber}` | Rechercher par IBAN | ADMIN, USER |
-| GET | `/api/accounts/customer/{customerId}` | Comptes d'un client | ADMIN, USER |
-| DELETE | `/api/accounts/{id}` | Supprimer un compte | ADMIN |
-
-### 💰 Transactions (`/api/transactions`)
-
-| Méthode | Endpoint | Description | Auth requise |
-|---------|----------|-------------|--------------|
-| POST | `/api/transactions/deposit` | Faire un dépôt | ADMIN, USER |
-| POST | `/api/transactions/withdraw` | Faire un retrait | ADMIN, USER |
-| POST | `/api/transactions/transfer` | Faire un virement | ADMIN, USER |
-| GET | `/api/transactions/account/{accountId}` | Historique d'un compte | ADMIN, USER |
-| GET | `/api/transactions/account/{accountId}/period` | Transactions par période | ADMIN, USER |
-| GET | `/api/transactions/{id}` | Détails d'une transaction | ADMIN, USER |
-
----
-
-## 📮 Tests avec Postman
-
-### Connexion avec le compte admin créé
-
-**POST** `http://localhost:8080/api/auth/login`
-
-```json
-{
-  "username": "admin",
-  "password": "votre_mot_de_passe"
-}
+Access interactive API documentation at:
+```
+http://localhost:8080/swagger-ui/index.html
 ```
 
-**Réponse** :
-```json
-{
-  "token": "eyJhbGciOiJIUzUxMiJ9...",
-  "type": "Bearer",
-  "id": 1,
-  "username": "admin",
-  "email": "admin@ega-bank.com",
-  "roles": ["ROLE_ADMIN", "ROLE_USER"]
-}
-```
+### Main Endpoints
 
-### 2. Utiliser le token
+#### Authentication (`/api/auth`)
+- `POST /api/auth/register` - User registration
+- `POST /api/auth/login` - User login (email + password)
+- `GET /api/auth/me` - Get current user profile
+- `PUT /api/auth/change-password` - Change password
+- `POST /api/auth/admin/create` - Create admin (ADMIN only)
 
-Pour toutes les requêtes protégées, ajoutez le header :
+#### Customers (`/api/customers`) - ADMIN only
+- `POST /api/customers` - Create customer
+- `GET /api/customers?page=0&size=10&sort=lastName,asc` - List customers (paginated)
+- `GET /api/customers/{id}` - Get customer details
+- `PUT /api/customers/{id}` - Update customer
+- `DELETE /api/customers/{id}` - Delete customer
+
+#### Accounts (`/api/accounts`)
+- `POST /api/accounts` - Create account (ADMIN)
+- `GET /api/accounts?page=0&size=10` - List accounts (paginated, ADMIN)
+- `GET /api/accounts/{id}` - Get account details
+- `GET /api/accounts/customer/{customerId}` - Get customer's accounts
+- `GET /api/accounts/{accountId}/statement` - Generate PDF statement
+
+#### Transactions (`/api/transactions`)
+- `POST /api/transactions/deposit` - Make deposit
+- `POST /api/transactions/withdraw` - Make withdrawal
+- `POST /api/transactions/transfer` - Make transfer
+- `GET /api/transactions/account/{accountId}` - Transaction history
+- `GET /api/transactions/account/{accountId}/period` - Transactions by period
+
+#### Dashboard (`/api/dashboard`) - ADMIN only
+- `GET /api/dashboard/stats` - Get dashboard statistics
+
+### Authentication
+
+All protected endpoints require a JWT token in the Authorization header:
 
 ```
 Authorization: Bearer eyJhbGciOiJIUzUxMiJ9...
 ```
 
-### 3. Créer un client (ADMIN uniquement)
+---
 
-**POST** `http://localhost:8080/api/customers`
+## Project Structure
 
-**Headers** : `Authorization: Bearer <token>`
-
-```json
-{
-  "lastName": "Doe",
-  "firstName": "John",
-  "dateOfBirth": "1990-01-15",
-  "gender": "MALE",
-  "address": "123 Main Street, Paris",
-  "phoneNumber": "+33612345678",
-  "email": "john.customer@example.com",
-  "nationality": "French"
-}
 ```
-
-### 4. Créer un compte
-
-**POST** `http://localhost:8080/api/accounts`
-
-```json
-{
-  "customerId": 1,
-  "accountType": "SAVINGS",
-  "currency": "EUR"
-}
-```
-
-### 5. Faire un dépôt
-
-**POST** `http://localhost:8080/api/transactions/deposit`
-
-```json
-{
-  "accountId": 1,
-  "amount": 1000.00,
-  "description": "Initial deposit"
-}
-```
-
-### 6. Faire un retrait
-
-**POST** `http://localhost:8080/api/transactions/withdraw`
-
-```json
-{
-  "accountId": 1,
-  "amount": 200.00,
-  "description": "ATM withdrawal"
-}
-```
-
-### 7. Faire un virement
-
-**POST** `http://localhost:8080/api/transactions/transfer`
-
-```json
-{
-  "sourceAccountId": 1,
-  "destinationAccountId": 2,
-  "amount": 500.00,
-  "description": "Transfer to friend"
-}
+src/main/java/com/ega/banking/
+├── config/               # Application configuration
+│   ├── CorsConfig.java
+│   ├── DataInitializer.java
+│   ├── OpenApiConfig.java
+│   └── SecurityConfig.java
+├── controller/           # REST controllers
+│   ├── AccountController.java
+│   ├── AuthController.java
+│   ├── CustomerController.java
+│   ├── DashboardController.java
+│   └── TransactionController.java
+├── dto/                  # Data Transfer Objects
+├── entity/              # JPA entities
+│   ├── Account.java
+│   ├── Customer.java
+│   ├── Role.java
+│   ├── Transaction.java
+│   └── User.java
+├── exception/           # Custom exceptions
+├── repository/          # JPA repositories
+├── security/            # Security configuration
+│   ├── AuthEntryPointJwt.java
+│   ├── JwtAuthenticationFilter.java
+│   ├── JwtUtils.java
+│   ├── UserDetailsImpl.java
+│   └── UserDetailsServiceImpl.java
+├── service/             # Business logic
+└── EgaApplication.java  # Main application class
 ```
 
 ---
 
-## 📁 Structure du projet
+## Security
 
-```
-backend/
-├── src/
-│   ├── main/
-│   │   ├── java/com/ega/banking/
-│   │   │   ├── config/           # Configurations (Security, CORS)
-│   │   │   ├── controller/       # Contrôleurs REST
-│   │   │   ├── dto/              # Data Transfer Objects
-│   │   │   ├── entity/           # Entités JPA
-│   │   │   ├── exception/        # Exceptions personnalisées
-│   │   │   ├── repository/       # Repositories JPA
-│   │   │   ├── security/         # Configuration JWT
-│   │   │   ├── service/          # Services (logique métier)
-│   │   │   └── EgaApplication.java
-│   │   └── resources/
-│   │       └── application.properties
-│   └── test/
-├── pom.xml
-└── README.md
-```
+### Authentication Flow
+
+1. User logs in with email and password
+2. Server validates credentials and generates JWT token (valid 24h)
+3. Client stores token in localStorage
+4. Client sends token in Authorization header for protected requests
+5. Server validates token and authorizes access
+
+### Roles and Permissions
+
+- `ROLE_USER`: Can manage own accounts and transactions
+- `ROLE_ADMIN`: Full access to all resources
+
+### Data Validation
+
+- Server-side validation with `@Valid` annotations
+- Entity constraints: `@NotBlank`, `@Email`, `@Past`, etc.
+- Global exception handling with custom error responses
 
 ---
 
-## 🔒 Sécurité
+## Testing
 
-### Authentification JWT
-
-1. L'utilisateur s'inscrit ou se connecte
-2. Le serveur retourne un token JWT valide 24h
-3. Le client stocke le token (localStorage/sessionStorage)
-4. Pour chaque requête protégée, le client envoie :
-   ```
-   Authorization: Bearer <token>
-   ```
-5. Le serveur valide le token et autorise l'accès
-
-### Rôles et permissions
-
-- **ROLE_USER** : Peut effectuer des opérations sur ses propres comptes
-- **ROLE_ADMIN** : Accès complet à toutes les ressources
-
-### Validation des données
-
-- Validation côté serveur avec `@Valid`
-- Contraintes sur les entités (@NotBlank, @Email, @Past, etc.)
-- Gestion globale des exceptions
-
----
-
-## 🧪 Tests
-
-### Lancer les tests unitaires
+### Run Unit Tests
 
 ```bash
 ./mvnw test
 ```
 
-### Collection Postman
+### Test Collections
 
-Une collection Postman complète est disponible dans `/postman/EGA_Banking.postman_collection.json`
+API test collection is available in `src/test/resources/api-tests.http`
+
+Use with REST Client extension in VSCode or IntelliJ IDEA HTTP Client.
+
+### Example Requests
+
+#### Login
+```http
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@ega-bank.com",
+  "password": "your_password"
+}
+```
+
+#### Create Customer
+```http
+POST http://localhost:8080/api/customers
+Authorization: Bearer YOUR_TOKEN
+Content-Type: application/json
+
+{
+  "lastName": "Dupont",
+  "firstName": "Jean",
+  "dateOfBirth": "1990-05-15",
+  "gender": "MALE",
+  "address": "123 Rue de la Paix, Paris",
+  "phoneNumber": "+33612345678",
+  "email": "jean.dupont@example.com",
+  "nationality": "French"
+}
+```
 
 ---
 
-## 🐛 Résolution des problèmes
+## Contributing
 
-### Erreur de connexion Database
+### Team Members
+- LOGOSSOU Ekoué Darryl-win
+- Academic Year: 2025-2026
+- Course: Java EE Programming
 
-```
-Access denied for user 'ega_user'@'localhost'
-```
+### Commit Guidelines
 
-**Solution** : Vérifiez que l'utilisateur de la database existe et a les bonnes permissions.
+- Use meaningful commit messages
+- Create feature branches for development
+- Submit pull requests for review
+- All team members must have visible commits
 
-### Port 8080 déjà utilisé
+---
 
-**Solution** : Changez le port dans `application.properties` :
+## Troubleshooting
+
+### Port 8080 already in use
+
+Change the port in `application.properties`:
 ```properties
 server.port=8081
 ```
 
-### Token JWT invalide
+### Supabase connection timeout
 
-**Solution** : Vérifiez que :
-- Le token n'a pas expiré (24h)
-- Le header est bien `Authorization: Bearer <token>`
-- Le secret JWT est le même que lors de la génération
+Verify your Supabase project is active and connection details are correct. Check the connection pooler URL in your Supabase dashboard.
 
----
+### JWT token invalid
 
-## 📝 TODO / Améliorations futures
-
-- [ ] Génération de relevés bancaires PDF
-- [ ] Notifications par email
-- [ ] Limitation du taux de requêtes (rate limiting)
-- [ ] Logs d'audit
-- [ ] Gestion des découverts autorisés
-- [ ] Frais bancaires automatiques
-- [ ] API de statistiques
+Ensure:
+- Token has not expired (24h validity)
+- Header format is correct: `Authorization: Bearer <token>`
+- JWT secret matches between token generation and validation
 
 ---
 
-## 👥 Contributeurs
+## License
 
-- **[LOGOSSOU Ekoué Darryl-win](https://github.com/Darrylwin)**
-
----
-
-## 📄 Licence
-
-Ce projet est un travail académique réalisé dans le cadre du cours de Java EE.
+This project is an academic assignment for Java EE course.
 
 ---
 
-## 📞 Contact
+## Contact
 
-Pour toute question concernant ce projet, contactez LOGOSSOU Darryl
+For questions regarding this project, please open an issue on GitHub.
 
 ---
 
-**🎓 Projet réalisé dans le cadre du TP Java EE - GLSI 2025-2026**
+**Academic Project - GLSI 2025-2026*
