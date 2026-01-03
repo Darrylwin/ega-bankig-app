@@ -20,18 +20,27 @@ export const MENU_ITEMS: NbMenuItem[] = [
   {
     title: "Opérations Bancaires",
     icon: "swap-horizontal-outline",
+    expanded: false, // ← Par défaut fermé
     children: [
+      {
+        title: "Toutes les opérations",
+        link: "/pages/transactions",
+        icon: "list-outline",
+      },
       {
         title: "Dépôt",
         link: "/pages/transactions/deposit",
+        icon: "trending-up-outline",
       },
       {
         title: "Retrait",
         link: "/pages/transactions/withdraw",
+        icon: "trending-down-outline",
       },
       {
         title: "Virement",
         link: "/pages/transactions/transfer",
+        icon: "swap-outline",
       },
     ],
   },
@@ -43,25 +52,40 @@ export const MENU_ITEMS: NbMenuItem[] = [
   {
     title: "Relevés",
     icon: "file-text-outline",
-    link: "/pages/statements",
+    link: "/pages/accounts", // ← Lien corrigé (module statements n'existe pas encore)
+    badge: {
+      text: "Bientôt",
+      status: "info",
+    },
   },
   {
     title: "Administration",
     icon: "settings-2-outline",
+    expanded: false,
     children: [
       {
         title: "Utilisateurs",
-        link: "/pages/admin/users",
+        link: "/pages/miscellaneous", // ← Temporaire
+        icon: "people-outline",
+        badge: {
+          text: "Bientôt",
+          status: "warning",
+        },
       },
       {
         title: "Audit",
-        link: "/pages/admin/audit",
+        link: "/pages/miscellaneous", // ← Temporaire
+        icon: "activity-outline",
+        badge: {
+          text: "Bientôt",
+          status: "warning",
+        },
       },
     ],
   },
   {
-    title: "Documentation",
-    icon: "book-open-outline",
-    link: "/pages/miscellaneous/help",
+    title: "Aide",
+    icon: "question-mark-circle-outline",
+    link: "/pages/miscellaneous",
   },
 ];
