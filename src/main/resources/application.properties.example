@@ -9,7 +9,7 @@ server.port=8080
 # Remplacez spring.datasource.password] par le vrai mot de passe Supabase
 spring.datasource.url=jdbc:postgresql://aws-1-eu-north-1.pooler.supabase.com:5432/postgres
 spring.datasource.username=postgres.tzubemfqoiphqztmkzbb
-spring.datasource.password=naruto10Hokage@
+spring.datasource.password=[MOT-DE-PASSE-SUPABASE]
 spring.datasource.driver-class-name=org.postgresql.Driver
 
 # ========================================
