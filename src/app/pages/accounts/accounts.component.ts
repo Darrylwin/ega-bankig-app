@@ -364,4 +364,12 @@ export class AccountsComponent implements OnInit {
     this.statusFilter = "ALL";
     this.applyFilters();
   }
+
+  get totalPages(): number {
+    return Math.ceil(this.totalItems / this.pageSize);
+  }
+
+  get currentPageDisplay(): number {
+    return this.currentPage + 1;
+  }
 }

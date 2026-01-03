@@ -189,4 +189,8 @@ export class DepositComponent implements OnInit {
       }
     });
   }
+
+  get totalPages(): number {
+    return Math.ceil(this.totalItems / this.pageSize);
+  }
 }

@@ -1,3 +1,4 @@
+import { NbCardModule, NbDialogModule } from '@nebular/theme';
 import { NgModule, Optional, SkipSelf } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
@@ -14,6 +15,8 @@ import { ErrorInterceptor } from "./data/interceptors/error.interceptor";
     CommonModule,
     HttpClientModule, // ← ESSENTIEL pour les requêtes HTTP
     RouterModule, // ← Utile pour la navigation dans les intercepteurs
+    NbCardModule,
+    NbDialogModule.forRoot(), // ← Configure le module dialog au niveau du CoreModule
   ],
   providers: [
     // Intercepteurs HTTP (DOIVENT être déclarés ici)

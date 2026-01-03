@@ -83,7 +83,7 @@
         </div>
         <div>
           <span class="text-muted me-3">
-            Page {{ currentPage + 1 }} sur {{ Math.ceil(totalItems / pageSize) }}
+            Page {{ currentPage + 1 }} sur {{ totalPages() }}
           </span>
           <button
             nbButton
@@ -105,7 +105,7 @@
             nbButton
             size="small"
             ghost
-            [disabled]="currentPage >= Math.ceil(totalItems / pageSize) - 1"
+            [disabled]="currentPage >= totalPages() - 1"
             (click)="currentPage++; loadCustomers()">
             <nb-icon icon="chevron-right-outline"></nb-icon>
           </button>
@@ -113,8 +113,8 @@
             nbButton
             size="small"
             ghost
-            [disabled]="currentPage >= Math.ceil(totalItems / pageSize) - 1"
-            (click)="currentPage = Math.ceil(totalItems / pageSize) - 1; loadCustomers()">
+            [disabled]="currentPage >= totalPages() - 1"
+            (click)="currentPage = totalPages() - 1; loadCustomers()">
             <nb-icon icon="skip-forward-outline"></nb-icon>
           </button>
         </div>

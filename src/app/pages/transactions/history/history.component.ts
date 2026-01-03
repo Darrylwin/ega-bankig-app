@@ -7,7 +7,6 @@ import {
   AccountApiService,
 } from "../../../@core/data/api/index";
 import { Transaction, Account } from "../../../@core/data/models/index";
-import { url } from "inspector";
 
 @Component({
   selector: "ngx-history",
@@ -161,11 +160,6 @@ export class HistoryComponent implements OnInit {
 
   // Propriété pour la date d'aujourd'hui
   today = new Date();
-
-  // Propriétés pour les labels du stepper (si tu utilises un stepper)
-  step1Label = "Comptes";
-  step2Label = "Montant";
-  step3Label = "Confirmation";
 
   constructor(
     private route: ActivatedRoute,
@@ -428,5 +422,14 @@ export class HistoryComponent implements OnInit {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     return tomorrow.toISOString().split("T")[0];
+  }
+
+  get totalPages(): number {
+    if (this.pageSize === 0) return 0;
+    return Math.ceil(this.totalItems / this.pageSize);
+  }
+
+  get currentPageDisplay(): number {
+    return this.currentPage + 1;
   }
 }

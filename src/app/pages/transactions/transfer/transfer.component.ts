@@ -216,4 +216,8 @@ export class TransferComponent implements OnInit {
       }
     });
   }
+
+  get totalPages(): number {
+    return Math.ceil(this.totalItems / this.pageSize);
+  }
 }

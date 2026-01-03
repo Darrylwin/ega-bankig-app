@@ -194,4 +194,8 @@ export class WithdrawalComponent implements OnInit {
       }
     });
   }
+
+  get totalPages(): number {
+    return Math.ceil(this.totalItems / this.pageSize);
+  }
 }
