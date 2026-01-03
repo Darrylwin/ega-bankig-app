@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { NbDialogRef } from '@nebular/theme';
 
 @Component({
@@ -7,42 +7,37 @@ import { NbDialogRef } from '@nebular/theme';
     <nb-card>
       <nb-card-header>{{ title }}</nb-card-header>
       <nb-card-body>
-        <p>{{ message }}</p>
+        {{ message }}
       </nb-card-body>
-      <nb-card-footer class="d-flex justify-content-end gap-2">
+      <nb-card-footer>
         <button nbButton status="basic" (click)="cancel()">
-          {{ cancelText || 'Annuler' }}
+          Annuler
         </button>
-        <button nbButton [status]="status || 'primary'" (click)="confirm()">
-          {{ confirmText || 'Confirmer' }}
+        <button nbButton status="danger" (click)="confirm()">
+          Confirmer
         </button>
       </nb-card-footer>
     </nb-card>
   `,
   styles: [`
-    nb-card {
-      min-width: 400px;
-      max-width: 500px;
-    }
-    nb-card-body p {
-      margin: 0;
+    nb-card-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
     }
   `]
 })
 export class ConfirmDialogComponent {
-  title = '';
-  message = '';
-  confirmText = '';
-  cancelText = '';
-  status = 'primary';
+  @Input() title: string = 'Confirmation';
+  @Input() message: string = 'Êtes-vous sûr ? ';
 
-  constructor(protected dialogRef: NbDialogRef<ConfirmDialogComponent>) {}
+  constructor(protected ref: NbDialogRef<ConfirmDialogComponent>) {}
 
-  cancel(): void {
-    this.dialogRef.close(false);
+  cancel() {
+    this.ref.close(false);
   }
 
-  confirm(): void {
-    this.dialogRef.close(true);
+  confirm() {
+    this.ref.close(true);
   }
 }
