@@ -19,24 +19,24 @@ export class HistoryComponent implements OnInit {
     actions: {
       columnTitle: "Actions",
       position: "right",
-      add: false,
+      add:  false,
       edit: false,
       delete: false,
     },
     columns: {
       transactionDate: {
         title: "Date & Heure",
-        type: "string",
+        type:  "string",
         valuePrepareFunction: (value: string) => {
           return new Date(value).toLocaleString("fr-FR");
         },
         filter: false,
       },
       transactionType: {
-        title: "Type",
+        title:  "Type",
         type: "html",
         valuePrepareFunction: (value: string) => {
-          const types: any = {
+          const types:  any = {
             DEPOSIT: '<span class="badge badge-success">Dépôt</span>',
             WITHDRAWAL: '<span class="badge badge-danger">Retrait</span>',
             TRANSFER: '<span class="badge badge-primary">Virement</span>',
@@ -59,14 +59,14 @@ export class HistoryComponent implements OnInit {
         title: "Compte Source",
         type: "string",
         valuePrepareFunction: (value: string) => {
-          return value ? this.formatAccountNumber(value) : "—";
+          return value ?  this.formatAccountNumber(value) : "—";
         },
-        filter: true,
+        filter:  true,
       },
       destinationAccountNumber: {
-        title: "Compte Destination",
+        title:  "Compte Destination",
         type: "string",
-        valuePrepareFunction: (value: string) => {
+        valuePrepareFunction: (value:  string) => {
           return value ? this.formatAccountNumber(value) : "—";
         },
         filter: true,
@@ -77,7 +77,7 @@ export class HistoryComponent implements OnInit {
         valuePrepareFunction: (value: number, row: Transaction) => {
           const formatted = this.formatCurrency(Math.abs(value));
           const color =
-            row.transactionType === "DEPOSIT" ? "text-success" : "text-danger";
+            row.transactionType === "DEPOSIT" ?  "text-success" : "text-danger";
           return `<span class="${color} fw-bold">${formatted}</span>`;
         },
         filter: false,
@@ -85,7 +85,7 @@ export class HistoryComponent implements OnInit {
       balanceAfter: {
         title: "Solde après",
         type: "number",
-        valuePrepareFunction: (value: number) => {
+        valuePrepareFunction:  (value: number) => {
           return this.formatCurrency(value);
         },
         filter: false,
@@ -102,7 +102,7 @@ export class HistoryComponent implements OnInit {
           return statusMap[value] || value;
         },
         filter: {
-          type: "list",
+          type:  "list",
           config: {
             selectText: "Tous",
             list: [
@@ -146,12 +146,12 @@ export class HistoryComponent implements OnInit {
   filterOptions = {
     accountTypes: [
       { value: "ALL", label: "Tous les types" },
-      { value: "DEPOSIT", label: "Dépôt" },
+      { value:  "DEPOSIT", label: "Dépôt" },
       { value: "WITHDRAWAL", label: "Retrait" },
       { value: "TRANSFER", label: "Virement" },
     ],
     statuses: [
-      { value: "ALL", label: "Tous les statuts" },
+      { value:  "ALL", label: "Tous les statuts" },
       { value: "SUCCESS", label: "Succès" },
       { value: "PENDING", label: "En attente" },
       { value: "FAILED", label: "Échoué" },
@@ -169,11 +169,10 @@ export class HistoryComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Vérifie si un accountId est passé dans l'URL
-    const accountId = this.route.snapshot.params["accountId"];
+    const accountId = this.route.snapshot. params["accountId"];
     if (accountId) {
       this.accountIdFromRoute = +accountId;
-      this.selectedAccountId = accountId.toString();
+      this.selectedAccountId = accountId. toString();
     }
 
     this.loadAccounts();
@@ -188,7 +187,7 @@ export class HistoryComponent implements OnInit {
       .getAccounts({ page: 0, size: 100, sort: "accountNumber,asc" })
       .subscribe({
         next: (response) => {
-          this.accounts = response.content;
+          this.accounts = response. content;
         },
         error: (error) => {
           console.error("Erreur chargement comptes:", error);
@@ -203,13 +202,11 @@ export class HistoryComponent implements OnInit {
     this.isLoading = true;
 
     if (this.selectedAccountId !== "ALL" && this.selectedAccountId) {
-      // Charger pour un compte spécifique
       const accountId = +this.selectedAccountId;
 
       if (this.startDate && this.endDate) {
-        // Charger avec période
         this.transactionApi
-          .getTransactionsByPeriod(accountId, this.startDate, this.endDate)
+          . getTransactionsByPeriod(accountId, this.startDate, this.endDate)
           .subscribe({
             next: (transactions) => {
               this.transactions = transactions;
@@ -225,11 +222,10 @@ export class HistoryComponent implements OnInit {
             },
           });
       } else {
-        // Charger tout l'historique du compte
-        this.transactionApi.getTransactionsByAccount(accountId).subscribe({
+        this.transactionApi. getTransactionsByAccount(accountId).subscribe({
           next: (transactions) => {
-            this.transactions = transactions;
-            this.applyFilters();
+            this. transactions = transactions;
+            this. applyFilters();
             this.isLoading = false;
           },
           error: (error) => {
@@ -242,7 +238,6 @@ export class HistoryComponent implements OnInit {
         });
       }
     } else {
-      // TODO: Si tu as un endpoint pour toutes les transactions
       this.isLoading = false;
       this.transactions = [];
       this.source.load([]);
@@ -255,28 +250,25 @@ export class HistoryComponent implements OnInit {
   applyFilters(): void {
     let filtered = this.transactions;
 
-    // Filtre par type
     if (this.selectedType !== "ALL") {
       filtered = filtered.filter(
         (tx) => tx.transactionType === this.selectedType
       );
     }
 
-    // Filtre par recherche
-    if (this.searchTerm.trim()) {
+    if (this. searchTerm. trim()) {
       const term = this.searchTerm.toLowerCase();
       filtered = filtered.filter(
         (tx) =>
           tx.description?.toLowerCase().includes(term) ||
-          tx.transactionReference.toLowerCase().includes(term) ||
+          tx.transactionReference. toLowerCase().includes(term) ||
           tx.sourceAccountNumber.toLowerCase().includes(term) ||
           (tx.destinationAccountNumber &&
             tx.destinationAccountNumber.toLowerCase().includes(term))
       );
     }
 
-    // Trier par date (récent en premier)
-    filtered.sort(
+    filtered. sort(
       (a, b) =>
         new Date(b.transactionDate).getTime() -
         new Date(a.transactionDate).getTime()
@@ -304,7 +296,8 @@ export class HistoryComponent implements OnInit {
    */
   exportToCSV(): void {
     const csvContent = this.convertToCSV(this.transactions);
-    this.downloadCSV(csvContent, "transactions.csv");
+    this.downloadCSV(csvContent, `transactions_${new Date().toISOString().split('T')[0]}.csv`);
+    this.toastr.success('Export CSV réussi', 'Succès');
   }
 
   private convertToCSV(transactions: Transaction[]): string {
@@ -336,7 +329,7 @@ export class HistoryComponent implements OnInit {
         : tx.status === "PENDING"
         ? "En attente"
         : "Échoué",
-      tx.description || "",
+      tx. description || "",
     ]);
 
     return [
@@ -346,12 +339,12 @@ export class HistoryComponent implements OnInit {
   }
 
   private downloadCSV(content: string, filename: string): void {
-    const blob = new Blob([content], { type: "text/csv;charset=utf-8;" });
+    const blob = new Blob(["\ufeff" + content], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
     link.download = filename;
     link.click();
-    window.URL.revokeObjectURL(link.href);
+    URL.revokeObjectURL(link.href);
   }
 
   /**
@@ -369,18 +362,6 @@ export class HistoryComponent implements OnInit {
       style: "currency",
       currency: "EUR",
     }).format(amount);
-  }
-
-  /**
-   * Retourne le nom du compte
-   */
-  getAccountName(accountId: number): string {
-    const account = this.accounts.find((acc) => acc.id === accountId);
-    return account
-      ? `${account.customerFullName} (${this.formatAccountNumber(
-          account.accountNumber
-        )})`
-      : `Compte #${accountId}`;
   }
 
   /**
@@ -410,26 +391,8 @@ export class HistoryComponent implements OnInit {
     const firstDay = new Date(today.getFullYear(), today.getMonth() - 1, 1);
     const lastDay = new Date(today.getFullYear(), today.getMonth(), 0);
 
-    this.startDate = firstDay.toISOString().split("T")[0];
+    this.startDate = firstDay. toISOString().split("T")[0];
     this.endDate = lastDay.toISOString().split("T")[0];
     this.loadTransactions();
-  }
-
-  /**
-   * Retourne la date de demain pour la validation
-   */
-  getTomorrowDate(): string {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    return tomorrow.toISOString().split("T")[0];
-  }
-
-  get totalPages(): number {
-    if (this.pageSize === 0) return 0;
-    return Math.ceil(this.totalItems / this.pageSize);
-  }
-
-  get currentPageDisplay(): number {
-    return this.currentPage + 1;
   }
 }

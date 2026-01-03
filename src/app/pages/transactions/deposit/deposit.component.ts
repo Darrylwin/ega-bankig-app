@@ -22,7 +22,7 @@ export class DepositComponent implements OnInit {
 
   // Options
   paymentMethods = [
-    { value: "CASH", label: "Espèces", icon: "cash-outline" },
+    { value: "CASH", label:  "Espèces", icon: "cash-outline" },
     { value: "CHECK", label: "Chèque", icon: "file-text-outline" },
     {
       value: "WIRE_TRANSFER",
@@ -96,7 +96,7 @@ export class DepositComponent implements OnInit {
    */
   onSubmit(): void {
     if (this.depositForm.invalid) {
-      this.markFormGroupTouched(this.depositForm);
+      this.markFormGroupTouched(this. depositForm);
       return;
     }
 
@@ -105,10 +105,10 @@ export class DepositComponent implements OnInit {
     const depositData: DepositRequest = {
       accountId: this.depositForm.value.accountId,
       amount: this.depositForm.value.amount,
-      description: this.depositForm.value.description || undefined,
+      description: this.depositForm.value. description || undefined,
     };
 
-    this.transactionApi.deposit(depositData).subscribe({
+    this.transactionApi. deposit(depositData).subscribe({
       next: (transaction) => {
         this.isSubmitting = false;
 
@@ -119,7 +119,6 @@ export class DepositComponent implements OnInit {
           "Succès"
         );
 
-        // Redirection vers l'historique ou confirmation
         this.showConfirmation(transaction);
       },
       error: (error) => {
@@ -140,8 +139,6 @@ export class DepositComponent implements OnInit {
    * Affiche la confirmation
    */
   private showConfirmation(transaction: any): void {
-    // Pourrait être un dialog de confirmation
-    // Redirige vers l'historique pour l'instant
     setTimeout(() => {
       this.router.navigate(["/pages/transactions/history"]);
     }, 1500);
@@ -151,7 +148,7 @@ export class DepositComponent implements OnInit {
    * Annule et retourne
    */
   onCancel(): void {
-    this.router.navigate(["/pages/transactions"]);
+    this.router. navigate(["/pages/transactions"]);
   }
 
   /**
@@ -175,7 +172,7 @@ export class DepositComponent implements OnInit {
    * Formatte le numéro de compte
    */
   formatAccountNumber(iban: string): string {
-    return iban.replace(/(.{4})/g, "$1 ").trim();
+    return iban.replace(/(. {4})/g, "$1 ").trim();
   }
 
   /**
@@ -183,14 +180,10 @@ export class DepositComponent implements OnInit {
    */
   private markFormGroupTouched(formGroup: FormGroup): void {
     Object.values(formGroup.controls).forEach((control) => {
-      control.markAsTouched();
+      control. markAsTouched();
       if (control instanceof FormGroup) {
         this.markFormGroupTouched(control);
       }
     });
-  }
-
-  get totalPages(): number {
-    return Math.ceil(this.totalItems / this.pageSize);
   }
 }
