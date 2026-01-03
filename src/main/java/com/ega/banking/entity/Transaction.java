@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 /**
  * Entité représentant une transaction bancaire
- * Sera transformée en table "transactions" dans MySQL
+ * Sera transformée en table "transactions"
  */
 @Entity
 @Table(name = "transactions")

@@ -13,7 +13,7 @@ import java.util.List;
 
 /**
  * Entité représentant un compte bancaire
- * Sera transformée en table "accounts" dans MySQL
+ * Sera transformée en table "accounts"
  */
 @Entity
 @Table(name = "accounts")

@@ -13,7 +13,7 @@ import java.util.List;
 
 /**
  * Entité représentant un client de la banque
- * Sera transformée en table "customers" dans MySQL
+ * Sera transformée en table "customers"
  */
 @Entity
 @Table(name = "customers")
@@ -23,7 +23,7 @@ import java.util.List;
 public class Customer {
 
     @Id  // Clé primaire
-    @GeneratedValue(strategy = GenerationType.IDENTITY)  // Auto-incrémentation MySQL
+    @GeneratedValue(strategy = GenerationType.IDENTITY)  // Auto-incrémentation
     private Long id;
 
     @NotBlank(message = "Last name is required")

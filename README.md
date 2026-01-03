@@ -457,13 +457,13 @@ Une collection Postman complète est disponible dans `/postman/EGA_Banking.postm
 
 ## 🐛 Résolution des problèmes
 
-### Erreur de connexion MySQL
+### Erreur de connexion Database
 
 ```
 Access denied for user 'ega_user'@'localhost'
 ```
 
-**Solution** : Vérifiez que l'utilisateur MySQL existe et a les bonnes permissions.
+**Solution** : Vérifiez que l'utilisateur de la database existe et a les bonnes permissions.
 
 ### Port 8080 déjà utilisé
 
