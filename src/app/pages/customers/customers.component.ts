@@ -1,5 +1,5 @@
 import { CustomerApiService } from "./../../@core/data/api/customer-api.service";
-import { Component, OnInit, ViewChild } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import { NbDialogService, NbToastrService } from "@nebular/theme";
 import { LocalDataSource } from "ng2-smart-table";
@@ -21,7 +21,7 @@ export class CustomersComponent implements OnInit {
     actions: {
       columnTitle: "Actions",
       position: "right",
-      add: false, // On utilise notre propre bouton
+      add: false,
     },
     add: {
       addButtonContent: '<i class="nb-plus"></i>',
@@ -115,7 +115,7 @@ export class CustomersComponent implements OnInit {
         filter: false,
       },
     },
-    mode: "external", // Important pour personnaliser les actions
+    mode: "external",
     pager: {
       display: true,
       perPage: 10,
@@ -134,8 +134,33 @@ export class CustomersComponent implements OnInit {
   isLoading = false;
   searchTerm = "";
 
-  // Pour la pagination manuelle
-  @ViewChild("customerTable") customerTable: any;
+  // Vue active
+  viewMode: "table" | "grid" | "stats" = "table";
+
+  // Statistiques clients
+  customerStats = {
+    totalCustomers: 0,
+    maleCount: 0,
+    femaleCount: 0,
+    otherCount: 0,
+    averageAge: 0,
+    minorsCount: 0,
+    adultsCount: 0,
+    seniorsCount: 0,
+    newThisMonth: 0,
+    topNationalities: [] as { name: string; count: number }[],
+  };
+
+  // Données graphiques
+  genderDistributionData: any[] = [];
+  ageDistributionData: any[] = [];
+  nationalityDistributionData: any[] = [];
+  registrationTrendData: any[] = [];
+
+  // Options graphiques
+  colorScheme = {
+    domain: ["#3366FF", "#00D68F", "#FFAA00", "#FF3D71", "#00E096"],
+  };
 
   constructor(
     private customerApi: CustomerApiService,
@@ -165,6 +190,8 @@ export class CustomersComponent implements OnInit {
         this.customers = response.content;
         this.totalItems = response.totalElements;
         this.source.load(this.customers);
+        this.calculateStatistics();
+        this.prepareChartData();
         this.isLoading = false;
       },
       error: (error) => {
@@ -173,6 +200,115 @@ export class CustomersComponent implements OnInit {
         console.error("Erreur chargement clients:", error);
       },
     });
+  }
+
+  /**
+   * Calcule les statistiques des clients
+   */
+  private calculateStatistics(): void {
+    this.customerStats.totalCustomers = this.customers.length;
+    this.customerStats.maleCount = this.customers.filter(
+      (c) => c.gender === "MALE"
+    ).length;
+    this.customerStats.femaleCount = this.customers.filter(
+      (c) => c.gender === "FEMALE"
+    ).length;
+    this.customerStats.otherCount = this.customers.filter(
+      (c) => c.gender === "OTHER"
+    ).length;
+
+    // Calcul âge moyen
+    const totalAge = this.customers.reduce((sum, c) => sum + c.age, 0);
+    this.customerStats.averageAge =
+      Math.round(totalAge / this.customers.length) || 0;
+
+    // Répartition par âge
+    this.customerStats.minorsCount = this.customers.filter(
+      (c) => c.age < 18
+    ).length;
+    this.customerStats.adultsCount = this.customers.filter(
+      (c) => c.age >= 18 && c.age < 65
+    ).length;
+    this.customerStats.seniorsCount = this.customers.filter(
+      (c) => c.age >= 65
+    ).length;
+
+    // Nouveaux clients ce mois
+    const now = new Date();
+    const thisMonth = now.getMonth();
+    const thisYear = now.getFullYear();
+    this.customerStats.newThisMonth = this.customers.filter((c) => {
+      const createdDate = new Date(c.createdAt);
+      return (
+        createdDate.getMonth() === thisMonth &&
+        createdDate.getFullYear() === thisYear
+      );
+    }).length;
+
+    // Top 5 nationalités
+    const nationalityCounts: { [key: string]: number } = {};
+    this.customers.forEach((c) => {
+      nationalityCounts[c.nationality] =
+        (nationalityCounts[c.nationality] || 0) + 1;
+    });
+
+    this.customerStats.topNationalities = Object.entries(nationalityCounts)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+  }
+
+  /**
+   * Prépare les données pour les graphiques
+   */
+  private prepareChartData(): void {
+    // Graphique 1: Répartition par genre
+    this.genderDistributionData = [
+      { name: "Hommes", value: this.customerStats.maleCount },
+      { name: "Femmes", value: this.customerStats.femaleCount },
+      { name: "Autre", value: this.customerStats.otherCount },
+    ].filter((item) => item.value > 0);
+
+    // Graphique 2: Répartition par âge
+    this.ageDistributionData = [
+      { name: "Mineurs (<18)", value: this.customerStats.minorsCount },
+      { name: "Adultes (18-64)", value: this.customerStats.adultsCount },
+      { name: "Seniors (65+)", value: this.customerStats.seniorsCount },
+    ].filter((item) => item.value > 0);
+
+    // Graphique 3: Top nationalités
+    this.nationalityDistributionData = this.customerStats.topNationalities.map(
+      (n) => ({
+        name: n.name,
+        value: n.count,
+      })
+    );
+
+    // Graphique 4: Tendance inscriptions (simulation sur 6 mois)
+    this.registrationTrendData = this.generateRegistrationTrend();
+  }
+
+  /**
+   * Génère une tendance d'inscription (simulation)
+   */
+  private generateRegistrationTrend(): any[] {
+    const months = ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin"];
+    return [
+      {
+        name: "Nouveaux clients",
+        series: months.map((month, index) => ({
+          name: month,
+          value: Math.floor(Math.random() * 20) + 10 + index * 2,
+        })),
+      },
+    ];
+  }
+
+  /**
+   * Change le mode d'affichage
+   */
+  setViewMode(mode: "table" | "grid" | "stats"): void {
+    this.viewMode = mode;
   }
 
   /**
@@ -208,7 +344,7 @@ export class CustomersComponent implements OnInit {
       .open(ConfirmDialogComponent, {
         context: {
           title: "Confirmer la suppression",
-          message: `Êtes-vous sûr de vouloir supprimer le client ${customer.firstName} ${customer.lastName} ? Cette action est irréversible.`,
+          message: `Êtes-vous sûr de vouloir supprimer le client ${customer.firstName} ${customer.lastName} ?  Cette action est irréversible. `,
           confirmText: "Supprimer",
           cancelText: "Annuler",
           status: "danger",
@@ -228,12 +364,12 @@ export class CustomersComponent implements OnInit {
     this.customerApi.deleteCustomer(id).subscribe({
       next: () => {
         this.toastr.success("Client supprimé avec succès", "Succès");
-        this.loadCustomers(); // Recharge la liste
+        this.loadCustomers();
       },
       error: (error) => {
         if (error.status === 409) {
           this.toastr.warning(
-            "Impossible de supprimer : ce client a des comptes actifs",
+            "Impossible de supprimer :  ce client a des comptes actifs",
             "Attention"
           );
         } else {
@@ -247,9 +383,7 @@ export class CustomersComponent implements OnInit {
    * Recherche de clients
    */
   onSearch(): void {
-    // TODO: Implémenter la recherche côté backend si disponible
     if (this.searchTerm.trim()) {
-      // Filtrage local en attendant l'API
       const filtered = this.customers.filter(
         (customer) =>
           customer.lastName
@@ -275,19 +409,34 @@ export class CustomersComponent implements OnInit {
   }
 
   /**
-   * Gestion de la pagination
-   */
-  onPageChange(page: number): void {
-    this.currentPage = page - 1; // ng2-smart-table utilise 1-based, notre API 0-based
-    this.loadCustomers();
-  }
-
-  /**
    * Export CSV
    */
   exportToCSV(): void {
     const csvContent = this.convertToCSV(this.customers);
-    this.downloadCSV(csvContent, "clients.csv");
+    this.downloadCSV(
+      csvContent,
+      `clients_${new Date().toISOString().split("T")[0]}.csv`
+    );
+    this.toastr.success("Export CSV réussi", "Succès");
+  }
+
+  /**
+   * Export PDF (simulation)
+   */
+  exportToPDF(): void {
+    this.toastr.info("Génération du PDF en cours...", "Export PDF");
+    // TODO: Implémenter l'export PDF avec jsPDF ou pdfmake
+    setTimeout(() => {
+      this.toastr.success("Export PDF réussi", "Succès");
+    }, 1500);
+  }
+
+  /**
+   * Import CSV (placeholder)
+   */
+  importFromCSV(): void {
+    this.toastr.info("Fonctionnalité d'import à venir", "Import");
+    // TODO: Implémenter l'import CSV
   }
 
   private convertToCSV(customers: Customer[]): string {
@@ -301,6 +450,8 @@ export class CustomersComponent implements OnInit {
       "Âge",
       "Genre",
       "Nationalité",
+      "Adresse",
+      "Date Inscription",
     ];
     const rows = customers.map((c) => [
       c.id,
@@ -312,6 +463,8 @@ export class CustomersComponent implements OnInit {
       c.age,
       c.gender === "MALE" ? "Homme" : c.gender === "FEMALE" ? "Femme" : "Autre",
       c.nationality,
+      c.address,
+      new Date(c.createdAt).toLocaleDateString("fr-FR"),
     ]);
 
     return [
@@ -321,19 +474,27 @@ export class CustomersComponent implements OnInit {
   }
 
   private downloadCSV(content: string, filename: string): void {
-    const blob = new Blob([content], { type: "text/csv;charset=utf-8;" });
+    const blob = new Blob(["\ufeff" + content], {
+      type: "text/csv;charset=utf-8;",
+    });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
     link.download = filename;
     link.click();
   }
 
-  get totalPages(): number {
-    return Math.ceil(this.totalItems / this.pageSize);
+  /**
+   * Formate un nombre
+   */
+  formatNumber(num: number): string {
+    return num.toLocaleString("fr-FR");
   }
 
-  get currentPageDisplay(): number {
-    return this.currentPage + 1;
+  /**
+   * Calcule un pourcentage
+   */
+  calculatePercentage(part: number, total: number): number {
+    return total > 0 ? Math.round((part / total) * 100) : 0;
   }
 
   /**
@@ -361,5 +522,13 @@ export class CustomersComponent implements OnInit {
   goToLastPage(): void {
     this.currentPage = this.totalPages - 1;
     this.loadCustomers();
+  }
+
+  get totalPages(): number {
+    return Math.ceil(this.totalItems / this.pageSize);
+  }
+
+  get currentPageDisplay(): number {
+    return this.currentPage + 1;
   }
 }

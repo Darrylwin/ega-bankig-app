@@ -18,10 +18,15 @@ import {
   NbTabsetModule,
   NbListModule,
   NbActionsModule,
+  NbProgressBarModule,
+  NbButtonGroupModule,
 } from "@nebular/theme";
 
 // Tableau intelligent
 import { Ng2SmartTableModule } from "ng2-smart-table";
+
+// Charts
+import { NgxChartsModule } from "@swimlane/ngx-charts";
 
 import { CustomersRoutingModule } from "./customers-routing.module";
 import { CustomersComponent } from "./customers.component";
@@ -57,9 +62,14 @@ import { CoreModule } from "./../../@core/core.module";
     NbTabsetModule,
     NbListModule,
     NbActionsModule,
+    NbProgressBarModule,
+    NbButtonGroupModule,
 
     // Tableau intelligent
     Ng2SmartTableModule,
+
+    // Charts
+    NgxChartsModule,
   ],
 })
 export class CustomersModule {}

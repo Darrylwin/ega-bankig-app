@@ -1,5 +1,5 @@
 .customers-container {
-  padding: 1.5rem;
+  padding: 1 5rem;
 
   .customers-header {
     h2 {
@@ -8,7 +8,7 @@
     }
 
     .search-box {
-      min-width: 300px;
+      min-width: 250px;
 
       .input-group {
         display: flex;
@@ -50,7 +50,6 @@
           margin: 0;
 
           ::ng-deep {
-            // En-têtes du tableau
             thead {
               background-color: #f8f9fa;
 
@@ -63,13 +62,13 @@
               }
             }
 
-            // Lignes du tableau
             tbody {
               tr {
                 transition: background-color 0.2s;
 
                 &:hover {
                   background-color: #f8f9fa;
+                  cursor: pointer;
                 }
 
                 td {
@@ -80,7 +79,6 @@
               }
             }
 
-            // Actions
             .ng2-smart-actions {
               text-align: center;
               width: 120px;
@@ -123,15 +121,6 @@
                 }
               }
             }
-
-            // Pagination
-            nav {
-              margin-top: 1rem;
-
-              .pagination {
-                margin-bottom: 0;
-              }
-            }
           }
         }
       }
@@ -152,6 +141,98 @@
           cursor: not-allowed;
         }
       }
+    }
+  }
+
+  // Vue grille
+  .grid-view {
+    .customer-card {
+      border-radius: 10px;
+      transition: all 0.3s;
+      cursor: pointer;
+      height: 100%;
+
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      }
+
+      .customer-avatar {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #3366ff 0%, #5580ff 100%);
+
+        .avatar-icon {
+          font-size: 2.5rem;
+          color: white;
+        }
+      }
+
+      h5 {
+        font-weight: 600;
+        color: #333;
+      }
+
+      .customer-info {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 0.5rem;
+      }
+
+      .customer-actions {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+
+        button {
+          width: 36px;
+          height: 36px;
+        }
+      }
+    }
+  }
+
+  // Vue statistiques
+  .stat-card {
+    transition: all 0.3s;
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .stat-icon {
+      font-size: 3rem;
+      opacity: 0.8;
+    }
+
+    h2 {
+      font-weight: 700;
+      font-size: 2.5rem;
+      color: #333;
+    }
+  }
+
+  // Graphiques
+  .chart-summary {
+    border-top: 1px solid #e9ecef;
+    padding-top: 1rem;
+    margin-top: 1rem;
+
+    small {
+      display: block;
+      color: #6c757d;
+      font-size: 0.75rem;
+    }
+
+    .fw-bold {
+      font-size: 1.25rem;
+      color: #333;
     }
   }
 
@@ -195,12 +276,14 @@
     .customers-header {
       .search-box {
         min-width: auto;
-        margin-bottom: 1rem;
+        width: 100%;
+        margin-bottom: 0.5rem;
       }
 
-      .text-end {
+      .d-flex {
         flex-direction: column;
         align-items: stretch !important;
+        gap: 0.5rem !important;
       }
     }
 
@@ -210,7 +293,17 @@
 
       > div {
         width: 100%;
-        justify-content: center;
+        text-align: center;
+      }
+    }
+
+    .stat-card {
+      h2 {
+        font-size: 2rem;
+      }
+
+      .stat-icon {
+        font-size: 2rem;
       }
     }
   }

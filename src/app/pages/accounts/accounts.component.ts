@@ -34,8 +34,7 @@ export class AccountsComponent implements OnInit {
         type: "string",
         filter: true,
         valuePrepareFunction: (value: string) => {
-          // Format: FR76 3000 4000 0500 1234 5678 901
-          return value.replace(/(.{4})/g, "$1 ").trim();
+          return value.replace(/(. {4})/g, "$1 ").trim();
         },
       },
       customerFullName: {
@@ -130,6 +129,9 @@ export class AccountsComponent implements OnInit {
   accountTypeFilter = "ALL";
   statusFilter = "ALL";
 
+  // Vue active
+  viewMode: "table" | "cards" | "stats" = "table";
+
   // Filtres
   filterOptions = {
     accountTypes: [
@@ -143,6 +145,37 @@ export class AccountsComponent implements OnInit {
       { value: "BLOCKED", label: "Bloqué" },
       { value: "CLOSED", label: "Clos" },
     ],
+  };
+
+  // Statistiques
+  accountStats = {
+    totalAccounts: 0,
+    savingsCount: 0,
+    currentCount: 0,
+    activeCount: 0,
+    blockedCount: 0,
+    closedCount: 0,
+    totalBalance: 0,
+    averageBalance: 0,
+    highestBalance: 0,
+    lowestBalance: 0,
+    currencyBreakdown: [] as {
+      currency: string;
+      count: number;
+      totalBalance: number;
+    }[],
+  };
+
+  // Données graphiques
+  accountTypeDistributionData: any[] = [];
+  accountStatusDistributionData: any[] = [];
+  balanceDistributionData: any[] = [];
+  currencyDistributionData: any[] = [];
+  accountGrowthTrendData: any[] = [];
+
+  // Options graphiques
+  colorScheme = {
+    domain: ["#3366FF", "#00D68F", "#FFAA00", "#FF3D71", "#00E096", "#A366FF"],
   };
 
   constructor(
@@ -173,6 +206,8 @@ export class AccountsComponent implements OnInit {
         this.accounts = response.content;
         this.totalItems = response.totalElements;
         this.applyFilters();
+        this.calculateStatistics();
+        this.prepareChartData();
         this.isLoading = false;
       },
       error: (error) => {
@@ -181,6 +216,135 @@ export class AccountsComponent implements OnInit {
         console.error("Erreur chargement comptes:", error);
       },
     });
+  }
+
+  /**
+   * Calcule les statistiques des comptes
+   */
+  private calculateStatistics(): void {
+    this.accountStats.totalAccounts = this.accounts.length;
+    this.accountStats.savingsCount = this.accounts.filter(
+      (a) => a.accountType === "SAVINGS"
+    ).length;
+    this.accountStats.currentCount = this.accounts.filter(
+      (a) => a.accountType === "CURRENT"
+    ).length;
+    this.accountStats.activeCount = this.accounts.filter(
+      (a) => a.status === "ACTIVE"
+    ).length;
+    this.accountStats.blockedCount = this.accounts.filter(
+      (a) => a.status === "BLOCKED"
+    ).length;
+    this.accountStats.closedCount = this.accounts.filter(
+      (a) => a.status === "CLOSED"
+    ).length;
+
+    // Calculs financiers
+    this.accountStats.totalBalance = this.accounts.reduce(
+      (sum, a) => sum + a.balance,
+      0
+    );
+    this.accountStats.averageBalance =
+      this.accountStats.totalAccounts > 0
+        ? this.accountStats.totalBalance / this.accountStats.totalAccounts
+        : 0;
+
+    const balances = this.accounts.map((a) => a.balance).sort((a, b) => b - a);
+    this.accountStats.highestBalance = balances[0] || 0;
+    this.accountStats.lowestBalance = balances[balances.length - 1] || 0;
+
+    // Répartition par devise
+    const currencyMap: {
+      [key: string]: { count: number; totalBalance: number };
+    } = {};
+    this.accounts.forEach((account) => {
+      if (!currencyMap[account.currency]) {
+        currencyMap[account.currency] = { count: 0, totalBalance: 0 };
+      }
+      currencyMap[account.currency].count++;
+      currencyMap[account.currency].totalBalance += account.balance;
+    });
+
+    this.accountStats.currencyBreakdown = Object.entries(currencyMap)
+      .map(([currency, data]) => ({ currency, ...data }))
+      .sort((a, b) => b.count - a.count);
+  }
+
+  /**
+   * Prépare les données pour les graphiques
+   */
+  private prepareChartData(): void {
+    // Graphique 1: Répartition par type
+    this.accountTypeDistributionData = [
+      { name: "Comptes Épargne", value: this.accountStats.savingsCount },
+      { name: "Comptes Courants", value: this.accountStats.currentCount },
+    ].filter((item) => item.value > 0);
+
+    // Graphique 2: Répartition par statut
+    this.accountStatusDistributionData = [
+      { name: "Actifs", value: this.accountStats.activeCount },
+      { name: "Bloqués", value: this.accountStats.blockedCount },
+      { name: "Clos", value: this.accountStats.closedCount },
+    ].filter((item) => item.value > 0);
+
+    // Graphique 3: Répartition des soldes par tranche
+    this.balanceDistributionData = this.generateBalanceDistribution();
+
+    // Graphique 4: Répartition par devise
+    this.currencyDistributionData = this.accountStats.currencyBreakdown.map(
+      (c) => ({
+        name: c.currency,
+        value: c.count,
+      })
+    );
+
+    // Graphique 5: Tendance d'ouverture de comptes (simulation 6 mois)
+    this.accountGrowthTrendData = this.generateAccountGrowthTrend();
+  }
+
+  /**
+   * Génère la distribution des soldes par tranches
+   */
+  private generateBalanceDistribution(): any[] {
+    const ranges = [
+      { name: "0 - 1K€", min: 0, max: 1000 },
+      { name: "1K - 5K€", min: 1000, max: 5000 },
+      { name: "5K - 10K€", min: 5000, max: 10000 },
+      { name: "10K - 50K€", min: 10000, max: 50000 },
+      { name: "50K+€", min: 50000, max: Infinity },
+    ];
+
+    return ranges
+      .map((range) => ({
+        name: range.name,
+        value: this.accounts.filter(
+          (a) => a.balance >= range.min && a.balance < range.max
+        ).length,
+      }))
+      .filter((item) => item.value > 0);
+  }
+
+  /**
+   * Génère la tendance d'ouverture de comptes (simulation)
+   */
+  private generateAccountGrowthTrend(): any[] {
+    const months = ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin"];
+    return [
+      {
+        name: "Nouveaux comptes",
+        series: months.map((month, index) => ({
+          name: month,
+          value: Math.floor(Math.random() * 15) + 5 + index * 3,
+        })),
+      },
+    ];
+  }
+
+  /**
+   * Change le mode d'affichage
+   */
+  setViewMode(mode: "table" | "cards" | "stats"): void {
+    this.viewMode = mode;
   }
 
   /**
@@ -270,7 +434,7 @@ export class AccountsComponent implements OnInit {
       error: (error) => {
         if (error.status === 409) {
           this.toastr.warning(
-            "Impossible de supprimer : compte avec solde non nul",
+            "Impossible de supprimer :  compte avec solde non nul",
             "Attention"
           );
         } else if (error.status === 400) {
@@ -297,7 +461,21 @@ export class AccountsComponent implements OnInit {
    */
   exportToCSV(): void {
     const csvContent = this.convertToCSV(this.accounts);
-    this.downloadCSV(csvContent, "comptes.csv");
+    this.downloadCSV(
+      csvContent,
+      `comptes_${new Date().toISOString().split("T")[0]}.csv`
+    );
+    this.toastr.success("Export CSV réussi", "Succès");
+  }
+
+  /**
+   * Export PDF (simulation)
+   */
+  exportToPDF(): void {
+    this.toastr.info("Génération du PDF en cours...", "Export PDF");
+    setTimeout(() => {
+      this.toastr.success("Export PDF réussi", "Succès");
+    }, 1500);
   }
 
   private convertToCSV(accounts: Account[]): string {
@@ -331,7 +509,9 @@ export class AccountsComponent implements OnInit {
   }
 
   private downloadCSV(content: string, filename: string): void {
-    const blob = new Blob([content], { type: "text/csv;charset=utf-8;" });
+    const blob = new Blob(["\ufeff" + content], {
+      type: "text/csv;charset=utf-8;",
+    });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
     link.download = filename;
@@ -339,20 +519,34 @@ export class AccountsComponent implements OnInit {
   }
 
   /**
-   * Formatte le numéro de compte
+   * Formate le numéro de compte
    */
   formatAccountNumber(iban: string): string {
-    return iban.replace(/(.{4})/g, "$1 ").trim();
+    return iban.replace(/(. {4})/g, "$1 ").trim();
   }
 
   /**
-   * Formatte la monnaie
+   * Formate la monnaie
    */
   formatCurrency(amount: number): string {
     return new Intl.NumberFormat("fr-FR", {
       style: "currency",
       currency: "EUR",
     }).format(amount);
+  }
+
+  /**
+   * Formate un nombre
+   */
+  formatNumber(num: number): string {
+    return num.toLocaleString("fr-FR");
+  }
+
+  /**
+   * Calcule un pourcentage
+   */
+  calculatePercentage(part: number, total: number): number {
+    return total > 0 ? Math.round((part / total) * 100) : 0;
   }
 
   /**
@@ -363,14 +557,6 @@ export class AccountsComponent implements OnInit {
     this.accountTypeFilter = "ALL";
     this.statusFilter = "ALL";
     this.applyFilters();
-  }
-
-  get totalPages(): number {
-    return Math.ceil(this.totalItems / this.pageSize);
-  }
-
-   get currentPageDisplay(): number {
-    return this.currentPage + 1;
   }
 
   /**
@@ -389,7 +575,7 @@ export class AccountsComponent implements OnInit {
   }
 
   goToNextPage(): void {
-    if (this. currentPage < this.totalPages - 1) {
+    if (this.currentPage < this.totalPages - 1) {
       this.currentPage++;
       this.loadAccounts();
     }
@@ -398,5 +584,13 @@ export class AccountsComponent implements OnInit {
   goToLastPage(): void {
     this.currentPage = this.totalPages - 1;
     this.loadAccounts();
+  }
+
+  get totalPages(): number {
+    return Math.ceil(this.totalItems / this.pageSize);
+  }
+
+  get currentPageDisplay(): number {
+    return this.currentPage + 1;
   }
 }

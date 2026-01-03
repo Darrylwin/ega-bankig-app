@@ -1,13 +1,13 @@
-import { CoreModule } from './../../@core/core.module';
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { CoreModule } from "./../../@core/core.module";
+import { NgModule } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 
 // Modules Nebular
-import { 
-  NbCardModule, 
-  NbIconModule, 
-  NbButtonModule, 
+import {
+  NbCardModule,
+  NbIconModule,
+  NbButtonModule,
   NbInputModule,
   NbSelectModule,
   NbDatepickerModule,
@@ -21,24 +21,28 @@ import {
   NbActionsModule,
   NbProgressBarModule,
   NbRadioModule,
-  NbCheckboxModule
-} from '@nebular/theme';
+  NbCheckboxModule,
+  NbButtonGroupModule,
+} from "@nebular/theme";
 
 // Tableau intelligent
-import { Ng2SmartTableModule } from 'ng2-smart-table';
+import { Ng2SmartTableModule } from "ng2-smart-table";
 
-import { AccountsRoutingModule } from './accounts-routing.module';
-import { AccountsComponent } from './accounts.component';
-import { AccountFormComponent } from './account-form/account-form.component';
-import { AccountDetailComponent } from './account-detail/account-detail.component';
-import { AccountStatementComponent } from './account-statement/account-statement.component';
+// Charts
+import { NgxChartsModule } from "@swimlane/ngx-charts";
+
+import { AccountsRoutingModule } from "./accounts-routing.module";
+import { AccountsComponent } from "./accounts.component";
+import { AccountFormComponent } from "./account-form/account-form.component";
+import { AccountDetailComponent } from "./account-detail/account-detail.component";
+import { AccountStatementComponent } from "./account-statement/account-statement.component";
 
 @NgModule({
   declarations: [
     AccountsComponent,
     AccountFormComponent,
     AccountDetailComponent,
-    AccountStatementComponent
+    AccountStatementComponent,
   ],
   imports: [
     CommonModule,
@@ -46,7 +50,7 @@ import { AccountStatementComponent } from './account-statement/account-statement
     ReactiveFormsModule,
     AccountsRoutingModule,
     CoreModule,
-    
+
     // Modules Nebular UI
     NbCardModule,
     NbIconModule,
@@ -65,9 +69,13 @@ import { AccountStatementComponent } from './account-statement/account-statement
     NbProgressBarModule,
     NbRadioModule,
     NbCheckboxModule,
-    
+    NbButtonGroupModule,
+
     // Tableau intelligent
-    Ng2SmartTableModule
-  ]
+    Ng2SmartTableModule,
+
+    // Charts
+    NgxChartsModule,
+  ],
 })
-export class AccountsModule { }
+export class AccountsModule {}

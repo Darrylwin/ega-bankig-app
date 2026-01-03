@@ -14,7 +14,11 @@ import {
   NbSelectModule,
   NbDatepickerModule,
   NbBadgeModule,
+  NbTabsetModule,
 } from "@nebular/theme";
+
+// Charts
+import { NgxChartsModule } from "@swimlane/ngx-charts";
 
 import { DashboardComponent } from "./dashboard.component";
 
@@ -42,6 +46,10 @@ const routes: Routes = [
     NbSelectModule,
     NbDatepickerModule,
     NbBadgeModule,
+    NbTabsetModule,
+
+    // Charts
+    NgxChartsModule,
   ],
 })
 export class DashboardModule {}
