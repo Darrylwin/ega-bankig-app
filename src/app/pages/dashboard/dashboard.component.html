@@ -14,16 +14,19 @@
             <nb-option value="week">Cette semaine</nb-option>
             <nb-option value="month">Ce mois</nb-option>
           </nb-select> -->
-          
+
           <!-- Bouton rafraîchir -->
-          <button 
-            nbButton 
-            size="small" 
-            status="primary" 
+          <button
+            nbButton
+            size="small"
+            status="primary"
             (click)="loadDashboardData()"
-            [disabled]="isLoading">
-            <nb-icon [icon]="isLoading ? 'sync-outline spin' : 'refresh-outline'"></nb-icon>
-            {{ isLoading ? 'Chargement...' : 'Rafraîchir' }}
+            [disabled]="isLoading"
+          >
+            <nb-icon
+              [icon]="isLoading ? 'sync-outline spin' : 'refresh-outline'"
+            ></nb-icon>
+            {{ isLoading ? "Chargement..." : "Rafraîchir" }}
           </button>
         </div>
       </div>
@@ -39,9 +42,15 @@
   <!-- Message d'erreur -->
   <div *ngIf="hasError && !isLoading" class="mb-4">
     <nb-alert status="danger" closable (close)="hasError = false">
-      <nb-icon icon="alert-circle-outline" class="mr-2"></nb-icon>
+      <nb-icon icon="alert-circle-outline" class="me-2"></nb-icon>
       {{ errorMessage }}
-      <button nbButton size="tiny" status="warning" class="ms-3" (click)="loadDashboardData()">
+      <button
+        nbButton
+        size="tiny"
+        status="warning"
+        class="ms-3"
+        (click)="loadDashboardData()"
+      >
         Réessayer
       </button>
     </nb-alert>
@@ -49,7 +58,6 @@
 
   <!-- Contenu principal -->
   <div *ngIf="!isLoading && !hasError && stats" class="dashboard-content">
-    
     <!-- ROW 1: Statistiques principales -->
     <div class="row mb-4">
       <!-- Clients -->
@@ -65,7 +73,9 @@
             </div>
           </nb-card-header>
           <nb-card-body class="text-center">
-            <h1 class="display-4 mb-2">{{ formatNumber(stats.totalCustomers) }}</h1>
+            <h1 class="display-4 mb-2">
+              {{ formatNumber(stats.totalCustomers) }}
+            </h1>
             <p class="text-muted mb-0">Clients actifs</p>
           </nb-card-body>
         </nb-card>
@@ -85,7 +95,9 @@
           </nb-card-header>
           <nb-card-body>
             <div class="text-center">
-              <h1 class="display-4 mb-2">{{ formatNumber(stats.totalAccounts) }}</h1>
+              <h1 class="display-4 mb-2">
+                {{ formatNumber(stats.totalAccounts) }}
+              </h1>
               <div class="row">
                 <div class="col-6">
                   <small class="text-muted">Courants</small>
@@ -110,11 +122,15 @@
                 <nb-icon icon="repeat-outline" class="stat-icon"></nb-icon>
                 <h5 class="mb-0">Transactions</h5>
               </div>
-              <span class="badge bg-info">{{ formatNumber(stats.totalTransactions) }}</span>
+              <span class="badge bg-info">{{
+                formatNumber(stats.totalTransactions)
+              }}</span>
             </div>
           </nb-card-header>
           <nb-card-body class="text-center">
-            <h1 class="display-4 mb-2">{{ formatNumber(stats.totalTransactions) }}</h1>
+            <h1 class="display-4 mb-2">
+              {{ formatNumber(stats.totalTransactions) }}
+            </h1>
             <p class="text-muted mb-0">Total des opérations</p>
           </nb-card-body>
         </nb-card>
@@ -129,11 +145,15 @@
                 <nb-icon icon="bar-chart-outline" class="stat-icon"></nb-icon>
                 <h5 class="mb-0">Solde Total</h5>
               </div>
-              <span class="badge bg-warning">{{ formatCurrency(stats.totalBalance) }}</span>
+              <span class="badge bg-warning">{{
+                formatCurrency(stats.totalBalance)
+              }}</span>
             </div>
           </nb-card-header>
           <nb-card-body class="text-center">
-            <h1 class="display-4 mb-2">{{ formatCurrency(stats.totalBalance) }}</h1>
+            <h1 class="display-4 mb-2">
+              {{ formatCurrency(stats.totalBalance) }}
+            </h1>
             <p class="text-muted mb-0">Capital total déposé</p>
           </nb-card-body>
         </nb-card>
@@ -153,9 +173,15 @@
               <div class="col-md-4 mb-3 mb-md-0">
                 <div class="activity-card text-center p-4">
                   <div class="activity-icon mb-3">
-                    <nb-icon icon="activity-outline" status="primary" size="giant"></nb-icon>
+                    <nb-icon
+                      icon="activity-outline"
+                      status="primary"
+                      size="giant"
+                    ></nb-icon>
                   </div>
-                  <h2 class="mb-1">{{ formatNumber(stats.transactionsToday) }}</h2>
+                  <h2 class="mb-1">
+                    {{ formatNumber(stats.transactionsToday) }}
+                  </h2>
                   <p class="text-muted mb-0">Transactions</p>
                   <small>Total aujourd'hui</small>
                 </div>
@@ -165,16 +191,22 @@
               <div class="col-md-4 mb-3 mb-md-0">
                 <div class="activity-card text-center p-4">
                   <div class="activity-icon mb-3">
-                    <nb-icon 
-                      [icon]="getTransactionIcon('deposits')" 
-                      [status]="getTransactionColor('deposits')" 
-                      size="giant">
+                    <nb-icon
+                      [icon]="getTransactionIcon('deposits')"
+                      [status]="getTransactionColor('deposits')"
+                      size="giant"
+                    >
                     </nb-icon>
                   </div>
                   <h2 class="mb-1">{{ formatNumber(stats.depositsToday) }}</h2>
                   <p class="text-muted mb-0">Dépôts</p>
                   <small>
-                    {{ calculatePercentage(stats.depositsToday, stats.transactionsToday) }}% des transactions
+                    {{
+                      calculatePercentage(
+                        stats.depositsToday,
+                        stats.transactionsToday
+                      )
+                    }}% des transactions
                   </small>
                 </div>
               </div>
@@ -183,16 +215,24 @@
               <div class="col-md-4">
                 <div class="activity-card text-center p-4">
                   <div class="activity-icon mb-3">
-                    <nb-icon 
-                      [icon]="getTransactionIcon('withdrawals')" 
-                      [status]="getTransactionColor('withdrawals')" 
-                      size="giant">
+                    <nb-icon
+                      [icon]="getTransactionIcon('withdrawals')"
+                      [status]="getTransactionColor('withdrawals')"
+                      size="giant"
+                    >
                     </nb-icon>
                   </div>
-                  <h2 class="mb-1">{{ formatNumber(stats.withdrawalsToday) }}</h2>
+                  <h2 class="mb-1">
+                    {{ formatNumber(stats.withdrawalsToday) }}
+                  </h2>
                   <p class="text-muted mb-0">Retraits</p>
                   <small>
-                    {{ calculatePercentage(stats.withdrawalsToday, stats.transactionsToday) }}% des transactions
+                    {{
+                      calculatePercentage(
+                        stats.withdrawalsToday,
+                        stats.transactionsToday
+                      )
+                    }}% des transactions
                   </small>
                 </div>
               </div>
@@ -214,23 +254,52 @@
             <div class="mb-3">
               <div class="d-flex justify-content-between mb-1">
                 <span>Transactions</span>
-                <span class="fw-bold">{{ formatNumber(stats.transactionsThisWeek) }}</span>
+                <span class="fw-bold">{{
+                  formatNumber(stats.transactionsThisWeek)
+                }}</span>
               </div>
-              <nb-progress-bar [value]="calculatePercentage(stats.transactionsThisWeek, stats.transactionsThisMonth)"></nb-progress-bar>
+              <nb-progress-bar
+                [value]="
+                  calculatePercentage(
+                    stats.transactionsThisWeek,
+                    stats.transactionsThisMonth
+                  )
+                "
+              ></nb-progress-bar>
             </div>
             <div class="mb-3">
               <div class="d-flex justify-content-between mb-1">
                 <span>Dépôts</span>
-                <span class="fw-bold">{{ formatNumber(stats.depositsThisWeek) }}</span>
+                <span class="fw-bold">{{
+                  formatNumber(stats.depositsThisWeek)
+                }}</span>
               </div>
-              <nb-progress-bar [value]="calculatePercentage(stats.depositsThisWeek, stats.depositsThisMonth)" status="success"></nb-progress-bar>
+              <nb-progress-bar
+                [value]="
+                  calculatePercentage(
+                    stats.depositsThisWeek,
+                    stats.depositsThisMonth
+                  )
+                "
+                status="success"
+              ></nb-progress-bar>
             </div>
             <div>
               <div class="d-flex justify-content-between mb-1">
                 <span>Retraits</span>
-                <span class="fw-bold">{{ formatNumber(stats.withdrawalsThisWeek) }}</span>
+                <span class="fw-bold">{{
+                  formatNumber(stats.withdrawalsThisWeek)
+                }}</span>
               </div>
-              <nb-progress-bar [value]="calculatePercentage(stats.withdrawalsThisWeek, stats.withdrawalsThisMonth)" status="danger"></nb-progress-bar>
+              <nb-progress-bar
+                [value]="
+                  calculatePercentage(
+                    stats.withdrawalsThisWeek,
+                    stats.withdrawalsThisMonth
+                  )
+                "
+                status="danger"
+              ></nb-progress-bar>
             </div>
           </nb-card-body>
         </nb-card>
@@ -246,21 +315,27 @@
             <div class="mb-3">
               <div class="d-flex justify-content-between mb-1">
                 <span>Transactions</span>
-                <span class="fw-bold">{{ formatNumber(stats.transactionsThisMonth) }}</span>
+                <span class="fw-bold">{{
+                  formatNumber(stats.transactionsThisMonth)
+                }}</span>
               </div>
               <nb-progress-bar [value]="100"></nb-progress-bar>
             </div>
             <div class="mb-3">
               <div class="d-flex justify-content-between mb-1">
                 <span>Dépôts</span>
-                <span class="fw-bold">{{ formatNumber(stats.depositsThisMonth) }}</span>
+                <span class="fw-bold">{{
+                  formatNumber(stats.depositsThisMonth)
+                }}</span>
               </div>
               <nb-progress-bar [value]="100" status="success"></nb-progress-bar>
             </div>
             <div>
               <div class="d-flex justify-content-between mb-1">
                 <span>Retraits</span>
-                <span class="fw-bold">{{ formatNumber(stats.withdrawalsThisMonth) }}</span>
+                <span class="fw-bold">{{
+                  formatNumber(stats.withdrawalsThisMonth)
+                }}</span>
               </div>
               <nb-progress-bar [value]="100" status="danger"></nb-progress-bar>
             </div>
@@ -276,22 +351,42 @@
           </nb-card-header>
           <nb-card-body>
             <div class="d-grid gap-2">
-              <button nbButton fullWidth status="primary" routerLink="/pages/customers">
+              <button
+                nbButton
+                fullWidth
+                status="primary"
+                routerLink="/pages/customers"
+              >
                 <nb-icon icon="person-add-outline" class="me-2"></nb-icon>
                 Nouveau Client
               </button>
-              
-              <button nbButton fullWidth status="success" routerLink="/pages/accounts">
+
+              <button
+                nbButton
+                fullWidth
+                status="success"
+                routerLink="/pages/accounts"
+              >
                 <nb-icon icon="plus-circle-outline" class="me-2"></nb-icon>
                 Ouvrir un Compte
               </button>
-              
-              <button nbButton fullWidth status="info" routerLink="/pages/transactions">
+
+              <button
+                nbButton
+                fullWidth
+                status="info"
+                routerLink="/pages/transactions"
+              >
                 <nb-icon icon="swap-horizontal-outline" class="me-2"></nb-icon>
                 Effectuer une Opération
               </button>
-              
-              <button nbButton fullWidth status="warning" routerLink="/pages/statements">
+
+              <button
+                nbButton
+                fullWidth
+                status="warning"
+                routerLink="/pages/statements"
+              >
                 <nb-icon icon="file-text-outline" class="me-2"></nb-icon>
                 Générer un Relevé
               </button>

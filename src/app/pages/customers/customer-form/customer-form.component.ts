@@ -205,4 +205,11 @@ export class CustomerFormComponent implements OnInit {
   isAdult(): boolean {
     return this.calculateAge() >= 18;
   }
+
+  /**
+   * Retourne la date maximale (aujourd'hui)
+   */
+  getMaxDate(): string {
+    return new Date().toISOString().split('T')[0];
+  }
 }
