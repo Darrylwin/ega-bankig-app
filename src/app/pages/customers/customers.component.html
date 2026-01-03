@@ -17,13 +17,15 @@
                 fullWidth
                 placeholder="Rechercher un client..."
                 [(ngModel)]="searchTerm"
-                (keyup.enter)="onSearch()">
+                (keyup.enter)="onSearch()"
+              />
               <button
                 nbButton
                 ghost
                 size="small"
                 (click)="onSearch()"
-                [disabled]="!searchTerm">
+                [disabled]="!searchTerm"
+              >
                 <nb-icon icon="search-outline"></nb-icon>
               </button>
               <button
@@ -31,7 +33,8 @@
                 ghost
                 size="small"
                 *ngIf="searchTerm"
-                (click)="clearSearch()">
+                (click)="clearSearch()"
+              >
                 <nb-icon icon="close-outline"></nb-icon>
               </button>
             </div>
@@ -69,7 +72,8 @@
             (create)="onCreate()"
             (edit)="onEdit($event)"
             (delete)="onDelete($event)"
-            (userRowSelect)="onView($event)">
+            (userRowSelect)="onView($event)"
+          >
           </ng2-smart-table>
         </div>
       </nb-card-body>
@@ -78,19 +82,20 @@
       <nb-card-footer class="d-flex justify-content-between align-items-center">
         <div>
           <span class="text-muted">
-            {{ totalItems }} client{{ totalItems > 1 ? 's' : '' }} au total
+            {{ totalItems }} client{{ totalItems > 1 ? "s" : "" }} au total
           </span>
         </div>
         <div>
           <span class="text-muted me-3">
-            Page {{ currentPage + 1 }} sur {{ totalPages() }}
+            Page {{ currentPageDisplay }} sur {{ totalPages }}
           </span>
           <button
             nbButton
             size="small"
             ghost
             [disabled]="currentPage === 0"
-            (click)="currentPage = 0; loadCustomers()">
+            (click)="goToFirstPage()"
+          >
             <nb-icon icon="skip-back-outline"></nb-icon>
           </button>
           <button
@@ -98,23 +103,26 @@
             size="small"
             ghost
             [disabled]="currentPage === 0"
-            (click)="currentPage--; loadCustomers()">
+            (click)="goToPreviousPage()"
+          >
             <nb-icon icon="chevron-left-outline"></nb-icon>
           </button>
           <button
             nbButton
             size="small"
             ghost
-            [disabled]="currentPage >= totalPages() - 1"
-            (click)="currentPage++; loadCustomers()">
+            [disabled]="currentPage >= totalPages - 1"
+            (click)="goToNextPage()"
+          >
             <nb-icon icon="chevron-right-outline"></nb-icon>
           </button>
           <button
             nbButton
             size="small"
             ghost
-            [disabled]="currentPage >= totalPages() - 1"
-            (click)="currentPage = totalPages() - 1; loadCustomers()">
+            [disabled]="currentPage >= totalPages - 1"
+            (click)="goToLastPage()"
+          >
             <nb-icon icon="skip-forward-outline"></nb-icon>
           </button>
         </div>
@@ -124,7 +132,11 @@
 
   <!-- Aucune donnée -->
   <div *ngIf="!isLoading && customers.length === 0" class="text-center py-5">
-    <nb-icon icon="people-outline" size="giant" class="text-muted mb-3"></nb-icon>
+    <nb-icon
+      icon="people-outline"
+      size="giant"
+      class="text-muted mb-3"
+    ></nb-icon>
     <h4>Aucun client trouvé</h4>
     <p class="text-muted mb-4">Commencez par ajouter votre premier client</p>
     <button nbButton status="primary" size="large" (click)="onCreate()">

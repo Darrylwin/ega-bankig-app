@@ -335,4 +335,31 @@ export class CustomersComponent implements OnInit {
   get currentPageDisplay(): number {
     return this.currentPage + 1;
   }
+
+  /**
+   * Navigation pagination
+   */
+  goToFirstPage(): void {
+    this.currentPage = 0;
+    this.loadCustomers();
+  }
+
+  goToPreviousPage(): void {
+    if (this.currentPage > 0) {
+      this.currentPage--;
+      this.loadCustomers();
+    }
+  }
+
+  goToNextPage(): void {
+    if (this.currentPage < this.totalPages - 1) {
+      this.currentPage++;
+      this.loadCustomers();
+    }
+  }
+
+  goToLastPage(): void {
+    this.currentPage = this.totalPages - 1;
+    this.loadCustomers();
+  }
 }

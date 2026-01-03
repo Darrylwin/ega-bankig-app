@@ -1,34 +1,33 @@
-// src/app/pages/customers/customers.module.ts
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NgModule } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 
 // Modules Nebular
-import { 
-  NbCardModule, 
-  NbIconModule, 
-  NbButtonModule, 
+import {
+  NbCardModule,
+  NbIconModule,
+  NbButtonModule,
   NbInputModule,
   NbSelectModule,
   NbDatepickerModule,
   NbSpinnerModule,
   NbAlertModule,
-  NbDialogModule,      // ← IMPORTANT pour les dialogs
+  NbDialogModule,
   NbTooltipModule,
   NbBadgeModule,
   NbTabsetModule,
   NbListModule,
-  NbActionsModule
-} from '@nebular/theme';
+  NbActionsModule,
+} from "@nebular/theme";
 
 // Tableau intelligent
-import { Ng2SmartTableModule } from 'ng2-smart-table';
+import { Ng2SmartTableModule } from "ng2-smart-table";
 
-import { CustomersRoutingModule } from './customers-routing.module';
-import { CustomersComponent } from './customers.component';
-import { CustomerFormComponent } from './customer-form/customer-form.component';
-import { CustomerDetailComponent } from './customer-detail/customer-detail.component';
-import { CoreModule } from './../../@core/core.module';
+import { CustomersRoutingModule } from "./customers-routing.module";
+import { CustomersComponent } from "./customers.component";
+import { CustomerFormComponent } from "./customer-form/customer-form.component";
+import { CustomerDetailComponent } from "./customer-detail/customer-detail.component";
+import { CoreModule } from "./../../@core/core.module";
 
 @NgModule({
   declarations: [
@@ -42,7 +41,7 @@ import { CoreModule } from './../../@core/core.module';
     ReactiveFormsModule,
     CustomersRoutingModule,
     CoreModule,
-    
+
     // Modules Nebular UI
     NbCardModule,
     NbIconModule,
@@ -52,17 +51,15 @@ import { CoreModule } from './../../@core/core.module';
     NbDatepickerModule,
     NbSpinnerModule,
     NbAlertModule,
-    NbDialogModule.forChild(), // ← CONFIGURE le module dialog
+    NbDialogModule.forChild(),
     NbTooltipModule,
     NbBadgeModule,
     NbTabsetModule,
     NbListModule,
     NbActionsModule,
-    
+
     // Tableau intelligent
-    Ng2SmartTableModule
+    Ng2SmartTableModule,
   ],
-  // entryComponents: [ConfirmDialogComponent] // ← IMPORTANT pour les dialogs
-  CoreModule,
 })
-export class CustomersModule { }
+export class CustomersModule {}
