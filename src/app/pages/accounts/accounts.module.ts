@@ -33,9 +33,6 @@ import { AccountFormComponent } from './account-form/account-form.component';
 import { AccountDetailComponent } from './account-detail/account-detail.component';
 import { AccountStatementComponent } from './account-statement/account-statement.component';
 
-// Pour les confirmations
-import { ConfirmDialogComponent } from '../../@core/components/confirm-dialog.component';
-
 @NgModule({
   declarations: [
     AccountsComponent,
@@ -71,7 +68,6 @@ import { ConfirmDialogComponent } from '../../@core/components/confirm-dialog.co
     
     // Tableau intelligent
     Ng2SmartTableModule
-  ],
-  entryComponents: [ConfirmDialogComponent]
+  ]
 })
 export class AccountsModule { }

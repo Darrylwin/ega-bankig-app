@@ -1,4 +1,4 @@
-import { NbCardModule, NbDialogModule } from '@nebular/theme';
+import { NbCardModule, NbDialogModule, NbButtonModule } from "@nebular/theme";
 import { NgModule, Optional, SkipSelf } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
@@ -10,20 +10,20 @@ import { JwtInterceptor } from "./data/interceptors/jwt.interceptor";
 import { ErrorInterceptor } from "./data/interceptors/error.interceptor";
 
 @NgModule({
-  declarations: [ConfirmDialogComponent], // Déclarez le composant ici
+  declarations: [ConfirmDialogComponent],
   imports: [
     CommonModule,
-    HttpClientModule, // ← ESSENTIEL pour les requêtes HTTP
-    RouterModule, // ← Utile pour la navigation dans les intercepteurs
+    HttpClientModule,
+    RouterModule,
     NbCardModule,
-    NbDialogModule.forRoot(), // ← Configure le module dialog au niveau du CoreModule
+    NbButtonModule,
+    NbDialogModule.forRoot(),
   ],
   providers: [
-    // Intercepteurs HTTP (DOIVENT être déclarés ici)
     {
       provide: HTTP_INTERCEPTORS,
       useClass: JwtInterceptor,
-      multi: true, // Permet plusieurs intercepteurs
+      multi: true,
     },
     {
       provide: HTTP_INTERCEPTORS,
@@ -34,7 +34,6 @@ import { ErrorInterceptor } from "./data/interceptors/error.interceptor";
   exports: [ConfirmDialogComponent],
 })
 export class CoreModule {
-  // Garantir que CoreModule n'est importé qu'une fois (dans AppModule)
   constructor(@Optional() @SkipSelf() parentModule?: CoreModule) {
     if (parentModule) {
       throw new Error(

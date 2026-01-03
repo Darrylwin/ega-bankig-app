@@ -369,7 +369,34 @@ export class AccountsComponent implements OnInit {
     return Math.ceil(this.totalItems / this.pageSize);
   }
 
-  get currentPageDisplay(): number {
+   get currentPageDisplay(): number {
     return this.currentPage + 1;
+  }
+
+  /**
+   * Navigation pagination
+   */
+  goToFirstPage(): void {
+    this.currentPage = 0;
+    this.loadAccounts();
+  }
+
+  goToPreviousPage(): void {
+    if (this.currentPage > 0) {
+      this.currentPage--;
+      this.loadAccounts();
+    }
+  }
+
+  goToNextPage(): void {
+    if (this. currentPage < this.totalPages - 1) {
+      this.currentPage++;
+      this.loadAccounts();
+    }
+  }
+
+  goToLastPage(): void {
+    this.currentPage = this.totalPages - 1;
+    this.loadAccounts();
   }
 }

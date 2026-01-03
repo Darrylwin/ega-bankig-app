@@ -4,7 +4,9 @@
     <div class="row align-items-center">
       <div class="col-md-8">
         <h2>Gestion des Comptes</h2>
-        <p class="text-muted mb-0">Gérez les comptes bancaires de vos clients</p>
+        <p class="text-muted mb-0">
+          Gérez les comptes bancaires de vos clients
+        </p>
       </div>
       <div class="col-md-4 text-end">
         <button nbButton status="primary" (click)="onCreate()">
@@ -28,7 +30,8 @@
               fullWidth
               placeholder="IBAN ou nom client..."
               [(ngModel)]="searchTerm"
-              (keyup.enter)="applyFilters()">
+              (keyup.enter)="applyFilters()"
+            />
             <button nbButton ghost (click)="applyFilters()">
               <nb-icon icon="search-outline"></nb-icon>
             </button>
@@ -40,8 +43,12 @@
           <nb-select
             fullWidth
             [(ngModel)]="accountTypeFilter"
-            (ngModelChange)="applyFilters()">
-            <nb-option *ngFor="let type of filterOptions.accountTypes" [value]="type.value">
+            (ngModelChange)="applyFilters()"
+          >
+            <nb-option
+              *ngFor="let type of filterOptions.accountTypes"
+              [value]="type.value"
+            >
               {{ type.label }}
             </nb-option>
           </nb-select>
@@ -52,8 +59,12 @@
           <nb-select
             fullWidth
             [(ngModel)]="statusFilter"
-            (ngModelChange)="applyFilters()">
-            <nb-option *ngFor="let status of filterOptions.statuses" [value]="status.value">
+            (ngModelChange)="applyFilters()"
+          >
+            <nb-option
+              *ngFor="let status of filterOptions.statuses"
+              [value]="status.value"
+            >
               {{ status.label }}
             </nb-option>
           </nb-select>
@@ -90,7 +101,7 @@
           </button>
         </div>
       </nb-card-header>
-      
+
       <nb-card-body>
         <div class="table-responsive">
           <ng2-smart-table
@@ -98,7 +109,8 @@
             [source]="source"
             (create)="onCreate()"
             (edit)="onView($event)"
-            (delete)="onDelete($event)">
+            (delete)="onDelete($event)"
+          >
           </ng2-smart-table>
         </div>
       </nb-card-body>
@@ -116,7 +128,8 @@
             size="small"
             ghost
             [disabled]="currentPage === 0"
-            (click)="currentPage = 0; loadAccounts()">
+            (click)="goToFirstPage()"
+          >
             <nb-icon icon="skip-back-outline"></nb-icon>
           </button>
           <button
@@ -124,23 +137,26 @@
             size="small"
             ghost
             [disabled]="currentPage === 0"
-            (click)="currentPage--; loadAccounts()">
+            (click)="goToPreviousPage()"
+          >
             <nb-icon icon="chevron-left-outline"></nb-icon>
           </button>
           <button
             nbButton
             size="small"
             ghost
-            [disabled]="currentPage >= totalPages() - 1"
-            (click)="currentPage++; loadAccounts()">
+            [disabled]="currentPage >= totalPages - 1"
+            (click)="goToNextPage()"
+          >
             <nb-icon icon="chevron-right-outline"></nb-icon>
           </button>
           <button
             nbButton
             size="small"
             ghost
-            [disabled]="currentPage >= totalPages() - 1"
-            (click)="currentPage = totalPages() - 1; loadAccounts()">
+            [disabled]="currentPage >= totalPages - 1"
+            (click)="goToLastPage()"
+          >
             <nb-icon icon="skip-forward-outline"></nb-icon>
           </button>
         </div>
@@ -150,7 +166,11 @@
 
   <!-- Aucune donnée -->
   <div *ngIf="!isLoading && accounts.length === 0" class="text-center py-5">
-    <nb-icon icon="credit-card-outline" size="giant" class="text-muted mb-3"></nb-icon>
+    <nb-icon
+      icon="credit-card-outline"
+      size="giant"
+      class="text-muted mb-3"
+    ></nb-icon>
     <h4>Aucun compte trouvé</h4>
     <p class="text-muted mb-4">Commencez par créer un nouveau compte</p>
     <button nbButton status="primary" size="large" (click)="onCreate()">
