@@ -33,7 +33,7 @@ public class CustomerController {
      * Accessible uniquement aux ADMIN
      */
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<CustomerDTO> createCustomer(@Valid @RequestBody CustomerRequestDTO request) {
         Customer customer = customerMapper.toEntity(request);
         Customer savedCustomer = customerService.createCustomer(customer);
@@ -48,7 +48,7 @@ public class CustomerController {
      * Accessible uniquement aux ADMIN
      */
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<org.springframework.data.domain.Page<CustomerDTO>> getAllCustomers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -76,7 +76,7 @@ public class CustomerController {
      * Accessible aux ADMIN et USER (propriétaire uniquement)
      */
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<CustomerDTO> getCustomerById(@PathVariable Long id) {
         Customer customer = customerService.getCustomerById(id);
         CustomerDTO response = customerMapper.toDTO(customer);
@@ -89,7 +89,7 @@ public class CustomerController {
      * Accessible uniquement aux ADMIN
      */
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<CustomerDTO> updateCustomer(
             @PathVariable Long id,
             @Valid @RequestBody CustomerRequestDTO request) {
@@ -105,7 +105,7 @@ public class CustomerController {
      * Accessible uniquement aux ADMIN
      */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Void> deleteCustomer(@PathVariable Long id) {
         customerService.deleteCustomer(id);
         return ResponseEntity.noContent().build();
@@ -117,7 +117,7 @@ public class CustomerController {
      * Accessible uniquement aux ADMIN
      */
     @GetMapping("/email/{email}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<CustomerDTO> getCustomerByEmail(@PathVariable String email) {
         Customer customer = customerService.getCustomerByEmail(email);
         CustomerDTO response = customerMapper.toDTO(customer);

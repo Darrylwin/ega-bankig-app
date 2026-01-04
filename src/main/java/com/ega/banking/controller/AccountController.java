@@ -39,7 +39,7 @@ public class AccountController {
      * Accessible uniquement aux ADMIN
      */
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<AccountDTO> createAccount(@Valid @RequestBody AccountRequestDTO request) {
         Account account = accountService.createAccount(
                 request.getCustomerId(),
@@ -57,7 +57,7 @@ public class AccountController {
      * Accessible uniquement aux ADMIN
      */
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<org.springframework.data.domain.Page<AccountDTO>> getAllAccounts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -85,7 +85,7 @@ public class AccountController {
      * Accessible aux ADMIN et USER (propriétaire)
      */
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<AccountDTO> getAccountById(@PathVariable Long id) {
         Account account = accountService.getAccountById(id);
         AccountDTO response = accountMapper.toDTO(account);
@@ -98,7 +98,7 @@ public class AccountController {
      * Accessible aux ADMIN et USER
      */
     @GetMapping("/number/{accountNumber}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<AccountDTO> getAccountByNumber(@PathVariable String accountNumber) {
         Account account = accountService.getAccountByAccountNumber(accountNumber);
         AccountDTO response = accountMapper.toDTO(account);
@@ -111,7 +111,7 @@ public class AccountController {
      * Accessible aux ADMIN et USER (propriétaire)
      */
     @GetMapping("/customer/{customerId}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<List<AccountDTO>> getAccountsByCustomerId(@PathVariable Long customerId) {
         List<Account> accounts = accountService.getAccountsByCustomerId(customerId);
         List<AccountDTO> response = accounts.stream()
@@ -126,7 +126,7 @@ public class AccountController {
      * Accessible uniquement aux ADMIN
      */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Void> deleteAccount(@PathVariable Long id) {
         accountService.deleteAccount(id);
         return ResponseEntity.noContent().build();
@@ -139,7 +139,7 @@ public class AccountController {
      * Accessible aux ADMIN et USER (propriétaire du compte)
      */
     @GetMapping("/{accountId}/statement")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<byte[]> generateStatement(
             @PathVariable Long accountId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,

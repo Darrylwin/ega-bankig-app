@@ -33,7 +33,7 @@ public class TransactionController {
      * Accessible aux ADMIN et USER
      */
     @PostMapping("/deposit")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<TransactionDTO> deposit(@Valid @RequestBody DepositRequestDTO request) {
         Transaction transaction = transactionService.deposit(
                 request.getAccountId(),
@@ -50,7 +50,7 @@ public class TransactionController {
      * Accessible aux ADMIN et USER
      */
     @PostMapping("/withdraw")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<TransactionDTO> withdraw(@Valid @RequestBody WithdrawalRequestDTO request) {
         Transaction transaction = transactionService.withdraw(
                 request.getAccountId(),
@@ -67,7 +67,7 @@ public class TransactionController {
      * Accessible aux ADMIN et USER
      */
     @PostMapping("/transfer")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<TransactionDTO> transfer(@Valid @RequestBody TransferRequestDTO request) {
         Transaction transaction = transactionService.transfer(
                 request.getSourceAccountId(),
@@ -85,7 +85,7 @@ public class TransactionController {
      * Accessible aux ADMIN et USER (propriétaire)
      */
     @GetMapping("/account/{accountId}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<List<TransactionDTO>> getTransactionsByAccountId(@PathVariable Long accountId) {
         List<Transaction> transactions = transactionService.getTransactionsByAccountId(accountId);
         List<TransactionDTO> response = transactions.stream()
@@ -101,7 +101,7 @@ public class TransactionController {
      * Accessible aux ADMIN et USER (propriétaire)
      */
     @GetMapping("/account/{accountId}/period")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<List<TransactionDTO>> getTransactionsByPeriod(
             @PathVariable Long accountId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
@@ -122,7 +122,7 @@ public class TransactionController {
      * Accessible aux ADMIN et USER
      */
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public ResponseEntity<TransactionDTO> getTransactionById(@PathVariable Long id) {
         Transaction transaction = transactionService.getTransactionById(id);
         TransactionDTO response = transactionMapper.toDTO(transaction);

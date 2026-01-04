@@ -57,7 +57,7 @@ public class AuthController {
      * Crée un nouvel administrateur (ADMIN uniquement)
      */
     @PostMapping("/admin/create")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<AuthResponseDTO> createAdmin(@Valid @RequestBody CreateAdminRequestDTO request) {
         AuthResponseDTO response = authService.createAdmin(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
