@@ -49,9 +49,4 @@ export const MENU_ITEMS: NbMenuItem[] = [
     icon: "archive-outline",
     link: "/pages/transactions/history",
   },
-  {
-    title: "Relevés",
-    icon: "file-text-outline",
-    link: "/pages/accounts",
-  },
 ];

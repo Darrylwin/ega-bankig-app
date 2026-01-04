@@ -61,7 +61,7 @@ export class DepositComponent implements OnInit {
   ];
 
   // Montants suggérés
-  quickAmounts = [100, 200, 500, 1000, 2000, 5000];
+  quickAmounts = [1000, 2000, 5000, 10000, 20000, 50000];
 
   constructor(
     private fb: FormBuilder,
@@ -235,7 +235,7 @@ export class DepositComponent implements OnInit {
   formatCurrency(amount: number): string {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
-      currency: 'EUR',
+      currency: 'FCFA',
     }).format(amount);
   }
 

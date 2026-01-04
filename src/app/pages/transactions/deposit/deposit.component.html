@@ -162,12 +162,12 @@
             </nb-card-footer>
           </nb-card>
 
-          <!-- ÉTAPE 2: Montant et mode de paiement -->
+          <!-- ÉTAPE 2: Montant -->
           <nb-card *ngIf="currentStep === 2" class="step-card step-2" [@slideIn]>
             <nb-card-header>
               <div class="step-header">
                 <div class="step-badge">Étape 2/3</div>
-                <h3>Montant et Mode de Paiement</h3>
+                <h3>Montant</h3>
                 <p>Indiquez le montant à déposer</p>
               </div>
             </nb-card-header>
@@ -214,12 +214,6 @@
                     </button>
                   </div>
                 </div>
-
-                <!-- Alerte si montant élevé -->
-                <nb-alert *ngIf="isAmountOverLimit()" status="warning" size="small">
-                  <nb-icon icon="alert-triangle-outline"></nb-icon>
-                  Le montant dépasse la limite journalière pour ce mode de paiement
-                </nb-alert>
               </div>
 
               <!-- Modes de paiement -->
@@ -268,19 +262,6 @@
               <!-- Informations complémentaires -->
               <div class="form-section">
                 <div class="row">
-                  <div class="col-md-6 mb-3">
-                    <label for="reference" class="form-label">Référence</label>
-                    <input
-                      type="text"
-                      id="reference"
-                      nbInput
-                      fullWidth
-                      formControlName="reference"
-                      placeholder="N° chèque, référence..."
-                      maxlength="50">
-                    <small class="field-hint">Optionnel</small>
-                  </div>
-
                   <div class="col-md-6 mb-3">
                     <label for="description" class="form-label">Description</label>
                     <input
@@ -355,14 +336,6 @@
                       Bénéficiaire
                     </span>
                     <span class="detail-value">{{ selectedAccount!.customerFullName }}</span>
-                  </div>
-
-                  <div class="detail-row">
-                    <span class="detail-label">
-                      <nb-icon icon="cube-outline"></nb-icon>
-                      Mode de paiement
-                    </span>
-                    <span class="detail-value">{{ getSelectedPaymentMethod()?.label }}</span>
                   </div>
 
                   <div class="detail-row" *ngIf="f.reference.value">
@@ -452,11 +425,6 @@
               <div class="summary-item" *ngIf="f.amount.value">
                 <small>Montant</small>
                 <strong class="text-success">{{ formatCurrency(f.amount.value) }}</strong>
-              </div>
-
-              <div class="summary-item" *ngIf="getSelectedPaymentMethod()">
-                <small>Mode</small>
-                <strong>{{ getSelectedPaymentMethod()?.label }}</strong>
               </div>
 
               <div class="summary-divider"></div>

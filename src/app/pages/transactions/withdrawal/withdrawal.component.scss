@@ -5,55 +5,71 @@
 
   // Header spécifique au retrait
   .page-header {
-    background: linear-gradient(135deg, #ff3d71 0%, #ff6b9d 100%);
-    box-shadow: 0 4px 20px rgba(255, 61, 113, 0.3);
+    background: linear-gradient(
+      135deg,
+      var(--color-danger-500) 0%,
+      var(--color-danger-300) 100%
+    );
+    box-shadow: 0 4px 20px rgba(var(--color-danger-500-rgb), 0.3);
   }
 
   // Steps spécifiques
   .step-item {
     &.active {
       .step-circle {
-        background: linear-gradient(135deg, #ff3d71 0%, #ff6b9d 100%);
-        box-shadow: 0 4px 12px rgba(255, 61, 113, 0.3);
+        background: linear-gradient(
+          135deg,
+          var(--color-danger-500) 0%,
+          var(--color-danger-300) 100%
+        );
+        box-shadow: 0 4px 12px rgba(var(--color-danger-500-rgb), 0.3);
       }
 
       .step-label {
-        color: #ff3d71;
+        color: var(--color-danger-500);
       }
     }
 
     &.completed {
       .step-circle {
-        background: #ff3d71;
+        background: var(--color-danger-500);
       }
     }
   }
 
   .step-line {
     &.active {
-      background: linear-gradient(90deg, #ff3d71 0%, #ff6b9d 100%);
+      background: linear-gradient(
+        90deg,
+        var(--color-danger-500) 0%,
+        var(--color-danger-300) 100%
+      );
     }
   }
 
   // Badge étape
   .step-badge {
-    background: linear-gradient(135deg, #ff3d71 0%, #ff6b9d 100%) !important;
+    background: linear-gradient(
+      135deg,
+      var(--color-danger-500) 0%,
+      var(--color-danger-300) 100%
+    ) !important;
   }
 
   // Compte sélectionné
   .selected-account-card {
-    border-color: #ff3d71;
+    border-color: var(--color-danger-500);
 
     .account-card-header nb-icon {
-      color: #ff3d71;
+      color: var(--color-danger-500);
     }
 
     .balance {
-      color: #ff3d71;
+      color: var(--color-danger-500);
     }
 
     .max-amount {
-      color: #ff3d71;
+      color: var(--color-danger-500);
       font-size: 1.25rem;
     }
   }
@@ -63,19 +79,19 @@
     align-items: center;
     gap: 0.75rem;
     padding: 1rem;
-    background: #fff3cd;
+    background: rgba(var(--color-warning-500-rgb), 0.1);
     border-radius: 0.75rem;
     margin-top: 1rem;
-    border-left: 4px solid #ffc107;
+    border-left: 4px solid var(--color-warning-500);
 
     nb-icon {
       font-size: 1.5rem;
-      color: #856404;
+      color: var(--color-warning-800);
       flex-shrink: 0;
     }
 
     span {
-      color: #856404;
+      color: var(--color-warning-800);
       font-weight: 600;
     }
   }
@@ -84,7 +100,7 @@
   .withdrawal-progress {
     margin-top: 1.5rem;
     padding: 1rem;
-    background: #f7f9fc;
+    background: var(--color-basic-100);
     border-radius: 0.75rem;
 
     .progress-header {
@@ -94,14 +110,14 @@
       margin-bottom: 0.75rem;
 
       small {
-        color: #8f9bb3;
+        color: var(--text-hint-color);
         font-size: 0.85rem;
         text-transform: uppercase;
         letter-spacing: 0.5px;
       }
 
       strong {
-        color: #222b45;
+        color: var(--text-basic-color);
         font-size: 1.25rem;
       }
     }
@@ -111,7 +127,7 @@
       text-align: right;
 
       small {
-        color: #8f9bb3;
+        color: var(--text-hint-color);
         font-size: 0.8rem;
       }
     }
@@ -126,33 +142,37 @@
 
   .reason-card {
     position: relative;
-    border: 2px solid #edf1f7;
+    border: 2px solid var(--border-basic-color-3);
     border-radius: 1rem;
     padding: 1.25rem;
     cursor: pointer;
     transition: all 0.3s;
-    background: white;
+    background: var(--background-basic-color-1);
 
     &:hover {
-      border-color: #c5cee0;
+      border-color: var(--border-basic-color-2);
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      box-shadow: var(--shadow-hover);
     }
 
     &.selected {
-      border-color: #ff3d71;
+      border-color: var(--color-danger-500);
       background: linear-gradient(
         135deg,
-        rgba(255, 61, 113, 0.05) 0%,
-        rgba(255, 107, 157, 0.05) 100%
+        rgba(var(--color-danger-500-rgb), 0.05) 0%,
+        rgba(var(--color-danger-300-rgb), 0.05) 100%
       );
-      box-shadow: 0 4px 12px rgba(255, 61, 113, 0.2);
+      box-shadow: 0 4px 12px rgba(var(--color-danger-500-rgb), 0.2);
 
       .reason-icon {
-        background: linear-gradient(135deg, #ff3d71 0%, #ff6b9d 100%);
+        background: linear-gradient(
+          135deg,
+          var(--color-danger-500) 0%,
+          var(--color-danger-300) 100%
+        );
 
         nb-icon {
-          color: white;
+          color: var(--text-control-color);
         }
       }
     }
@@ -165,7 +185,7 @@
       width: 45px;
       height: 45px;
       border-radius: 0.75rem;
-      background: #f7f9fc;
+      background: var(--color-basic-100);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -174,21 +194,21 @@
 
       nb-icon {
         font-size: 1.25rem;
-        color: #ff3d71;
+        color: var(--color-danger-500);
       }
     }
 
     .reason-info {
       h6 {
         font-weight: 700;
-        color: #222b45;
+        color: var(--text-basic-color);
         margin: 0 0 0.25rem 0;
         font-size: 0.95rem;
       }
 
       p {
         font-size: 0.8rem;
-        color: #8f9bb3;
+        color: var(--text-hint-color);
         margin: 0;
         line-height: 1.3;
       }
@@ -198,7 +218,7 @@
       position: absolute;
       top: 0 75rem;
       right: 0.75rem;
-      color: #ff3d71;
+      color: var(--color-danger-500);
 
       nb-icon {
         font-size: 1.5rem;
@@ -208,8 +228,12 @@
 
   // Carte de vérification
   .verification-card {
-    background: linear-gradient(135deg, #f7f9fc 0%, #ffffff 100%);
-    border: 2px solid #3366ff;
+    background: linear-gradient(
+      135deg,
+      var(--color-basic-100) 0%,
+      var(--background-basic-color-1) 100%
+    );
+    border: 2px solid var(--color-primary-500);
     border-radius: 1rem;
     padding: 1.5rem;
 
@@ -219,17 +243,17 @@
       gap: 1rem;
       margin-bottom: 1.5rem;
       padding-bottom: 1rem;
-      border-bottom: 1px solid #edf1f7;
+      border-bottom: 1px solid var(--border-basic-color-3);
 
       nb-icon {
         font-size: 2rem;
-        color: #3366ff;
+        color: var(--color-primary-500);
       }
 
       h6 {
         margin: 0;
         font-weight: 700;
-        color: #222b45;
+        color: var(--text-basic-color);
       }
     }
 
@@ -243,7 +267,7 @@
 
             strong {
               font-size: 1rem;
-              color: #222b45;
+              color: var(--text-basic-color);
             }
           }
         }
@@ -251,7 +275,7 @@
 
       .verification-hint {
         font-size: 0.85rem;
-        color: #8f9bb3;
+        color: var(--text-hint-color);
         margin: 0.5rem 0 0 0;
         line-height: 1.4;
       }
@@ -261,11 +285,11 @@
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      color: #ff3d71;
+      color: var(--color-danger-500);
       font-size: 0.875rem;
       margin-top: 1rem;
       padding: 0.75rem;
-      background: rgba(255, 61, 113, 0.1);
+      background: rgba(var(--color-danger-500-rgb), 0.1);
       border-radius: 0.5rem;
 
       nb-icon {
@@ -280,16 +304,20 @@
     &.danger {
       background: linear-gradient(
         135deg,
-        rgba(255, 61, 113, 0.05) 0%,
-        rgba(255, 107, 157, 0.05) 100%
+        rgba(var(--color-danger-500-rgb), 0.05) 0%,
+        rgba(var(--color-danger-300-rgb), 0.05) 100%
       );
 
       .amount-icon {
-        background: linear-gradient(135deg, #ff3d71 0%, #ff6b9d 100%);
+        background: linear-gradient(
+          135deg,
+          var(--color-danger-500) 0%,
+          var(--color-danger-300) 100%
+        );
       }
 
       .amount-value {
-        color: #ff3d71;
+        color: var(--color-danger-500);
       }
 
       .amount-warning {
@@ -299,9 +327,9 @@
         gap: 0.5rem;
         margin-top: 1rem;
         padding: 0.75rem;
-        background: rgba(255, 193, 7, 0.1);
+        background: rgba(var(--color-warning-500-rgb), 0.1);
         border-radius: 0.5rem;
-        color: #856404;
+        color: var(--color-warning-800);
         font-size: 0.85rem;
         font-weight: 600;
 
@@ -315,12 +343,12 @@
   .detail-row {
     &.danger {
       .detail-value {
-        color: #ff3d71;
+        color: var(--color-danger-500);
       }
     }
 
     &.usage {
-      background: #f7f9fc;
+      background: var(--color-basic-100);
 
       .detail-value {
         display: flex;
@@ -330,7 +358,7 @@
     }
 
     .detail-value.success {
-      color: #00d68f;
+      color: var(--color-success-500);
       display: flex;
       align-items: center;
       gap: 0.5rem;
@@ -345,7 +373,11 @@
   .summary-card {
     nb-progress-bar {
       ::ng-deep .progress-value {
-        background: linear-gradient(90deg, #ff3d71 0%, #ff6b9d 100%);
+        background: linear-gradient(
+          90deg,
+          var(--color-danger-500) 0%,
+          var(--color-danger-300) 100%
+        );
       }
     }
   }
@@ -353,16 +385,16 @@
   .limits-card {
     border-radius: 1rem;
     border: none;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--shadow);
 
     nb-card-header {
-      background: #f7f9fc;
-      border-bottom: 1px solid #edf1f7;
+      background: var(--color-basic-100);
+      border-bottom: 1px solid var(--border-basic-color-3);
 
       h6 {
         margin: 0;
         font-weight: 600;
-        color: #222b45;
+        color: var(--text-basic-color);
         display: flex;
         align-items: center;
         gap: 0.5rem;
@@ -382,7 +414,7 @@
       justify-content: space-between;
       align-items: center;
       padding: 1rem;
-      background: #f7f9fc;
+      background: var(--color-basic-100);
       border-radius: 0.75rem;
       margin-bottom: 0.75rem;
 
@@ -394,7 +426,7 @@
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        color: #8f9bb3;
+        color: var(--text-hint-color);
         font-size: 0.9rem;
         font-weight: 500;
 
@@ -405,7 +437,7 @@
 
       .limit-value {
         font-weight: 700;
-        color: #ff3d71;
+        color: var(--color-danger-500);
         font-size: 1rem;
       }
     }
@@ -414,16 +446,16 @@
   .security-card {
     border-radius: 1rem;
     border: none;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--shadow);
 
     nb-card-header {
-      background: #f7f9fc;
-      border-bottom: 1px solid #edf1f7;
+      background: var(--color-basic-100);
+      border-bottom: 1px solid var(--border-basic-color-3);
 
       h6 {
         margin: 0;
         font-weight: 600;
-        color: #222b45;
+        color: var(--text-basic-color);
         display: flex;
         align-items: center;
         gap: 0.5rem;
@@ -442,7 +474,7 @@
       display: flex;
       gap: 1rem;
       padding: 0.75rem 0;
-      border-bottom: 1px solid #edf1f7;
+      border-bottom: 1px solid var(--border-basic-color-3);
 
       &:last-child {
         border-bottom: none;
@@ -456,7 +488,7 @@
 
       strong {
         display: block;
-        color: #222b45;
+        color: var(--text-basic-color);
         margin-bottom: 0.25rem;
         font-weight: 700;
         font-size: 0.9rem;
@@ -464,7 +496,7 @@
 
       p {
         font-size: 0.8rem;
-        color: #8f9bb3;
+        color: var(--text-hint-color);
         margin: 0;
         line-height: 1.3;
       }
@@ -474,23 +506,31 @@
   // Boutons d'action
   .step-actions {
     button[status="danger"] {
-      background: linear-gradient(135deg, #ff3d71 0%, #ff6b9d 100%);
+      background: linear-gradient(
+        135deg,
+        var(--color-danger-500) 0%,
+        var(--color-danger-300) 100%
+      );
       border: none;
 
       &:hover:not(:disabled) {
-        background: linear-gradient(135deg, #ff1744 0%, #ff5177 100%);
+        background: linear-gradient(
+          135deg,
+          var(--color-danger-600) 0%,
+          var(--color-danger-400) 100%
+        );
       }
     }
   }
 
   .help-card {
     button[status="danger"] {
-      border-color: #ff3d71;
-      color: #ff3d71;
+      border-color: var(--color-danger-500);
+      color: var(--color-danger-500);
 
       &:hover {
-        background: #ff3d71;
-        color: white;
+        background: var(--color-danger-500);
+        color: var(--text-control-color);
       }
     }
   }

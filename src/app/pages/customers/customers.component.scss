@@ -4,12 +4,16 @@
 
 // En-tête moderne
 .page-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: linear-gradient(
+    135deg,
+    var(--color-primary-400) 0%,
+    var(--color-primary-600) 100%
+  );
+  color: var(--text-control-color);
   padding: 2rem;
   margin: -1.5rem -1.5rem 1.5rem -1.5rem;
   border-radius: 0 0 1rem 1rem;
-  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 20px rgba(var(--color-primary-400-rgb), 0.3);
 
   .header-content {
     display: flex;
@@ -42,8 +46,8 @@
     margin: 0;
 
     .badge {
-      background: rgba(255, 255, 255, 0.2);
-      color: white;
+      background: rgba(var(--text-control-color-rgb), 0.2);
+      color: var(--text-control-color);
       font-weight: 600;
       padding: 0.25rem 0.75rem;
       border-radius: 1rem;
@@ -55,10 +59,6 @@
     gap: 0.75rem;
     align-items: center;
     flex-wrap: wrap;
-
-    button {
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    }
   }
 }
 
@@ -67,7 +67,7 @@
   margin-bottom: 1.5rem;
   border-radius: 0.75rem;
   border: none;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow);
 
   nb-card-body {
     padding: 1rem;
@@ -102,7 +102,7 @@
 
   .loading-text {
     margin-top: 1rem;
-    color: #8f9bb3;
+    color: var(--text-hint-color);
   }
 }
 
@@ -119,14 +119,15 @@
       table {
         th {
           font-weight: 600;
+          color: var(--text-basic-color);
           padding: 1rem;
-          border-bottom: 2px solid #edf1f7;
+          border-bottom: 2px solid var(--border-basic-color-3);
         }
 
         td {
           padding: 1rem;
           vertical-align: middle;
-          border-bottom: 1px solid #edf1f7;
+          border-bottom: 1px solid var(--border-basic-color-3);
         }
 
         tr:hover {
@@ -163,22 +164,20 @@
             }
 
             &.ng2-smart-action-edit-edit {
-              background: #e7f1ff;
-              color: #3366ff;
+              color: var(--color-primary-500);
 
               &:hover {
-                background: #3366ff;
-                color: white;
+                background: var(--color-primary-500);
+                color: var(--text-control-color);
               }
             }
 
             &.ng2-smart-action-delete-delete {
-              background: #ffe8ed;
-              color: #ff3d71;
+              color: var(--color-danger-500);
 
               &:hover {
-                background: #ff3d71;
-                color: white;
+                background: var(--color-danger-500);
+                color: var(--text-control-color);
               }
             }
           }
@@ -193,7 +192,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem 1.5rem;
-  border-top: 1px solid #edf1f7;
+  border-top: 1px solid var(--border-basic-color-3);
 
   .pagination-info {
     font-size: 0.9rem;
@@ -217,14 +216,14 @@
 .customer-card {
   border-radius: 1rem;
   border: none;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow);
   transition: all 0.3s;
   overflow: hidden;
   cursor: pointer;
 
   &:hover {
     transform: translateY(-8px);
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--shadow-hover);
   }
 
   nb-card-body {
@@ -236,7 +235,11 @@
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(
+      135deg,
+      var(--color-primary-400) 0%,
+      var(--color-primary-600) 100%
+    );
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -244,20 +247,20 @@
 
     nb-icon {
       font-size: 2.5rem;
-      color: white;
+      color: var(--text-control-color);
     }
   }
 
   .customer-name {
     font-size: 1.1rem;
     font-weight: 700;
-    color: #222b45;
+    color: var(--text-basic-color);
     margin-bottom: 0.5rem;
   }
 
   .customer-email {
     font-size: 0.85rem;
-    color: #8f9bb3;
+    color: var(--text-hint-color);
     margin-bottom: 1rem;
   }
 
@@ -273,10 +276,10 @@
       justify-content: center;
       gap: 0.5rem;
       font-size: 0.85rem;
-      color: #222b45;
+      color: var(--text-basic-color);
 
       nb-icon {
-        color: #8f9bb3;
+        color: var(--text-hint-color);
       }
     }
   }
@@ -289,8 +292,8 @@
   }
 
   nb-card-footer {
-    background: #f7f9fc;
-    border-top: 1px solid #edf1f7;
+    background: var(--color-basic-100);
+    border-top: 1px solid var(--border-basic-color-3);
     padding: 0.75rem 1rem;
     display: flex;
     flex-direction: column;
@@ -314,7 +317,7 @@
 
   span {
     font-weight: 500;
-    color: #222b45;
+    color: var(--text-basic-color);
   }
 }
 
@@ -325,18 +328,18 @@
 
   .empty-icon {
     font-size: 4rem;
-    color: #c5cee0;
+    color: var(--color-basic-400);
     margin-bottom: 1.5rem;
   }
 
   h4 {
     font-weight: 600;
-    color: #222b45;
+    color: var(--text-basic-color);
     margin-bottom: 0.5rem;
   }
 
   p {
-    color: #8f9bb3;
+    color: var(--text-hint-color);
     margin-bottom: 1.5rem;
   }
 }
@@ -357,7 +360,7 @@
 .kpi-card {
   border-radius: 1rem;
   border: none;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow);
   overflow: hidden;
   position: relative;
 
@@ -372,19 +375,19 @@
   }
 
   &.kpi-primary {
-    --kpi-color: #3366ff;
+    --kpi-color: var(--color-primary-500);
   }
 
   &.kpi-success {
-    --kpi-color: #00d68f;
+    --kpi-color: var(--color-success-500);
   }
 
   &.kpi-info {
-    --kpi-color: #0095ff;
+    --kpi-color: var(--color-info-500);
   }
 
   &.kpi-warning {
-    --kpi-color: #ffaa00;
+    --kpi-color: var(--color-warning-500);
   }
 
   nb-card-body {
@@ -422,13 +425,13 @@
   .kpi-value {
     font-size: 1.75rem;
     font-weight: 700;
-    color: #222b45;
+    color: var(--text-basic-color);
     margin-bottom: 0.25rem;
   }
 
   .kpi-label {
     font-size: 0.85rem;
-    color: #8f9bb3;
+    color: var(--text-hint-color);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     font-weight: 600;
@@ -436,7 +439,7 @@
 
   .kpi-detail {
     font-size: 0.8rem;
-    color: #8f9bb3;
+    color: var(--text-hint-color);
     margin-top: 0.25rem;
   }
 }
@@ -449,11 +452,10 @@
   nb-card {
     border-radius: 1rem;
     border: none;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--shadow);
 
     nb-card-header {
-      background: #f7f9fc;
-      border-bottom: 1px solid #edf1f7;
+      border-bottom: 1px solid var(--border-basic-color-3);
 
       .chart-header {
         display: flex;
@@ -463,11 +465,11 @@
         h6 {
           margin: 0;
           font-weight: 600;
-          color: #222b45;
+          color: var(--text-basic-color);
         }
 
         nb-icon {
-          color: #8f9bb3;
+          color: var(--text-hint-color);
         }
       }
     }
@@ -479,7 +481,7 @@
 }
 
 .chart-summary {
-  border-top: 1px solid #edf1f7;
+  border-top: 1px solid var(--border-basic-color-3);
   padding-top: 1rem;
   margin-top: 1rem;
 
@@ -490,12 +492,12 @@
     font-size: 0.9rem;
 
     .summary-label {
-      color: #8f9bb3;
+      color: var(--text-hint-color);
     }
 
     .summary-value {
       font-weight: 600;
-      color: #222b45;
+      color: var(--text-basic-color);
     }
   }
 }
@@ -508,20 +510,20 @@
 
 .info-item {
   padding: 1rem;
-  background: #f7f9fc;
+  background: rgba(var(--color-basic-100-rgb), 0.7);
   border-radius: 0.75rem;
   text-align: center;
 
   .info-label {
     font-size: 0.85rem;
-    color: #8f9bb3;
+    color: var(--text-hint-color);
     margin-bottom: 0.5rem;
   }
 
   .info-value {
     font-size: 1.25rem;
     font-weight: 700;
-    color: #222b45;
+    color: var(--text-basic-color);
 
     small {
       display: block;
