@@ -58,34 +58,4 @@ export const MENU_ITEMS: NbMenuItem[] = [
       status: "info",
     },
   },
-  {
-    title: "Administration",
-    icon: "settings-2-outline",
-    expanded: false,
-    children: [
-      {
-        title: "Utilisateurs",
-        link: "/pages/miscellaneous", // ← Temporaire
-        icon: "people-outline",
-        badge: {
-          text: "Bientôt",
-          status: "warning",
-        },
-      },
-      {
-        title: "Audit",
-        link: "/pages/miscellaneous", // ← Temporaire
-        icon: "activity-outline",
-        badge: {
-          text: "Bientôt",
-          status: "warning",
-        },
-      },
-    ],
-  },
-  {
-    title: "Aide",
-    icon: "question-mark-circle-outline",
-    link: "/pages/miscellaneous",
-  },
 ];
