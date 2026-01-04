@@ -1,4 +1,3 @@
-import { CoreModule } from "./../../@core/core.module";
 import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
@@ -49,7 +48,6 @@ import { AccountStatementComponent } from "./account-statement/account-statement
     FormsModule,
     ReactiveFormsModule,
     AccountsRoutingModule,
-    CoreModule,
 
     // Modules Nebular UI
     NbCardModule,

@@ -1,4 +1,3 @@
-import { CoreModule } from './../../@core/core.module';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -38,9 +37,6 @@ import { WithdrawalComponent } from './withdrawal/withdrawal.component';
 import { TransferComponent } from './transfer/transfer.component';
 import { HistoryComponent } from './history/history.component';
 
-// Pour les confirmations
-import { ConfirmDialogComponent } from '../../@core/components/confirm-dialog.component';
-
 @NgModule({
   declarations: [
     TransactionsComponent,
@@ -54,7 +50,6 @@ import { ConfirmDialogComponent } from '../../@core/components/confirm-dialog.co
     FormsModule,
     ReactiveFormsModule,
     TransactionsRoutingModule,
-    CoreModule,
     
     // Modules Nebular UI
     NbCardModule,
@@ -79,9 +74,8 @@ import { ConfirmDialogComponent } from '../../@core/components/confirm-dialog.co
     // Tableau intelligent
     Ng2SmartTableModule,
     
-    // Graphiques (optionnel)
+    // Graphiques
     NgxChartsModule
   ],
-  entryComponents: [ConfirmDialogComponent]
 })
 export class TransactionsModule { }

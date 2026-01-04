@@ -32,10 +32,9 @@ import { CustomersRoutingModule } from "./customers-routing.module";
 import { CustomersComponent } from "./customers.component";
 import { CustomerFormComponent } from "./customer-form/customer-form.component";
 import { CustomerDetailComponent } from "./customer-detail/customer-detail.component";
-import { CoreModule } from "./../../@core/core.module";
 
 @NgModule({
-  declarations: [
+  declarations:  [
     CustomersComponent,
     CustomerFormComponent,
     CustomerDetailComponent,
@@ -45,7 +44,6 @@ import { CoreModule } from "./../../@core/core.module";
     FormsModule,
     ReactiveFormsModule,
     CustomersRoutingModule,
-    CoreModule,
 
     // Modules Nebular UI
     NbCardModule,
