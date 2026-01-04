@@ -34,6 +34,8 @@
     </div>
   </div>
 
+  <br/>
+
   <!-- Chargement -->
   <div *ngIf="isLoading" class="loading-container">
     <nb-spinner size="giant" status="primary"></nb-spinner>
@@ -97,46 +99,46 @@
     </div>
 
     <!-- Actions rapides -->
-    <div class="quick-actions">
+    <div class="quick-actions" style="display: flex; gap: 0.75rem;">
       <button
-        nbButton
-        status="success"
-        size="large"
-        (click)="onDeposit()"
-        class="action-btn"
+      nbButton
+      status="success"
+      size="large"
+      (click)="onDeposit()"
+      class="action-btn"
       >
-        <nb-icon icon="arrow-downward-outline"></nb-icon>
-        <span>Dépôt</span>
+      <nb-icon icon="arrow-downward-outline"></nb-icon>
+      <span>Dépôt</span>
       </button>
       <button
-        nbButton
-        status="danger"
-        size="large"
-        (click)="onWithdraw()"
-        class="action-btn"
+      nbButton
+      status="danger"
+      size="large"
+      (click)="onWithdraw()"
+      class="action-btn"
       >
-        <nb-icon icon="arrow-upward-outline"></nb-icon>
-        <span>Retrait</span>
+      <nb-icon icon="arrow-upward-outline"></nb-icon>
+      <span>Retrait</span>
       </button>
       <button
-        nbButton
-        status="primary"
-        size="large"
-        (click)="onTransfer()"
-        class="action-btn"
+      nbButton
+      status="primary"
+      size="large"
+      (click)="onTransfer()"
+      class="action-btn"
       >
-        <nb-icon icon="swap-outline"></nb-icon>
-        <span>Virement</span>
+      <nb-icon icon="swap-outline"></nb-icon>
+      <span>Virement</span>
       </button>
       <button
-        nbButton
-        status="info"
-        size="large"
-        (click)="onViewAllTransactions()"
-        class="action-btn"
+      nbButton
+      status="info"
+      size="large"
+      (click)="onViewAllTransactions()"
+      class="action-btn"
       >
-        <nb-icon icon="list-outline"></nb-icon>
-        <span>Historique</span>
+      <nb-icon icon="list-outline"></nb-icon>
+      <span>Historique</span>
       </button>
     </div>
 

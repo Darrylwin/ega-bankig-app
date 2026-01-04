@@ -25,6 +25,8 @@
     </div>
   </div>
 
+  <br />
+
   <!-- Chargement -->
   <div *ngIf="isLoading" class="loading-container">
     <nb-spinner size="giant" status="primary"></nb-spinner>
@@ -372,45 +374,6 @@
                   <nb-icon icon="checkmark-circle-outline"></nb-icon>
                   Toutes les informations sont complètes
                 </nb-alert>
-              </div>
-            </nb-card-body>
-          </nb-card>
-
-          <!-- Informations -->
-          <nb-card class="info-card">
-            <nb-card-header>
-              <h6>
-                <nb-icon icon="info-outline"></nb-icon>
-                Informations
-              </h6>
-            </nb-card-header>
-            <nb-card-body>
-              <div class="info-item">
-                <nb-icon icon="shield-outline" status="success"></nb-icon>
-                <div>
-                  <strong>Sécurité garantie</strong>
-                  <p>
-                    Le numéro IBAN sera généré automatiquement selon les normes
-                    bancaires internationales
-                  </p>
-                </div>
-              </div>
-              <div class="info-item">
-                <nb-icon icon="flash-outline" status="info"></nb-icon>
-                <div>
-                  <strong>Activation immédiate</strong>
-                  <p>Le compte sera activé immédiatement après création</p>
-                </div>
-              </div>
-              <div class="info-item">
-                <nb-icon icon="email-outline" status="warning"></nb-icon>
-                <div>
-                  <strong>Notification</strong>
-                  <p>
-                    Le client recevra un email de confirmation avec les détails
-                    du compte
-                  </p>
-                </div>
               </div>
             </nb-card-body>
           </nb-card>
