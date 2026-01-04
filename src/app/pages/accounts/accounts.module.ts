@@ -29,7 +29,6 @@ import { Ng2SmartTableModule } from "ng2-smart-table";
 
 // Charts
 import { NgxChartsModule } from "@swimlane/ngx-charts";
-
 import { AccountsRoutingModule } from "./accounts-routing.module";
 import { AccountsComponent } from "./accounts.component";
 import { AccountFormComponent } from "./account-form/account-form.component";
@@ -39,9 +38,9 @@ import { AccountStatementComponent } from "./account-statement/account-statement
 @NgModule({
   declarations: [
     AccountsComponent,
-    AccountFormComponent,
     AccountDetailComponent,
     AccountStatementComponent,
+    AccountFormComponent,
   ],
   imports: [
     CommonModule,

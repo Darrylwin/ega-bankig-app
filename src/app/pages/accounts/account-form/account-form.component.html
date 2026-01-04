@@ -1,262 +1,421 @@
 <div class="account-form-container">
-  <!-- En-tête -->
-  <div class="account-form-header mb-4">
-    <div class="row align-items-center">
-      <div class="col-md-8">
-        <h2>Ouverture d'un Compte</h2>
-        <p class="text-muted mb-0">Créez un nouveau compte bancaire pour un client</p>
-      </div>
-      <div class="col-md-4 text-end">
-        <button nbButton status="basic" size="small" (click)="onCancel()">
-          <nb-icon icon="arrow-back-outline" class="me-2"></nb-icon>
-          Retour à la liste
+  <!-- Header moderne -->
+  <div class="form-header">
+    <div class="header-content">
+      <div class="header-left">
+        <button
+          nbButton
+          ghost
+          size="small"
+          (click)="onCancel()"
+          class="back-btn"
+        >
+          <nb-icon icon="arrow-back-outline"></nb-icon>
         </button>
+        <div>
+          <h1 class="form-title">
+            <nb-icon icon="plus-circle-outline"></nb-icon>
+            Ouverture de Compte
+          </h1>
+          <p class="form-subtitle">
+            Créez un nouveau compte bancaire en quelques étapes
+          </p>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Chargement clients -->
-  <div *ngIf="isLoading" class="text-center py-5">
+  <!-- Chargement -->
+  <div *ngIf="isLoading" class="loading-container">
     <nb-spinner size="giant" status="primary"></nb-spinner>
-    <p class="mt-3">Chargement des clients...</p>
+    <p class="loading-text">Chargement des clients...</p>
   </div>
 
   <!-- Formulaire -->
-  <div *ngIf="!isLoading">
-    <div class="row">
-      <div class="col-lg-8">
-        <nb-card>
-          <nb-card-body>
-            <form [formGroup]="accountForm" (ngSubmit)="onSubmit()" novalidate>
-              <!-- Client -->
-              <div class="row mb-4">
-                <div class="col-12">
-                  <h4 class="section-title mb-3">
-                    <nb-icon icon="person-outline" class="me-2"></nb-icon>
-                    Sélection du Client
-                  </h4>
-                </div>
-
-                <div class="col-12 mb-3">
-                  <label for="customerId" class="form-label required">Client</label>
-                  <nb-select
-                    id="customerId"
-                    fullWidth
-                    formControlName="customerId"
-                    placeholder="Rechercher un client..."
-                    [status]="f.customerId.invalid && f.customerId.touched ? 'danger' : 'basic'"
-                    (input)="filterCustomers($event)">
-                    
-                    <nb-option *ngFor="let customer of filteredCustomers" [value]="customer.id">
-                      {{ customer.lastName }} {{ customer.firstName }} ({{ customer.email }})
-                    </nb-option>
-                    
-                    <nb-option *ngIf="filteredCustomers.length === 0" disabled>
-                      Aucun client trouvé
-                    </nb-option>
-                  </nb-select>
-                  
-                  <div *ngIf="f.customerId.invalid && f.customerId.touched" class="text-danger mt-1 small">
-                    <span *ngIf="f.customerId.errors?.['required']">
-                      La sélection d'un client est obligatoire
-                    </span>
-                  </div>
-                  
-                  <!-- Info client sélectionné -->
-                  <div *ngIf="f.customerId.value" class="mt-3">
-                    <nb-alert status="info" size="small">
-                      <nb-icon icon="info-outline" class="me-2"></nb-icon>
-                      Client sélectionné : {{ displayCustomerName(f.customerId.value) }}
-                    </nb-alert>
-                  </div>
+  <div *ngIf="!isLoading" class="form-content">
+    <form [formGroup]="accountForm" (ngSubmit)="onSubmit()">
+      <div class="form-grid">
+        <!-- Colonne principale -->
+        <div class="form-main">
+          <!-- Étape 1: Sélection du client -->
+          <nb-card class="form-card">
+            <nb-card-header>
+              <div class="card-header-content">
+                <div class="step-badge">1</div>
+                <div>
+                  <h5>Sélection du Client</h5>
+                  <p class="text-muted mb-0">
+                    Choisissez le titulaire du compte
+                  </p>
                 </div>
               </div>
-
-              <!-- Type de compte -->
-              <div class="row mb-4">
-                <div class="col-12">
-                  <h4 class="section-title mb-3">
-                    <nb-icon icon="credit-card-outline" class="me-2"></nb-icon>
-                    Type de Compte
-                  </h4>
-                </div>
-
-                <div class="col-12 mb-3">
-                  <div class="d-flex gap-3">
-                    <div *ngFor="let type of accountTypes" class="flex-fill">
-                      <input
-                        type="radio"
-                        [id]="'type-' + type.value"
-                        class="btn-check"
-                        name="accountType"
-                        [value]="type.value"
-                        formControlName="accountType"
-                        autocomplete="off">
-                      
-                      <label
-                        [for]="'type-' + type.value"
-                        class="account-type-card d-flex flex-column align-items-center justify-content-center p-4 w-100"
-                        [class.selected]="f.accountType.value === type.value">
-                        
-                        <nb-icon [icon]="type.icon" size="giant" class="mb-3"></nb-icon>
-                        <h5 class="mb-2">{{ type.label }}</h5>
-                        
-                        <div *ngIf="type.value === 'SAVINGS'" class="text-center">
-                          <small class="text-muted">Taux d'intérêt : 2.0%</small>
+            </nb-card-header>
+            <nb-card-body>
+              <div class="form-field">
+                <label for="customerId" class="form-label required"
+                  >Client titulaire</label
+                >
+                <nb-select
+                  id="customerId"
+                  fullWidth
+                  formControlName="customerId"
+                  placeholder="Rechercher un client..."
+                  (selectedChange)="onCustomerChange($event)"
+                  [status]="
+                    f.customerId.invalid && f.customerId.touched
+                      ? 'danger'
+                      : 'basic'
+                  "
+                >
+                  <nb-select-label>
+                    <span *ngIf="f.customerId.value">
+                      {{ displayCustomerFn(f.customerId.value) }}
+                    </span>
+                  </nb-select-label>
+                  <input
+                    type="text"
+                    nbInput
+                    (input)="onCustomerSearch($event.target.value)"
+                    placeholder="Taper pour rechercher... "
+                  />
+                  <nb-option
+                    *ngFor="let customer of filteredCustomers"
+                    [value]="customer.id"
+                  >
+                    <div class="customer-option">
+                      <div class="customer-avatar">
+                        <nb-icon icon="person-outline"></nb-icon>
+                      </div>
+                      <div class="customer-info">
+                        <div class="customer-name">
+                          {{ customer.lastName }} {{ customer.firstName }}
                         </div>
-                        
-                        <div *ngIf="type.value === 'CURRENT'" class="text-center">
-                          <small class="text-muted">Découvert autorisé : 1 000 €</small>
-                        </div>
-                      </label>
+                        <small class="text-muted">{{ customer.email }}</small>
+                      </div>
                     </div>
-                  </div>
-                  
-                  <div *ngIf="f.accountType.invalid && f.accountType.touched" class="text-danger mt-1 small">
-                    <span *ngIf="f.accountType.errors?.['required']">
-                      Le type de compte est obligatoire
-                    </span>
-                  </div>
+                  </nb-option>
+                </nb-select>
+                <div
+                  *ngIf="f.customerId.invalid && f.customerId.touched"
+                  class="field-error"
+                >
+                  <nb-icon icon="alert-circle-outline"></nb-icon>
+                  La sélection d'un client est obligatoire
                 </div>
               </div>
 
-              <!-- Devise -->
-              <div class="row mb-4">
-                <div class="col-12">
-                  <h4 class="section-title mb-3">
-                    <nb-icon icon="globe-outline" class="me-2"></nb-icon>
-                    Configuration
-                  </h4>
+              <!-- Info client sélectionné -->
+              <div *ngIf="selectedCustomer" class="customer-preview">
+                <div class="preview-header">
+                  <nb-icon
+                    icon="checkmark-circle-outline"
+                    status="success"
+                  ></nb-icon>
+                  <span>Client sélectionné</span>
                 </div>
+                <div class="preview-body">
+                  <div class="preview-row">
+                    <span class="preview-label">Nom complet:</span>
+                    <span class="preview-value"
+                      >{{ selectedCustomer.lastName }}
+                      {{ selectedCustomer.firstName }}</span
+                    >
+                  </div>
+                  <div class="preview-row">
+                    <span class="preview-label">Email:</span>
+                    <span class="preview-value">{{
+                      selectedCustomer.email
+                    }}</span>
+                  </div>
+                  <div class="preview-row">
+                    <span class="preview-label">Téléphone:</span>
+                    <span class="preview-value">{{
+                      selectedCustomer.phoneNumber
+                    }}</span>
+                  </div>
+                  <div class="preview-row">
+                    <span class="preview-label">Date de naissance:</span>
+                    <span class="preview-value"
+                      >{{
+                        selectedCustomer.dateOfBirth | date : "dd/MM/yyyy"
+                      }}
+                      ({{ selectedCustomer.age }} ans)</span
+                    >
+                  </div>
+                </div>
+              </div>
+            </nb-card-body>
+          </nb-card>
 
-                <div class="col-md-6">
-                  <label for="currency" class="form-label required">Devise</label>
-                  <nb-select
-                    id="currency"
-                    fullWidth
+          <!-- Étape 2: Type de compte -->
+          <nb-card class="form-card">
+            <nb-card-header>
+              <div class="card-header-content">
+                <div class="step-badge">2</div>
+                <div>
+                  <h5>Type de Compte</h5>
+                  <p class="text-muted mb-0">
+                    Sélectionnez le type de compte à ouvrir
+                  </p>
+                </div>
+              </div>
+            </nb-card-header>
+            <nb-card-body>
+              <div class="account-types-grid">
+                <div
+                  *ngFor="let type of accountTypes"
+                  class="account-type-card"
+                  [class.selected]="f.accountType.value === type.value"
+                  (click)="f.accountType.setValue(type.value)"
+                >
+                  <input
+                    type="radio"
+                    [id]="'type-' + type.value"
+                    [value]="type.value"
+                    formControlName="accountType"
+                    class="type-radio"
+                  />
+
+                  <div
+                    class="type-icon-wrapper"
+                    [ngClass]="'type-' + type.color"
+                  >
+                    <nb-icon [icon]="type.icon" class="type-icon"></nb-icon>
+                  </div>
+
+                  <h6 class="type-title">{{ type.label }}</h6>
+                  <p class="type-description">{{ type.description }}</p>
+
+                  <ul class="type-features">
+                    <li *ngFor="let feature of type.features">
+                      <nb-icon
+                        icon="checkmark-outline"
+                        status="success"
+                      ></nb-icon>
+                      <span>{{ feature }}</span>
+                    </li>
+                  </ul>
+
+                  <div
+                    class="type-check"
+                    *ngIf="f.accountType.value === type.value"
+                  >
+                    <nb-icon icon="checkmark-circle-2-outline"></nb-icon>
+                  </div>
+                </div>
+              </div>
+            </nb-card-body>
+          </nb-card>
+
+          <!-- Étape 3: Devise -->
+          <nb-card class="form-card">
+            <nb-card-header>
+              <div class="card-header-content">
+                <div class="step-badge">3</div>
+                <div>
+                  <h5>Devise du Compte</h5>
+                  <p class="text-muted mb-0">Choisissez la devise de gestion</p>
+                </div>
+              </div>
+            </nb-card-header>
+            <nb-card-body>
+              <div class="currency-grid">
+                <div
+                  *ngFor="let currency of currencies"
+                  class="currency-card"
+                  [class.selected]="f.currency.value === currency.value"
+                  (click)="f.currency.setValue(currency.value)"
+                >
+                  <input
+                    type="radio"
+                    [id]="'currency-' + currency.value"
+                    [value]="currency.value"
                     formControlName="currency"
-                    [status]="f.currency.invalid && f.currency.touched ? 'danger' : 'basic'">
-                    <nb-option *ngFor="let currency of currencies" [value]="currency.value">
-                      {{ currency.label }}
-                    </nb-option>
-                  </nb-select>
-                  
-                  <div *ngIf="f.currency.invalid && f.currency.touched" class="text-danger mt-1 small">
-                    <span *ngIf="f.currency.errors?.['required']">
-                      La devise est obligatoire
-                    </span>
+                    class="currency-radio"
+                  />
+
+                  <div class="currency-flag">{{ currency.flag }}</div>
+                  <div class="currency-code">{{ currency.value }}</div>
+                  <div class="currency-name">{{ currency.label }}</div>
+
+                  <div
+                    class="currency-check"
+                    *ngIf="f.currency.value === currency.value"
+                  >
+                    <nb-icon icon="checkmark-circle-2-outline"></nb-icon>
                   </div>
                 </div>
               </div>
+            </nb-card-body>
+          </nb-card>
 
-              <!-- Récapitulatif -->
-              <div class="row mb-4" *ngIf="f.customerId.value && f.accountType.value && f.currency.value">
-                <div class="col-12">
-                  <nb-alert status="success">
-                    <h6 class="mb-2">Récapitulatif</h6>
-                    <ul class="mb-0">
-                      <li>Client : {{ displayCustomerName(f.customerId.value) }}</li>
-                      <li>Type de compte : {{ getAccountTypeLabel(f.accountType.value) }}</li>
-                      <li>Devise : {{ f.currency.value }}</li>
-                      <li *ngIf="f.accountType.value === 'SAVINGS'">Taux d'intérêt : {{ getInterestRate() }}%</li>
-                      <li *ngIf="f.accountType.value === 'CURRENT'">Découvert autorisé : {{ getOverdraftLimit() | currency:'EUR' }}</li>
-                      <li>Solde initial : 0 {{ f.currency.value }}</li>
-                    </ul>
-                  </nb-alert>
+          <!-- Actions -->
+          <div class="form-actions">
+            <button
+              nbButton
+              size="large"
+              status="basic"
+              type="button"
+              (click)="onCancel()"
+              [disabled]="isSubmitting"
+            >
+              <nb-icon icon="close-outline"></nb-icon>
+              Annuler
+            </button>
+
+            <button
+              nbButton
+              size="large"
+              status="primary"
+              type="submit"
+              [disabled]="accountForm.invalid || isSubmitting"
+              [class.btn-loading]="isSubmitting"
+            >
+              <nb-icon
+                [icon]="isSubmitting ? 'loader-outline' : 'checkmark-outline'"
+                [class.spin]="isSubmitting"
+              ></nb-icon>
+              {{ isSubmitting ? "Création en cours..." : "Créer le compte" }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Sidebar récapitulatif -->
+        <div class="form-sidebar">
+          <!-- Récapitulatif -->
+          <nb-card class="summary-card">
+            <nb-card-header>
+              <h6>
+                <nb-icon icon="clipboard-outline"></nb-icon>
+                Récapitulatif
+              </h6>
+            </nb-card-header>
+            <nb-card-body>
+              <div class="summary-section">
+                <div class="summary-label">
+                  <nb-icon icon="person-outline"></nb-icon>
+                  Client
+                </div>
+                <div
+                  class="summary-value"
+                  *ngIf="selectedCustomer; else noClient"
+                >
+                  {{ selectedCustomer.lastName }}
+                  {{ selectedCustomer.firstName }}
+                </div>
+                <ng-template #noClient>
+                  <div class="summary-value text-muted">Non sélectionné</div>
+                </ng-template>
+              </div>
+
+              <div class="summary-divider"></div>
+
+              <div class="summary-section">
+                <div class="summary-label">
+                  <nb-icon
+                    [icon]="
+                      getSelectedAccountType()?.icon || 'credit-card-outline'
+                    "
+                  ></nb-icon>
+                  Type de compte
+                </div>
+                <div class="summary-value">
+                  {{ getSelectedAccountType()?.label || "Non sélectionné" }}
                 </div>
               </div>
 
-              <!-- Actions -->
-              <div class="row">
-                <div class="col-12">
-                  <div class="d-flex justify-content-end gap-2">
-                    <button
-                      nbButton
-                      status="basic"
-                      type="button"
-                      (click)="onCancel()"
-                      [disabled]="isSubmitting">
-                      Annuler
-                    </button>
-                    
-                    <button
-                      nbButton
-                      status="primary"
-                      type="submit"
-                      [disabled]="accountForm.invalid || isSubmitting"
-                      [class.btn-pulse]="isSubmitting">
-                      
-                      <span *ngIf="!isSubmitting">
-                        <nb-icon icon="checkmark-outline" class="me-2"></nb-icon>
-                        Créer le compte
-                      </span>
-                      
-                      <span *ngIf="isSubmitting">
-                        <nb-icon icon="sync-outline" class="spin me-2"></nb-icon>
-                        Création en cours...
-                      </span>
-                    </button>
-                  </div>
+              <div class="summary-divider"></div>
+
+              <div class="summary-section">
+                <div class="summary-label">
+                  <nb-icon icon="globe-outline"></nb-icon>
+                  Devise
+                </div>
+                <div class="summary-value">
+                  <span *ngIf="getSelectedCurrency()">
+                    {{ getSelectedCurrency()?.flag }}
+                    {{ getSelectedCurrency()?.label }}
+                  </span>
+                  <span *ngIf="!getSelectedCurrency()" class="text-muted"
+                    >Non sélectionnée</span
+                  >
                 </div>
               </div>
-            </form>
-          </nb-card-body>
-        </nb-card>
-      </div>
 
-      <!-- Informations -->
-      <div class="col-lg-4">
-        <nb-card>
-          <nb-card-header>
-            <h5 class="mb-0">
-              <nb-icon icon="info-circle-outline" class="me-2"></nb-icon>
-              Informations
-            </h5>
-          </nb-card-header>
-          <nb-card-body>
-            <div class="mb-4">
-              <h6>Compte Épargne</h6>
-              <ul class="text-muted small">
-                <li>Taux d'intérêt annuel : 2.0%</li>
-                <li>Pas de découvert autorisé</li>
-                <li>Frais de tenue de compte : 0 €</li>
-                <li>Capital garanti</li>
-              </ul>
-            </div>
-            
-            <div>
-              <h6>Compte Courant</h6>
-              <ul class="text-muted small">
-                <li>Découvert autorisé : 1 000 €</li>
-                <li>Frais de tenue de compte : 5 €/mois</li>
-                <li>Carte bancaire incluse</li>
-                <li>Chéquier disponible</li>
-              </ul>
-            </div>
-          </nb-card-body>
-        </nb-card>
+              <div class="summary-divider"></div>
 
-        <!-- Génération IBAN -->
-        <nb-card>
-          <nb-card-header>
-            <h5 class="mb-0">
-              <nb-icon icon="hash-outline" class="me-2"></nb-icon>
-              Numéro de Compte
-            </h5>
-          </nb-card-header>
-          <nb-card-body>
-            <p class="text-muted small">
-              Le numéro IBAN sera généré automatiquement lors de la création du compte selon le format bancaire standard.
-            </p>
-            <div class="text-center">
-              <nb-icon icon="sync-outline" class="text-primary" size="giant"></nb-icon>
-              <p class="mt-2 mb-0">
-                <small>Génération automatique</small>
-              </p>
-            </div>
-          </nb-card-body>
-        </nb-card>
+              <div class="summary-section">
+                <div class="summary-label">
+                  <nb-icon icon="pricetags-outline"></nb-icon>
+                  Solde initial
+                </div>
+                <div class="summary-value">
+                  0. 00 {{ getSelectedCurrency()?.symbol || "€" }}
+                </div>
+              </div>
+
+              <div class="summary-divider"></div>
+
+              <div class="summary-section">
+                <div class="summary-label">
+                  <nb-icon icon="calendar-outline"></nb-icon>
+                  Date d'ouverture
+                </div>
+                <div class="summary-value">
+                  {{ "now" | date : "dd/MM/yyyy" }}
+                </div>
+              </div>
+
+              <!-- Validation -->
+              <div class="summary-validation" *ngIf="accountForm.valid">
+                <nb-alert status="success" size="tiny">
+                  <nb-icon icon="checkmark-circle-outline"></nb-icon>
+                  Toutes les informations sont complètes
+                </nb-alert>
+              </div>
+            </nb-card-body>
+          </nb-card>
+
+          <!-- Informations -->
+          <nb-card class="info-card">
+            <nb-card-header>
+              <h6>
+                <nb-icon icon="info-outline"></nb-icon>
+                Informations
+              </h6>
+            </nb-card-header>
+            <nb-card-body>
+              <div class="info-item">
+                <nb-icon icon="shield-outline" status="success"></nb-icon>
+                <div>
+                  <strong>Sécurité garantie</strong>
+                  <p>
+                    Le numéro IBAN sera généré automatiquement selon les normes
+                    bancaires internationales
+                  </p>
+                </div>
+              </div>
+              <div class="info-item">
+                <nb-icon icon="flash-outline" status="info"></nb-icon>
+                <div>
+                  <strong>Activation immédiate</strong>
+                  <p>Le compte sera activé immédiatement après création</p>
+                </div>
+              </div>
+              <div class="info-item">
+                <nb-icon icon="email-outline" status="warning"></nb-icon>
+                <div>
+                  <strong>Notification</strong>
+                  <p>
+                    Le client recevra un email de confirmation avec les détails
+                    du compte
+                  </p>
+                </div>
+              </div>
+            </nb-card-body>
+          </nb-card>
+        </div>
       </div>
-    </div>
+    </form>
   </div>
 </div>

@@ -1,32 +1,233 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { AccountApiService } from '../../../@core/data/api/index';
-import { NbToastrService } from '@nebular/theme';
+import { Component, OnInit } from "@angular/core";
+import { ActivatedRoute, Router } from "@angular/router";
+import { NbToastrService } from "@nebular/theme";
+import {
+  AccountApiService,
+  TransactionApiService,
+} from "../../../@core/data/api/index";
+import { Account, Transaction } from "../../../@core/data/models/index";
 
 @Component({
-  selector: 'ngx-account-statement',
-  templateUrl: './account-statement.component.html',
-  styleUrls: ['./account-statement.component.scss']
+  selector: "ngx-account-statement",
+  templateUrl: "./account-statement.component.html",
+  styleUrls: ["./account-statement.component.scss"],
 })
 export class AccountStatementComponent implements OnInit {
   accountId: number = 0;
-  startDate: string = '';
-  endDate: string = '';
-  format: string = 'pdf';
-  includeLogo: boolean = true;
-  includeAllTransactions: boolean = true;
+  account: Account | null = null;
+
+  // Formulaire
+  startDate: string = "";
+  endDate: string = "";
+  format: string = "pdf";
+
+    today: string = '';
+
+  // Options
+  includeHeader: boolean = true;
+  includeFooter: boolean = true;
+  includeChart: boolean = true;
   includeSummary: boolean = true;
+
+  // États
+  isLoading = false;
   isGenerating = false;
+  isLoadingPreview = false;
+
+  // Aperçu
+  previewTransactions: Transaction[] = [];
+  previewStats = {
+    totalTransactions: 0,
+    totalDeposits: 0,
+    totalWithdrawals: 0,
+    totalTransfers: 0,
+    depositAmount: 0,
+    withdrawalAmount: 0,
+    transferAmount: 0,
+    openingBalance: 0,
+    closingBalance: 0,
+    netChange: 0,
+  };
+
+  // Formats disponibles
+  formats = [
+    {
+      value: "pdf",
+      label: "PDF",
+      icon: "file-text-outline",
+      description: "Format standard pour impression",
+      color: "danger",
+      features: [
+        "Optimisé pour l'impression",
+        "Signature numérique",
+        "Compatible tous systèmes",
+      ],
+    },
+    {
+      value: "csv",
+      label: "CSV",
+      icon: "file-outline",
+      description: "Fichier Excel pour analyse",
+      color: "success",
+      features: [
+        "Import dans Excel",
+        "Analyse de données",
+        "Compatible tableurs",
+      ],
+    },
+    {
+      value: "html",
+      label: "HTML",
+      icon: "browser-outline",
+      description: "Consultation en ligne",
+      color: "info",
+      features: ["Affichage navigateur", "Partage facile", "Responsive design"],
+    },
+  ];
+
+  // Périodes prédéfinies
+  quickPeriods = [
+    {
+      label: "Ce mois",
+      icon: "calendar-outline",
+      action: () => this.setCurrentMonth(),
+    },
+    {
+      label: "Mois dernier",
+      icon: "arrow-back-outline",
+      action: () => this.setLastMonth(),
+    },
+    {
+      label: "30 derniers jours",
+      icon: "clock-outline",
+      action: () => this.setLast30Days(),
+    },
+    {
+      label: "3 derniers mois",
+      icon: "calendar-outline",
+      action: () => this.setLast3Months(),
+    },
+    {
+      label: "Cette année",
+      icon: "calendar-outline",
+      action: () => this.setCurrentYear(),
+    },
+    {
+      label: "Personnalisée",
+      icon: "options-2-outline",
+      action: () => this.clearDates(),
+    },
+  ];
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private accountApi: AccountApiService,
+    private transactionApi: TransactionApiService,
     private toastr: NbToastrService
   ) {}
 
   ngOnInit(): void {
     this.accountId = +this.route.snapshot.params['id'];
-    this.setCurrentMonth(); // Par défaut : ce mois
+    this.today = this.formatDateForInput(new Date());
+    this.setCurrentMonth();
+    this.loadAccount();
+  }
+
+  /**
+   * Charge les informations du compte
+   */
+  loadAccount(): void {
+    this.isLoading = true;
+
+    this.accountApi.getAccountById(this.accountId).subscribe({
+      next: (account) => {
+        this.account = account;
+        this.isLoading = false;
+        this.loadPreview();
+      },
+      error: (error) => {
+        this.isLoading = false;
+        this.toastr.danger("Erreur lors du chargement du compte", "Erreur");
+        this.router.navigate(["/pages/accounts"]);
+      },
+    });
+  }
+
+  /**
+   * Charge l'aperçu des transactions
+   */
+  loadPreview(): void {
+    if (!this.startDate || !this.endDate) return;
+
+    this.isLoadingPreview = true;
+
+    const startISO = `${this.startDate}T00:00:00`;
+    const endISO = `${this.endDate}T23:59:59`;
+
+    this.transactionApi
+      .getTransactionsByPeriod(this.accountId, startISO, endISO)
+      .subscribe({
+        next: (transactions) => {
+          this.previewTransactions = transactions;
+          this.calculatePreviewStats(transactions);
+          this.isLoadingPreview = false;
+        },
+        error: (error) => {
+          this.isLoadingPreview = false;
+          this.toastr.warning("Impossible de charger l'aperçu", "Attention");
+        },
+      });
+  }
+
+  /**
+   * Calcule les statistiques de l'aperçu
+   */
+  calculatePreviewStats(transactions: Transaction[]): void {
+    this.previewStats.totalTransactions = transactions.length;
+
+    const deposits = transactions.filter(
+      (t) => t.transactionType === "DEPOSIT"
+    );
+    const withdrawals = transactions.filter(
+      (t) => t.transactionType === "WITHDRAWAL"
+    );
+    const transfers = transactions.filter(
+      (t) => t.transactionType === "TRANSFER"
+    );
+
+    this.previewStats.totalDeposits = deposits.length;
+    this.previewStats.totalWithdrawals = withdrawals.length;
+    this.previewStats.totalTransfers = transfers.length;
+
+    this.previewStats.depositAmount = deposits.reduce(
+      (sum, t) => sum + t.amount,
+      0
+    );
+    this.previewStats.withdrawalAmount = withdrawals.reduce(
+      (sum, t) => sum + Math.abs(t.amount),
+      0
+    );
+    this.previewStats.transferAmount = transfers.reduce(
+      (sum, t) => sum + Math.abs(t.amount),
+      0
+    );
+
+    if (transactions.length > 0) {
+      const sorted = [...transactions].sort(
+        (a, b) =>
+          new Date(a.transactionDate).getTime() -
+          new Date(b.transactionDate).getTime()
+      );
+      this.previewStats.openingBalance = sorted[0].balanceBefore;
+      this.previewStats.closingBalance = sorted[sorted.length - 1].balanceAfter;
+      this.previewStats.netChange =
+        this.previewStats.closingBalance - this.previewStats.openingBalance;
+    } else if (this.account) {
+      this.previewStats.openingBalance = this.account.balance;
+      this.previewStats.closingBalance = this.account.balance;
+      this.previewStats.netChange = 0;
+    }
   }
 
   /**
@@ -34,51 +235,54 @@ export class AccountStatementComponent implements OnInit {
    */
   generateStatement(): void {
     if (!this.startDate || !this.endDate) {
-      this.toastr.warning('Veuillez sélectionner une période', 'Attention');
+      this.toastr.warning("Veuillez sélectionner une période", "Attention");
       return;
     }
 
     if (new Date(this.startDate) > new Date(this.endDate)) {
-      this.toastr.warning('La date de début doit être avant la date de fin', 'Erreur');
+      this.toastr.warning(
+        "La date de début doit être avant la date de fin",
+        "Erreur"
+      );
       return;
     }
 
     this.isGenerating = true;
 
-    // Convertir en format ISO complet
     const startISO = `${this.startDate}T00:00:00`;
     const endISO = `${this.endDate}T23:59:59`;
 
-    this.accountApi.generateStatement(this.accountId, startISO, endISO).subscribe({
-      next: (blob) => {
-        this.isGenerating = false;
-        
-        // Télécharger le fichier
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        
-        // Nom du fichier selon le format
-        let extension = this.format;
-        let mimeType = 'application/pdf';
-        
-        if (this.format === 'csv') {
-          mimeType = 'text/csv';
-        } else if (this.format === 'html') {
-          mimeType = 'text/html';
-        }
-        
-        a.download = `releve_compte_${this.accountId}_${this.startDate}_${this.endDate}.${extension}`;
-        a.click();
-        window.URL.revokeObjectURL(url);
-        
-        this.toastr.success('Relevé généré avec succès', 'Succès');
-      },
-      error: (error) => {
-        this.isGenerating = false;
-        this.toastr.danger('Erreur lors de la génération du relevé', 'Erreur');
-      }
-    });
+    this.accountApi
+      .generateStatement(this.accountId, startISO, endISO)
+      .subscribe({
+        next: (blob) => {
+          this.isGenerating = false;
+
+          // Télécharger le fichier
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+
+          const extension = this.format;
+          const filename = `releve_${this.account?.accountNumber}_${this.startDate}_${this.endDate}.${extension}`;
+
+          a.download = filename;
+          a.click();
+          window.URL.revokeObjectURL(url);
+
+          this.toastr.success(
+            `Relevé ${this.format.toUpperCase()} généré avec succès`,
+            "Succès"
+          );
+        },
+        error: (error) => {
+          this.isGenerating = false;
+          this.toastr.danger(
+            "Erreur lors de la génération du relevé",
+            "Erreur"
+          );
+        },
+      });
   }
 
   /**
@@ -87,51 +291,132 @@ export class AccountStatementComponent implements OnInit {
   setCurrentMonth(): void {
     const today = new Date();
     const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
-    
-    this.startDate = firstDay.toISOString().split('T')[0];
-    this.endDate = today.toISOString().split('T')[0];
+
+    this.startDate = this.formatDateForInput(firstDay);
+    this.endDate = this.formatDateForInput(today);
+    this.loadPreview();
   }
 
   setLastMonth(): void {
     const today = new Date();
     const firstDay = new Date(today.getFullYear(), today.getMonth() - 1, 1);
     const lastDay = new Date(today.getFullYear(), today.getMonth(), 0);
-    
-    this.startDate = firstDay.toISOString().split('T')[0];
-    this.endDate = lastDay.toISOString().split('T')[0];
+
+    this.startDate = this.formatDateForInput(firstDay);
+    this.endDate = this.formatDateForInput(lastDay);
+    this.loadPreview();
   }
 
   setLast30Days(): void {
     const today = new Date();
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(today.getDate() - 30);
-    
-    this.startDate = thirtyDaysAgo.toISOString().split('T')[0];
-    this.endDate = today.toISOString().split('T')[0];
+
+    this.startDate = this.formatDateForInput(thirtyDaysAgo);
+    this.endDate = this.formatDateForInput(today);
+    this.loadPreview();
   }
 
-  setLast90Days(): void {
+  setLast3Months(): void {
     const today = new Date();
-    const ninetyDaysAgo = new Date();
-    ninetyDaysAgo.setDate(today.getDate() - 90);
-    
-    this.startDate = ninetyDaysAgo.toISOString().split('T')[0];
-    this.endDate = today.toISOString().split('T')[0];
+    const threeMonthsAgo = new Date();
+    threeMonthsAgo.setMonth(today.getMonth() - 3);
+
+    this.startDate = this.formatDateForInput(threeMonthsAgo);
+    this.endDate = this.formatDateForInput(today);
+    this.loadPreview();
   }
 
-  setLastYear(): void {
+  setCurrentYear(): void {
     const today = new Date();
-    const lastYear = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
-    
-    this.startDate = lastYear.toISOString().split('T')[0];
-    this.endDate = today.toISOString().split('T')[0];
+    const firstDay = new Date(today.getFullYear(), 0, 1);
+
+    this.startDate = this.formatDateForInput(firstDay);
+    this.endDate = this.formatDateForInput(today);
+    this.loadPreview();
+  }
+
+  clearDates(): void {
+    this.startDate = "";
+    this.endDate = "";
   }
 
   /**
-   * Formate la date pour l'affichage
+   * Événements
    */
-  formatDateDisplay(dateString: string): string {
-    if (!dateString) return '';
-    return new Date(dateString).toLocaleDateString('fr-FR');
+  onDateChange(): void {
+    if (this.startDate && this.endDate) {
+      this.loadPreview();
+    }
+  }
+
+  onFormatChange(format: string): void {
+    this.format = format;
+  }
+
+  onBack(): void {
+    this.router.navigate(["/pages/accounts/detail", this.accountId]);
+  }
+
+  /**
+   * Helpers
+   */
+  formatDateForInput(date: Date): string {
+    return date.toISOString().split("T")[0];
+  }
+
+  formatDate(dateString: string): string {
+    if (!dateString) return "";
+    return new Date(dateString).toLocaleDateString("fr-FR");
+  }
+
+  formatDateTime(dateString: string): string {
+    if (!dateString) return "";
+    return new Date(dateString).toLocaleString("fr-FR");
+  }
+
+  formatCurrency(amount: number): string {
+    return new Intl.NumberFormat("fr-FR", {
+      style: "currency",
+      currency: "EUR",
+    }).format(amount);
+  }
+
+  formatAccountNumber(iban: string): string {
+    return iban ? iban.match(/.{1,4}/g)?.join(" ") || iban : "";
+  }
+
+  formatNumber(num: number): string {
+    return num.toLocaleString("fr-FR");
+  }
+
+  getSelectedFormat() {
+    return this.formats.find((f) => f.value === this.format);
+  }
+
+  getDaysBetween(): number {
+    if (!this.startDate || !this.endDate) return 0;
+    const start = new Date(this.startDate);
+    const end = new Date(this.endDate);
+    const diffTime = Math.abs(end.getTime() - start.getTime());
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  }
+
+  getTransactionTypeLabel(type: string): string {
+    const labels: any = {
+      DEPOSIT: "Dépôt",
+      WITHDRAWAL: "Retrait",
+      TRANSFER: "Virement",
+    };
+    return labels[type] || type;
+  }
+
+  getTransactionTypeIcon(type: string): string {
+    const icons: any = {
+      DEPOSIT: "arrow-downward-outline",
+      WITHDRAWAL: "arrow-upward-outline",
+      TRANSFER: "swap-outline",
+    };
+    return icons[type] || "activity-outline";
   }
 }

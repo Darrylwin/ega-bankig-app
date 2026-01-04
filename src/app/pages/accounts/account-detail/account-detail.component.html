@@ -1,285 +1,509 @@
 <div class="account-detail-container">
-  <!-- En-tête -->
-  <div class="account-detail-header mb-4">
-    <div class="row align-items-center">
-      <div class="col-md-8">
-        <div class="d-flex align-items-center">
-          <button nbButton ghost size="small" (click)="onBack()" class="me-3">
-            <nb-icon icon="arrow-back-outline"></nb-icon>
-          </button>
-          <div>
-            <h2>Détails du Compte</h2>
-            <p class="text-muted mb-0">Informations complètes et opérations</p>
-          </div>
+  <!-- Header -->
+  <div class="detail-header">
+    <div class="header-content">
+      <div class="header-left">
+        <button nbButton ghost size="small" (click)="onBack()" class="back-btn">
+          <nb-icon icon="arrow-back-outline"></nb-icon>
+        </button>
+        <div>
+          <h1 class="detail-title">
+            <nb-icon
+              [icon]="
+                account
+                  ? getAccountTypeIcon(account.accountType)
+                  : 'credit-card-outline'
+              "
+            ></nb-icon>
+            Détails du Compte
+          </h1>
+          <p class="detail-subtitle" *ngIf="account">
+            {{ formatAccountNumber(account.accountNumber) }}
+          </p>
         </div>
       </div>
-      <div class="col-md-4 text-end">
-        <button nbButton status="primary" [routerLink]="['/pages/transactions/history', account?.id]" [disabled]="!account">
-          <nb-icon icon="repeat-outline" class="me-2"></nb-icon>
-          Historique
-        </button>
-        <button nbButton status="success" [routerLink]="['/pages/accounts/statement', account?.id]" [disabled]="!account" class="ms-2">
-          <nb-icon icon="file-text-outline" class="me-2"></nb-icon>
+      <div class="header-actions" *ngIf="account">
+        <button nbButton status="success" (click)="onGenerateStatement()">
+          <nb-icon icon="file-text-outline"></nb-icon>
           Relevé
+        </button>
+        <button nbButton status="danger" ghost (click)="onDeleteAccount()">
+          <nb-icon icon="trash-outline"></nb-icon>
         </button>
       </div>
     </div>
   </div>
 
   <!-- Chargement -->
-  <div *ngIf="isLoading" class="text-center py-5">
+  <div *ngIf="isLoading" class="loading-container">
     <nb-spinner size="giant" status="primary"></nb-spinner>
-    <p class="mt-3">Chargement des informations du compte...</p>
+    <p class="loading-text">Chargement des détails...</p>
   </div>
 
-  <!-- Détail compte -->
-  <div *ngIf="account && !isLoading">
-    <!-- En-tête avec numéro de compte -->
-    <div class="row mb-4">
-      <div class="col-12">
-        <nb-card status="info">
-          <nb-card-body>
-            <div class="d-flex justify-content-between align-items-center">
-              <div>
-                <h4 class="mb-1">{{ formatAccountNumber(account.accountNumber) }}</h4>
-                <p class="text-muted mb-0">
-                  {{ account.customerFullName }}
-                  <nb-badge [text]="getAccountTypeLabel(account.accountType)" 
-                           [status]="account.accountType === 'SAVINGS' ? 'success' : 'primary'"
-                           class="ms-2">
-                  </nb-badge>
-                  <nb-badge [text]="getStatusLabel(account.status)" 
-                           [status]="getStatusColor(account.status)"
-                           class="ms-2">
-                  </nb-badge>
-                </p>
+  <!-- Contenu -->
+  <div *ngIf="!isLoading && account" class="detail-content">
+    <!-- Carte principale du compte -->
+    <div class="account-main-card">
+      <nb-card class="balance-card">
+        <nb-card-body>
+          <div class="balance-content">
+            <div class="balance-left">
+              <div class="account-info">
+                <div
+                  class="account-type-badge"
+                  [ngClass]="
+                    'type-' +
+                    (account.accountType === 'SAVINGS' ? 'success' : 'primary')
+                  "
+                >
+                  <nb-icon
+                    [icon]="getAccountTypeIcon(account.accountType)"
+                  ></nb-icon>
+                  <span>{{ getAccountTypeLabel(account.accountType) }}</span>
+                </div>
+                <nb-badge
+                  [text]="getStatusLabel(account.status)"
+                  [status]="getStatusColor(account.status)"
+                  class="status-badge"
+                >
+                </nb-badge>
               </div>
-              <div class="text-end">
-                <h2 class="mb-0">{{ formatCurrency(account.balance) }}</h2>
-                <p class="text-muted mb-0">Solde actuel</p>
+              <div class="account-number">
+                <small>Numéro de compte</small>
+                <div class="number-value">
+                  {{ formatAccountNumber(account.accountNumber) }}
+                </div>
+              </div>
+            </div>
+            <div class="balance-right">
+              <div class="balance-display">
+                <small>Solde disponible</small>
+                <div
+                  class="balance-value"
+                  [ngClass]="{
+                    positive: account.balance > 0,
+                    zero: account.balance === 0,
+                    negative: account.balance < 0
+                  }"
+                >
+                  {{ formatCurrency(account.balance) }}
+                </div>
+                <small class="currency">{{ account.currency }}</small>
+              </div>
+            </div>
+          </div>
+        </nb-card-body>
+      </nb-card>
+    </div>
+
+    <!-- Actions rapides -->
+    <div class="quick-actions">
+      <button
+        nbButton
+        status="success"
+        size="large"
+        (click)="onDeposit()"
+        class="action-btn"
+      >
+        <nb-icon icon="arrow-downward-outline"></nb-icon>
+        <span>Dépôt</span>
+      </button>
+      <button
+        nbButton
+        status="danger"
+        size="large"
+        (click)="onWithdraw()"
+        class="action-btn"
+      >
+        <nb-icon icon="arrow-upward-outline"></nb-icon>
+        <span>Retrait</span>
+      </button>
+      <button
+        nbButton
+        status="primary"
+        size="large"
+        (click)="onTransfer()"
+        class="action-btn"
+      >
+        <nb-icon icon="swap-outline"></nb-icon>
+        <span>Virement</span>
+      </button>
+      <button
+        nbButton
+        status="info"
+        size="large"
+        (click)="onViewAllTransactions()"
+        class="action-btn"
+      >
+        <nb-icon icon="list-outline"></nb-icon>
+        <span>Historique</span>
+      </button>
+    </div>
+
+    <!-- Grille de contenu -->
+    <div class="detail-grid">
+      <!-- Colonne principale -->
+      <div class="detail-main">
+        <!-- Statistiques du compte -->
+        <nb-card class="stats-card">
+          <nb-card-header>
+            <h6>
+              <nb-icon icon="bar-chart-outline"></nb-icon>
+              Statistiques du Compte
+            </h6>
+          </nb-card-header>
+          <nb-card-body>
+            <div class="stats-grid">
+              <div class="stat-item">
+                <div class="stat-icon stat-success">
+                  <nb-icon icon="arrow-downward-outline"></nb-icon>
+                </div>
+                <div class="stat-content">
+                  <div class="stat-value">
+                    {{ formatCurrency(accountStats.depositAmount) }}
+                  </div>
+                  <div class="stat-label">Total Dépôts</div>
+                  <small class="text-muted"
+                    >{{ accountStats.totalDeposits }} opération(s)</small
+                  >
+                </div>
+              </div>
+
+              <div class="stat-item">
+                <div class="stat-icon stat-danger">
+                  <nb-icon icon="arrow-upward-outline"></nb-icon>
+                </div>
+                <div class="stat-content">
+                  <div class="stat-value">
+                    {{ formatCurrency(accountStats.withdrawalAmount) }}
+                  </div>
+                  <div class="stat-label">Total Retraits</div>
+                  <small class="text-muted"
+                    >{{ accountStats.totalWithdrawals }} opération(s)</small
+                  >
+                </div>
+              </div>
+
+              <div class="stat-item">
+                <div class="stat-icon stat-primary">
+                  <nb-icon icon="swap-outline"></nb-icon>
+                </div>
+                <div class="stat-content">
+                  <div class="stat-value">
+                    {{ formatCurrency(accountStats.transferAmount) }}
+                  </div>
+                  <div class="stat-label">Total Virements</div>
+                  <small class="text-muted"
+                    >{{ accountStats.totalTransfers }} opération(s)</small
+                  >
+                </div>
+              </div>
+
+              <div class="stat-item">
+                <div class="stat-icon stat-info">
+                  <nb-icon icon="activity-outline"></nb-icon>
+                </div>
+                <div class="stat-content">
+                  <div class="stat-value">
+                    {{ formatNumber(accountStats.totalTransactions) }}
+                  </div>
+                  <div class="stat-label">Total Transactions</div>
+                  <small class="text-muted"
+                    >Moyenne:
+                    {{ formatCurrency(accountStats.averageTransaction) }}</small
+                  >
+                </div>
               </div>
             </div>
           </nb-card-body>
         </nb-card>
-      </div>
-    </div>
 
-    <div class="row">
-      <!-- Informations principales -->
-      <div class="col-lg-8">
-        <!-- Informations du compte -->
-        <nb-card class="mb-4">
+        <!-- Graphiques -->
+        <div class="charts-row">
+          <nb-card class="chart-card">
+            <nb-card-header>
+              <h6>
+                <nb-icon icon="pie-chart-outline"></nb-icon>
+                Répartition par Type
+              </h6>
+            </nb-card-header>
+            <nb-card-body>
+              <ngx-charts-pie-chart
+                *ngIf="transactionTypeChartData.length > 0"
+                [view]="[undefined, 300]"
+                [scheme]="colorScheme"
+                [results]="transactionTypeChartData"
+                [legend]="true"
+                [labels]="true"
+                [doughnut]="true"
+              >
+              </ngx-charts-pie-chart>
+              <div
+                *ngIf="transactionTypeChartData.length === 0"
+                class="no-data"
+              >
+                <nb-icon icon="inbox-outline"></nb-icon>
+                <p>Aucune transaction</p>
+              </div>
+            </nb-card-body>
+          </nb-card>
+
+          <nb-card class="chart-card">
+            <nb-card-header>
+              <h6>
+                <nb-icon icon="activity-outline"></nb-icon>
+                Activité Mensuelle
+              </h6>
+            </nb-card-header>
+            <nb-card-body>
+              <ngx-charts-line-chart
+                *ngIf="monthlyActivityChartData.length > 0"
+                [view]="[undefined, 300]"
+                [scheme]="colorScheme"
+                [results]="monthlyActivityChartData"
+                [xAxis]="true"
+                [yAxis]="true"
+                [legend]="false"
+                [showXAxisLabel]="false"
+                [showYAxisLabel]="true"
+                [yAxisLabel]="'Transactions'"
+              >
+              </ngx-charts-line-chart>
+              <div
+                *ngIf="monthlyActivityChartData.length === 0"
+                class="no-data"
+              >
+                <nb-icon icon="inbox-outline"></nb-icon>
+                <p>Aucune donnée</p>
+              </div>
+            </nb-card-body>
+          </nb-card>
+        </div>
+
+        <!-- Dernières transactions -->
+        <nb-card class="transactions-card">
           <nb-card-header>
-            <h5 class="mb-0">
-              <nb-icon icon="info-circle-outline" class="me-2"></nb-icon>
-              Informations du Compte
-            </h5>
+            <div class="card-header-flex">
+              <h6>
+                <nb-icon icon="clock-outline"></nb-icon>
+                Dernières Transactions
+              </h6>
+              <button
+                nbButton
+                ghost
+                size="tiny"
+                (click)="onViewAllTransactions()"
+              >
+                Voir tout
+                <nb-icon icon="arrow-forward-outline"></nb-icon>
+              </button>
+            </div>
           </nb-card-header>
           <nb-card-body>
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label class="text-muted small">Numéro de compte (IBAN)</label>
-                <div class="fw-bold font-monospace">{{ formatAccountNumber(account.accountNumber) }}</div>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label class="text-muted small">Type de compte</label>
-                <div class="fw-bold">
-                  <nb-badge [text]="getAccountTypeLabel(account.accountType)" 
-                           [status]="account.accountType === 'SAVINGS' ? 'success' : 'primary'">
-                  </nb-badge>
-                  <span class="ms-2">
-                    <small *ngIf="account.accountType === 'SAVINGS'" class="text-muted">Taux d'intérêt : 2.0%</small>
-                    <small *ngIf="account.accountType === 'CURRENT'" class="text-muted">Découvert : 1 000 €</small>
-                  </span>
+            <div *ngIf="isLoadingTransactions" class="loading-transactions">
+              <nb-spinner size="large" status="primary"></nb-spinner>
+            </div>
+
+            <div
+              *ngIf="!isLoadingTransactions && recentTransactions.length > 0"
+              class="transactions-list"
+            >
+              <div
+                *ngFor="let transaction of recentTransactions"
+                class="transaction-item"
+              >
+                <div
+                  class="transaction-icon"
+                  [ngClass]="
+                    'icon-' +
+                    getTransactionTypeColor(transaction.transactionType)
+                  "
+                >
+                  <nb-icon
+                    [icon]="getTransactionTypeIcon(transaction.transactionType)"
+                  ></nb-icon>
+                </div>
+                <div class="transaction-info">
+                  <div class="transaction-type">
+                    {{ getTransactionTypeLabel(transaction.transactionType) }}
+                  </div>
+                  <small class="transaction-date">{{
+                    formatDateTime(transaction.transactionDate)
+                  }}</small>
+                  <small
+                    class="transaction-ref"
+                    *ngIf="transaction.description"
+                    >{{ transaction.description }}</small
+                  >
+                </div>
+                <div
+                  class="transaction-amount"
+                  [ngClass]="{
+                    'amount-positive':
+                      transaction.transactionType === 'DEPOSIT',
+                    'amount-negative':
+                      transaction.transactionType === 'WITHDRAWAL' ||
+                      transaction.transactionType === 'TRANSFER'
+                  }"
+                >
+                  <div class="amount-value">
+                    {{ transaction.transactionType === "DEPOSIT" ? "+" : "-"
+                    }}{{ formatCurrency(Math.abs(transaction.amount)) }}
+                  </div>
+                  <small class="amount-balance"
+                    >Solde:
+                    {{ formatCurrency(transaction.balanceAfter) }}</small
+                  >
                 </div>
               </div>
-              <div class="col-md-6 mb-3">
-                <label class="text-muted small">Solde actuel</label>
-                <div class="fw-bold h5">{{ formatCurrency(account.balance) }}</div>
+            </div>
+
+            <div
+              *ngIf="!isLoadingTransactions && recentTransactions.length === 0"
+              class="no-transactions"
+            >
+              <nb-icon icon="inbox-outline"></nb-icon>
+              <p>Aucune transaction enregistrée</p>
+              <button
+                nbButton
+                status="primary"
+                size="small"
+                (click)="onDeposit()"
+              >
+                Effectuer un dépôt
+              </button>
+            </div>
+          </nb-card-body>
+        </nb-card>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="detail-sidebar">
+        <!-- Informations du compte -->
+        <nb-card class="info-card">
+          <nb-card-header>
+            <h6>
+              <nb-icon icon="info-outline"></nb-icon>
+              Informations du Compte
+            </h6>
+          </nb-card-header>
+          <nb-card-body>
+            <div class="info-item">
+              <div class="info-label">
+                <nb-icon icon="calendar-outline"></nb-icon>
+                Date d'ouverture
               </div>
-              <div class="col-md-6 mb-3">
-                <label class="text-muted small">Devise</label>
-                <div class="fw-bold">{{ account.currency }}</div>
+              <div class="info-value">{{ formatDate(account.createdAt) }}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">
+                <nb-icon icon="clock-outline"></nb-icon>
+                Ancienneté
               </div>
-              <div class="col-md-6 mb-3">
-                <label class="text-muted small">Statut du compte</label>
-                <div class="fw-bold">
-                  <nb-badge [text]="getStatusLabel(account.status)" 
-                           [status]="getStatusColor(account.status)">
-                  </nb-badge>
-                </div>
+              <div class="info-value">{{ accountStats.accountAge }} jours</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">
+                <nb-icon icon="globe-outline"></nb-icon>
+                Devise
               </div>
-              <div class="col-md-6 mb-3">
-                <label class="text-muted small">Ouvert le</label>
-                <div class="fw-bold">{{ formatDate(account.createdAt) }}</div>
+              <div class="info-value">{{ account.currency }}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">
+                <nb-icon icon="activity-outline"></nb-icon>
+                Activité mensuelle
+              </div>
+              <div class="info-value">
+                {{ accountStats.monthlyAverage.toFixed(1) }} transactions/mois
+              </div>
+            </div>
+            <div class="info-item" *ngIf="accountStats.lastTransactionDate">
+              <div class="info-label">
+                <nb-icon icon="flash-outline"></nb-icon>
+                Dernière activité
+              </div>
+              <div class="info-value">
+                {{ formatDateTime(accountStats.lastTransactionDate) }}
               </div>
             </div>
           </nb-card-body>
         </nb-card>
 
         <!-- Informations du client -->
-        <nb-card class="mb-4">
+        <nb-card class="customer-card" *ngIf="customer">
           <nb-card-header>
-            <h5 class="mb-0">
-              <nb-icon icon="person-outline" class="me-2"></nb-icon>
-              Informations du Client
-            </h5>
+            <h6>
+              <nb-icon icon="person-outline"></nb-icon>
+              Titulaire du Compte
+            </h6>
           </nb-card-header>
           <nb-card-body>
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label class="text-muted small">Nom du client</label>
-                <div class="fw-bold">{{ account.customerFullName }}</div>
+            <div class="customer-avatar">
+              <nb-icon icon="person-outline"></nb-icon>
+            </div>
+            <div class="customer-name">
+              {{ customer.lastName }} {{ customer.firstName }}
+            </div>
+            <div class="customer-details">
+              <div class="detail-row">
+                <nb-icon icon="email-outline"></nb-icon>
+                <span>{{ customer.email }}</span>
               </div>
-              <div class="col-md-6 mb-3">
-                <label class="text-muted small">ID Client</label>
-                <div class="fw-bold">#{{ account.customerId }}</div>
+              <div class="detail-row">
+                <nb-icon icon="phone-outline"></nb-icon>
+                <span>{{ customer.phoneNumber }}</span>
               </div>
-              <div class="col-12">
-                <button nbButton status="primary" size="small" [routerLink]="['/pages/customers/detail', account.customerId]">
-                  <nb-icon icon="eye-outline" class="me-2"></nb-icon>
-                  Voir la fiche client complète
-                </button>
+              <div class="detail-row">
+                <nb-icon icon="pin-outline"></nb-icon>
+                <span>{{ customer.address }}</span>
+              </div>
+              <div class="detail-row">
+                <nb-icon icon="calendar-outline"></nb-icon>
+                <span>{{ customer.age }} ans</span>
               </div>
             </div>
+            <button
+              nbButton
+              status="primary"
+              fullWidth
+              size="small"
+              (click)="onViewCustomer()"
+            >
+              <nb-icon icon="eye-outline"></nb-icon>
+              Voir la fiche complète
+            </button>
           </nb-card-body>
         </nb-card>
-      </div>
 
-      <!-- Actions rapides -->
-      <div class="col-lg-4">
         <!-- Actions -->
-        <nb-card class="mb-4">
+        <nb-card class="actions-card">
           <nb-card-header>
-            <h5 class="mb-0">
-              <nb-icon icon="flash-outline" class="me-2"></nb-icon>
-              Actions Rapides
-            </h5>
+            <h6>
+              <nb-icon icon="options-outline"></nb-icon>
+              Actions
+            </h6>
           </nb-card-header>
           <nb-card-body>
-            <div class="d-grid gap-2">
-              <button nbButton fullWidth status="primary" [routerLink]="['/pages/transactions/deposit']" [queryParams]="{ accountId: account.id }">
-                <nb-icon icon="trending-up-outline" class="me-2"></nb-icon>
-                Effectuer un dépôt
-              </button>
-              
-              <button nbButton fullWidth status="danger" [routerLink]="['/pages/transactions/withdraw']" [queryParams]="{ accountId: account.id }">
-                <nb-icon icon="trending-down-outline" class="me-2"></nb-icon>
-                Effectuer un retrait
-              </button>
-              
-              <button nbButton fullWidth status="info" [routerLink]="['/pages/transactions/transfer']" [queryParams]="{ sourceAccountId: account.id }">
-                <nb-icon icon="swap-horizontal-outline" class="me-2"></nb-icon>
-                Effectuer un virement
-              </button>
-              
-              <button nbButton fullWidth status="success" (click)="generateStatement()">
-                <nb-icon icon="file-text-outline" class="me-2"></nb-icon>
+            <div class="action-list">
+              <button nbButton fullWidth ghost (click)="onGenerateStatement()">
+                <nb-icon icon="file-text-outline"></nb-icon>
                 Générer un relevé
               </button>
-              
-              <div class="dropdown-divider my-2"></div>
-              
-              <button nbButton fullWidth status="warning" disabled>
-                <nb-icon icon="lock-outline" class="me-2"></nb-icon>
+              <button nbButton fullWidth ghost status="warning" disabled>
+                <nb-icon icon="lock-outline"></nb-icon>
                 Bloquer le compte
               </button>
-              
-              <button nbButton fullWidth status="basic" disabled>
-                <nb-icon icon="archive-outline" class="me-2"></nb-icon>
-                Clôturer le compte
+              <button
+                nbButton
+                fullWidth
+                ghost
+                status="danger"
+                (click)="onDeleteAccount()"
+              >
+                <nb-icon icon="trash-outline"></nb-icon>
+                Supprimer le compte
               </button>
-            </div>
-          </nb-card-body>
-        </nb-card>
-
-        <!-- Statistiques rapides -->
-        <nb-card>
-          <nb-card-header>
-            <h5 class="mb-0">
-              <nb-icon icon="activity-outline" class="me-2"></nb-icon>
-              Statistiques
-            </h5>
-          </nb-card-header>
-          <nb-card-body>
-            <div class="mb-3">
-              <label class="text-muted small">Transactions ce mois</label>
-              <div class="fw-bold">24 opérations</div>
-              <nb-progress-bar [value]="75" status="success" size="tiny" class="mt-1"></nb-progress-bar>
-            </div>
-            
-            <div class="mb-3">
-              <label class="text-muted small">Dépôts ce mois</label>
-              <div class="fw-bold text-success">+ 5 430 €</div>
-              <nb-progress-bar [value]="60" status="success" size="tiny" class="mt-1"></nb-progress-bar>
-            </div>
-            
-            <div class="mb-3">
-              <label class="text-muted small">Retraits ce mois</label>
-              <div class="fw-bold text-danger">- 2 150 €</div>
-              <nb-progress-bar [value]="40" status="danger" size="tiny" class="mt-1"></nb-progress-bar>
-            </div>
-            
-            <div>
-              <label class="text-muted small">Solde moyen</label>
-              <div class="fw-bold">{{ formatCurrency(account.balance * 0.9) }}</div>
-              <small class="text-muted">Moyenne sur 30 jours</small>
-            </div>
-          </nb-card-body>
-        </nb-card>
-      </div>
-    </div>
-
-    <!-- Dernières transactions -->
-    <div class="row mt-4">
-      <div class="col-12">
-        <nb-card>
-          <nb-card-header class="d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">
-              <nb-icon icon="clock-outline" class="me-2"></nb-icon>
-              Dernières Transactions
-            </h5>
-            <button nbButton size="small" [routerLink]="['/pages/transactions/history', account.id]">
-              <nb-icon icon="list-outline" class="me-2"></nb-icon>
-              Voir tout l'historique
-            </button>
-          </nb-card-header>
-          <nb-card-body>
-            <div class="table-responsive">
-              <table class="table table-hover">
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Type</th>
-                    <th>Description</th>
-                    <th>Montant</th>
-                    <th>Solde après</th>
-                    <th>Statut</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let i of [1,2,3,4,5]">
-                    <td>{{ '2026-01-' + (20 + i) + 'T10:30:00' | date:'dd/MM/yyyy HH:mm' }}</td>
-                    <td>
-                      <nb-badge *ngIf="i % 3 === 0" text="Dépôt" status="success"></nb-badge>
-                      <nb-badge *ngIf="i % 3 === 1" text="Retrait" status="danger"></nb-badge>
-                      <nb-badge *ngIf="i % 3 === 2" text="Virement" status="primary"></nb-badge>
-                    </td>
-                    <td>
-                      <span *ngIf="i % 3 === 0">Dépôt espèce</span>
-                      <span *ngIf="i % 3 === 1">Retrait guichet</span>
-                      <span *ngIf="i % 3 === 2">Virement vers compte épargne</span>
-                    </td>
-                    <td [class]="i % 3 === 0 ? 'text-success' : 'text-danger'">
-                      {{ i % 3 === 0 ? '+' : '-' }} {{ 150 * i | currency:'EUR' }}
-                    </td>
-                    <td>{{ (account.balance + 150 * i) | currency:'EUR' }}</td>
-                    <td>
-                      <nb-badge text="Succès" status="success"></nb-badge>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
             </div>
           </nb-card-body>
         </nb-card>
@@ -287,14 +511,14 @@
     </div>
   </div>
 
-  <!-- Message si erreur -->
-  <div *ngIf="!isLoading && !account" class="text-center py-5">
-    <nb-icon icon="alert-circle-outline" size="giant" class="text-danger mb-3"></nb-icon>
-    <h4>Compte non trouvé</h4>
-    <p class="text-muted mb-4">Le compte demandé n'existe pas ou a été supprimé</p>
+  <!-- Message d'erreur -->
+  <div *ngIf="!isLoading && !account" class="error-container">
+    <nb-icon icon="alert-circle-outline" class="error-icon"></nb-icon>
+    <h4>Compte introuvable</h4>
+    <p>Le compte demandé n'existe pas ou a été supprimé</p>
     <button nbButton status="primary" size="large" (click)="onBack()">
-      <nb-icon icon="arrow-back-outline" class="me-2"></nb-icon>
-      Retour à la liste des comptes
+      <nb-icon icon="arrow-back-outline"></nb-icon>
+      Retour à la liste
     </button>
   </div>
 </div>

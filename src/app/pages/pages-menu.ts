@@ -20,7 +20,7 @@ export const MENU_ITEMS: NbMenuItem[] = [
   {
     title: "Opérations Bancaires",
     icon: "swap-horizontal-outline",
-    expanded: false, // ← Par défaut fermé
+    expanded: false,
     children: [
       {
         title: "Toutes les opérations",
@@ -52,10 +52,6 @@ export const MENU_ITEMS: NbMenuItem[] = [
   {
     title: "Relevés",
     icon: "file-text-outline",
-    link: "/pages/accounts", // ← Lien corrigé (module statements n'existe pas encore)
-    badge: {
-      text: "Bientôt",
-      status: "info",
-    },
+    link: "/pages/accounts",
   },
 ];

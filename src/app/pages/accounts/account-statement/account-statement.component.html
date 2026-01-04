@@ -1,254 +1,522 @@
-<div class="account-statement-container">
-  <!-- En-tête -->
-  <div class="account-statement-header mb-4">
-    <div class="row align-items-center">
-      <div class="col-md-8">
-        <h2>Génération de Relevé Bancaire</h2>
-        <p class="text-muted mb-0">Générez et téléchargez un relevé de compte</p>
-      </div>
-      <div class="col-md-4 text-end">
-        <button nbButton ghost size="small" [routerLink]="['/pages/accounts/detail', accountId]" class="mb-3">
-          <nb-icon icon="arrow-back-outline" class="me-2"></nb-icon>
-          Retour au compte
+<div class="statement-container">
+  <!-- Header -->
+  <div class="statement-header">
+    <div class="header-content">
+      <div class="header-left">
+        <button nbButton ghost size="small" (click)="onBack()" class="back-btn">
+          <nb-icon icon="arrow-back-outline"></nb-icon>
         </button>
+        <div>
+          <h1 class="statement-title">
+            <nb-icon icon="file-text-outline"></nb-icon>
+            Génération de Relevé
+          </h1>
+          <p class="statement-subtitle" *ngIf="account">
+            {{ formatAccountNumber(account.accountNumber) }}
+          </p>
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="row">
-    <div class="col-lg-8">
-      <nb-card>
-        <nb-card-header>
-          <h4 class="mb-0">
-            <nb-icon icon="file-text-outline" class="me-2"></nb-icon>
-            Paramètres du Relevé
-          </h4>
-        </nb-card-header>
-        <nb-card-body>
-          <form (ngSubmit)="generateStatement()" #statementForm="ngForm">
-            <!-- Période -->
-            <div class="row mb-4">
-              <div class="col-12">
-                <h5 class="mb-3">Période</h5>
+  <!-- Chargement -->
+  <div *ngIf="isLoading" class="loading-container">
+    <nb-spinner size="giant" status="primary"></nb-spinner>
+    <p class="loading-text">Chargement...</p>
+  </div>
+
+  <!-- Contenu -->
+  <div *ngIf="!isLoading && account" class="statement-content">
+    <div class="content-grid">
+      <!-- Colonne principale -->
+      <div class="content-main">
+        <!-- Sélection de la période -->
+        <nb-card class="period-card">
+          <nb-card-header>
+            <div class="card-header-content">
+              <div class="step-badge">1</div>
+              <div>
+                <h5>Période du Relevé</h5>
+                <p class="text-muted mb-0">
+                  Sélectionnez la période à inclure dans le relevé
+                </p>
               </div>
-              
-              <div class="col-md-6 mb-3">
-                <label for="startDate" class="form-label required">Date de début</label>
+            </div>
+          </nb-card-header>
+          <nb-card-body>
+            <!-- Périodes rapides -->
+            <div class="quick-periods">
+              <button
+                *ngFor="let period of quickPeriods"
+                nbButton
+                ghost
+                size="small"
+                (click)="period.action()"
+                class="period-btn"
+              >
+                <nb-icon [icon]="period.icon"></nb-icon>
+                {{ period.label }}
+              </button>
+            </div>
+
+            <!-- Dates personnalisées -->
+            <div class="date-inputs">
+              <div class="date-field">
+                <label for="startDate" class="form-label required"
+                  >Date de début</label
+                >
                 <input
                   type="date"
                   id="startDate"
-                  name="startDate"
                   [(ngModel)]="startDate"
+                  (change)="onDateChange()"
                   nbInput
                   fullWidth
-                  required>
-                <small class="text-muted">Date de début de la période</small>
+                  [max]="endDate"
+                />
               </div>
 
-              <div class="col-md-6 mb-3">
-                <label for="endDate" class="form-label required">Date de fin</label>
+              <div class="date-separator">
+                <nb-icon icon="arrow-forward-outline"></nb-icon>
+              </div>
+
+              <div class="date-field">
+                <label for="endDate" class="form-label required"
+                  >Date de fin</label
+                >
                 <input
                   type="date"
                   id="endDate"
-                  name="endDate"
                   [(ngModel)]="endDate"
+                  (change)="onDateChange()"
                   nbInput
                   fullWidth
-                  required>
-                <small class="text-muted">Date de fin de la période</small>
+                  [min]="startDate"
+                  [max]="today"
+                />
+              </div>
+            </div>
+
+            <!-- Info période -->
+            <div class="period-info" *ngIf="startDate && endDate">
+              <nb-alert status="info" size="small">
+                <div class="alert-content">
+                  <nb-icon icon="calendar-outline"></nb-icon>
+                  <div>
+                    <strong>Période sélectionnée</strong>
+                    <p class="mb-0">
+                      Du {{ formatDate(startDate) }} au
+                      {{ formatDate(endDate) }}
+                      <span class="badge badge-primary ms-2"
+                        >{{ getDaysBetween() }} jour(s)</span
+                      >
+                    </p>
+                  </div>
+                </div>
+              </nb-alert>
+            </div>
+          </nb-card-body>
+        </nb-card>
+
+        <!-- Sélection du format -->
+        <nb-card class="format-card">
+          <nb-card-header>
+            <div class="card-header-content">
+              <div class="step-badge">2</div>
+              <div>
+                <h5>Format du Relevé</h5>
+                <p class="text-muted mb-0">
+                  Choisissez le format de téléchargement
+                </p>
+              </div>
+            </div>
+          </nb-card-header>
+          <nb-card-body>
+            <div class="formats-grid">
+              <div
+                *ngFor="let formatOption of formats"
+                class="format-option"
+                [class.selected]="format === formatOption.value"
+                (click)="onFormatChange(formatOption.value)"
+              >
+                <input
+                  type="radio"
+                  [id]="'format-' + formatOption.value"
+                  [value]="formatOption.value"
+                  [(ngModel)]="format"
+                  class="format-radio"
+                />
+
+                <div
+                  class="format-icon"
+                  [ngClass]="'icon-' + formatOption.color"
+                >
+                  <nb-icon [icon]="formatOption.icon"></nb-icon>
+                </div>
+
+                <h6 class="format-title">{{ formatOption.label }}</h6>
+                <p class="format-description">{{ formatOption.description }}</p>
+
+                <ul class="format-features">
+                  <li *ngFor="let feature of formatOption.features">
+                    <nb-icon
+                      icon="checkmark-outline"
+                      status="success"
+                    ></nb-icon>
+                    <span>{{ feature }}</span>
+                  </li>
+                </ul>
+
+                <div class="format-check" *ngIf="format === formatOption.value">
+                  <nb-icon icon="checkmark-circle-2-outline"></nb-icon>
+                </div>
+              </div>
+            </div>
+          </nb-card-body>
+        </nb-card>
+
+        <!-- Options -->
+        <nb-card class="options-card">
+          <nb-card-header>
+            <div class="card-header-content">
+              <div class="step-badge">3</div>
+              <div>
+                <h5>Options d'Inclusion</h5>
+                <p class="text-muted mb-0">
+                  Personnalisez le contenu du relevé
+                </p>
+              </div>
+            </div>
+          </nb-card-header>
+          <nb-card-body>
+            <div class="options-grid">
+              <div class="option-item">
+                <nb-checkbox [(ngModel)]="includeHeader">
+                  <strong>En-tête</strong>
+                  <p class="option-desc">Logo et informations de la banque</p>
+                </nb-checkbox>
               </div>
 
-              <!-- Périodes prédéfinies -->
-              <div class="col-12 mb-4">
-                <label class="form-label mb-2">Périodes rapides</label>
-                <div class="d-flex flex-wrap gap-2">
-                  <button
-                    nbButton
-                    size="small"
-                    ghost
-                    type="button"
-                    (click)="setLastMonth()">
-                    Dernier mois
-                  </button>
-                  <button
-                    nbButton
-                    size="small"
-                    ghost
-                    type="button"
-                    (click)="setCurrentMonth()">
-                    Ce mois
-                  </button>
-                  <button
-                    nbButton
-                    size="small"
-                    ghost
-                    type="button"
-                    (click)="setLast30Days()">
-                    30 derniers jours
-                  </button>
-                  <button
-                    nbButton
-                    size="small"
-                    ghost
-                    type="button"
-                    (click)="setLast90Days()">
-                    90 derniers jours
-                  </button>
-                  <button
-                    nbButton
-                    size="small"
-                    ghost
-                    type="button"
-                    (click)="setLastYear()">
-                    Dernière année
-                  </button>
+              <div class="option-item">
+                <nb-checkbox [(ngModel)]="includeFooter">
+                  <strong>Pied de page</strong>
+                  <p class="option-desc">Coordonnées et mentions légales</p>
+                </nb-checkbox>
+              </div>
+
+              <div class="option-item">
+                <nb-checkbox [(ngModel)]="includeSummary">
+                  <strong>Résumé détaillé</strong>
+                  <p class="option-desc">
+                    Statistiques et totaux de la période
+                  </p>
+                </nb-checkbox>
+              </div>
+
+              <div class="option-item">
+                <nb-checkbox [(ngModel)]="includeChart">
+                  <strong>Graphiques</strong>
+                  <p class="option-desc">Visualisations des transactions</p>
+                </nb-checkbox>
+              </div>
+            </div>
+          </nb-card-body>
+        </nb-card>
+
+        <!-- Aperçu des transactions -->
+        <nb-card class="preview-card" *ngIf="startDate && endDate">
+          <nb-card-header>
+            <div class="card-header-flex">
+              <h6>
+                <nb-icon icon="eye-outline"></nb-icon>
+                Aperçu des Transactions
+              </h6>
+              <nb-badge
+                [text]="
+                  formatNumber(previewStats.totalTransactions) +
+                  ' transaction(s)'
+                "
+                status="primary"
+              >
+              </nb-badge>
+            </div>
+          </nb-card-header>
+          <nb-card-body>
+            <div *ngIf="isLoadingPreview" class="loading-preview">
+              <nb-spinner size="large" status="primary"></nb-spinner>
+            </div>
+
+            <div *ngIf="!isLoadingPreview && previewTransactions.length > 0">
+              <!-- Résumé -->
+              <div class="preview-summary">
+                <div class="summary-row">
+                  <span class="summary-label">Solde d'ouverture: </span>
+                  <span class="summary-value">{{
+                    formatCurrency(previewStats.openingBalance)
+                  }}</span>
+                </div>
+                <div class="summary-row positive">
+                  <span class="summary-label">
+                    <nb-icon icon="arrow-downward-outline"></nb-icon>
+                    Dépôts ({{ previewStats.totalDeposits }}):
+                  </span>
+                  <span class="summary-value"
+                    >+{{ formatCurrency(previewStats.depositAmount) }}</span
+                  >
+                </div>
+                <div class="summary-row negative">
+                  <span class="summary-label">
+                    <nb-icon icon="arrow-upward-outline"></nb-icon>
+                    Retraits ({{ previewStats.totalWithdrawals }}):
+                  </span>
+                  <span class="summary-value"
+                    >-{{ formatCurrency(previewStats.withdrawalAmount) }}</span
+                  >
+                </div>
+                <div class="summary-row negative">
+                  <span class="summary-label">
+                    <nb-icon icon="swap-outline"></nb-icon>
+                    Virements ({{ previewStats.totalTransfers }}):
+                  </span>
+                  <span class="summary-value"
+                    >-{{ formatCurrency(previewStats.transferAmount) }}</span
+                  >
+                </div>
+                <div class="summary-divider"></div>
+                <div
+                  class="summary-row total"
+                  [ngClass]="{
+                    positive: previewStats.netChange > 0,
+                    negative: previewStats.netChange < 0
+                  }"
+                >
+                  <span class="summary-label"
+                    ><strong>Variation nette:</strong></span
+                  >
+                  <span class="summary-value">
+                    <strong
+                      >{{ previewStats.netChange >= 0 ? "+" : ""
+                      }}{{ formatCurrency(previewStats.netChange) }}</strong
+                    >
+                  </span>
+                </div>
+                <div class="summary-row total">
+                  <span class="summary-label"
+                    ><strong>Solde de clôture:</strong></span
+                  >
+                  <span class="summary-value">
+                    <strong>{{
+                      formatCurrency(previewStats.closingBalance)
+                    }}</strong>
+                  </span>
+                </div>
+              </div>
+
+              <!-- Transactions (5 premières) -->
+              <div class="preview-transactions">
+                <small class="text-muted mb-2 d-block"
+                  >Aperçu des 5 premières transactions</small
+                >
+                <div
+                  *ngFor="let transaction of previewTransactions.slice(0, 5)"
+                  class="preview-transaction-item"
+                >
+                  <div
+                    class="transaction-icon"
+                    [ngClass]="
+                      'icon-' + transaction.transactionType.toLowerCase()
+                    "
+                  >
+                    <nb-icon
+                      [icon]="
+                        getTransactionTypeIcon(transaction.transactionType)
+                      "
+                    ></nb-icon>
+                  </div>
+                  <div class="transaction-details">
+                    <div class="transaction-type">
+                      {{ getTransactionTypeLabel(transaction.transactionType) }}
+                    </div>
+                    <small class="transaction-date">{{
+                      formatDateTime(transaction.transactionDate)
+                    }}</small>
+                  </div>
+                  <div
+                    class="transaction-amount"
+                    [ngClass]="{
+                      positive: transaction.transactionType === 'DEPOSIT',
+                      negative: transaction.transactionType !== 'DEPOSIT'
+                    }"
+                  >
+                    {{ transaction.transactionType === "DEPOSIT" ? "+" : "-"
+                    }}{{ formatCurrency(Math.abs(transaction.amount)) }}
+                  </div>
+                </div>
+                <div
+                  *ngIf="previewTransactions.length > 5"
+                  class="more-transactions"
+                >
+                  <small class="text-muted"
+                    >+ {{ previewTransactions.length - 5 }} autre(s)
+                    transaction(s)</small
+                  >
                 </div>
               </div>
             </div>
 
-            <!-- Options -->
-            <div class="row mb-4">
-              <div class="col-12">
-                <h5 class="mb-3">Options</h5>
-              </div>
+            <div
+              *ngIf="!isLoadingPreview && previewTransactions.length === 0"
+              class="no-preview"
+            >
+              <nb-icon icon="inbox-outline"></nb-icon>
+              <p>Aucune transaction sur cette période</p>
+            </div>
+          </nb-card-body>
+        </nb-card>
 
-              <div class="col-md-6 mb-3">
-                <label class="form-label">Format</label>
-                <nb-select fullWidth [(ngModel)]="format" name="format">
-                  <nb-option value="pdf">PDF (Recommandé)</nb-option>
-                  <nb-option value="csv">CSV (Excel)</nb-option>
-                  <nb-option value="html">HTML</nb-option>
-                </nb-select>
-              </div>
+        <!-- Actions -->
+        <div class="form-actions">
+          <button
+            nbButton
+            size="large"
+            status="basic"
+            (click)="onBack()"
+            [disabled]="isGenerating"
+          >
+            <nb-icon icon="close-outline"></nb-icon>
+            Annuler
+          </button>
 
-              <div class="col-md-6 mb-3">
-                <label class="form-label">Inclure</label>
-                <div class="d-flex flex-column gap-2">
-                  <nb-checkbox [(ngModel)]="includeLogo" name="includeLogo">
-                    Logo de la banque
-                  </nb-checkbox>
-                  <nb-checkbox [(ngModel)]="includeAllTransactions" name="includeAllTransactions" checked>
-                    Toutes les transactions
-                  </nb-checkbox>
-                  <nb-checkbox [(ngModel)]="includeSummary" name="includeSummary" checked>
-                    Résumé détaillé
-                  </nb-checkbox>
+          <button
+            nbButton
+            size="large"
+            status="primary"
+            (click)="generateStatement()"
+            [disabled]="!startDate || !endDate || isGenerating"
+            [class.btn-loading]="isGenerating"
+          >
+            <nb-icon
+              [icon]="isGenerating ? 'loader-outline' : 'download-outline'"
+              [class.spin]="isGenerating"
+            ></nb-icon>
+            {{ isGenerating ? "Génération en cours..." : "Générer le relevé" }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="content-sidebar">
+        <!-- Info compte -->
+        <nb-card class="account-info-card">
+          <nb-card-header>
+            <h6>
+              <nb-icon icon="credit-card-outline"></nb-icon>
+              Compte
+            </h6>
+          </nb-card-header>
+          <nb-card-body>
+            <div class="account-display">
+              <div class="account-number-display">
+                <small>Numéro de compte</small>
+                <div class="number-mono">
+                  {{ formatAccountNumber(account.accountNumber) }}
+                </div>
+              </div>
+              <div class="account-balance-display">
+                <small>Solde actuel</small>
+                <div class="balance-large">
+                  {{ formatCurrency(account.balance) }}
+                </div>
+              </div>
+              <div class="account-details">
+                <div class="detail-item">
+                  <nb-icon icon="person-outline"></nb-icon>
+                  <span>{{ account.customerFullName }}</span>
+                </div>
+                <div class="detail-item">
+                  <nb-icon icon="pricetags-outline"></nb-icon>
+                  <span>{{
+                    account.accountType === "SAVINGS" ? "Épargne" : "Courant"
+                  }}</span>
+                </div>
+                <div class="detail-item">
+                  <nb-icon icon="globe-outline"></nb-icon>
+                  <span>{{ account.currency }}</span>
                 </div>
               </div>
             </div>
+          </nb-card-body>
+        </nb-card>
 
-            <!-- Boutons -->
-            <div class="row">
-              <div class="col-12">
-                <div class="d-flex justify-content-end gap-2">
-                  <button
-                    nbButton
-                    status="basic"
-                    type="button"
-                    [routerLink]="['/pages/accounts/detail', accountId]"
-                    [disabled]="isGenerating">
-                    Annuler
-                  </button>
-                  
-                  <button
-                    nbButton
-                    status="primary"
-                    type="submit"
-                    [disabled]="isGenerating || !startDate || !endDate"
-                    [class.btn-pulse]="isGenerating">
-                    
-                    <span *ngIf="!isGenerating">
-                      <nb-icon icon="download-outline" class="me-2"></nb-icon>
-                      Générer le relevé
-                    </span>
-                    
-                    <span *ngIf="isGenerating">
-                      <nb-icon icon="sync-outline" class="spin me-2"></nb-icon>
-                      Génération en cours...
-                    </span>
-                  </button>
+        <!-- Format sélectionné -->
+        <nb-card
+          class="selected-format-card"
+          *ngIf="getSelectedFormat() as selectedFormat"
+        >
+          <nb-card-header>
+            <h6>
+              <nb-icon icon="checkmark-circle-outline"></nb-icon>
+              Format Sélectionné
+            </h6>
+          </nb-card-header>
+          <nb-card-body>
+            <div class="selected-format-display">
+              <div
+                class="format-icon-large"
+                [ngClass]="'icon-' + selectedFormat.color"
+              >
+                <nb-icon [icon]="selectedFormat.icon"></nb-icon>
+              </div>
+              <h6>{{ selectedFormat.label }}</h6>
+              <p class="text-muted">{{ selectedFormat.description }}</p>
+            </div>
+          </nb-card-body>
+        </nb-card>
+
+        <!-- Informations -->
+        <nb-card class="info-card">
+          <nb-card-header>
+            <h6>
+              <nb-icon icon="info-outline"></nb-icon>
+              Informations
+            </h6>
+          </nb-card-header>
+          <nb-card-body>
+            <div class="info-list">
+              <div class="info-item">
+                <nb-icon icon="shield-outline" status="success"></nb-icon>
+                <div>
+                  <strong>Sécurisé</strong>
+                  <p>
+                    Les relevés sont signés numériquement et conformes aux
+                    normes bancaires
+                  </p>
+                </div>
+              </div>
+              <div class="info-item">
+                <nb-icon icon="clock-outline" status="info"></nb-icon>
+                <div>
+                  <strong>Instantané</strong>
+                  <p>
+                    Le relevé est généré en temps réel avec les données
+                    actuelles
+                  </p>
+                </div>
+              </div>
+              <div class="info-item">
+                <nb-icon icon="download-outline" status="primary"></nb-icon>
+                <div>
+                  <strong>Téléchargement</strong>
+                  <p>
+                    Le fichier sera automatiquement téléchargé dans votre
+                    dossier de téléchargements
+                  </p>
                 </div>
               </div>
             </div>
-          </form>
-        </nb-card-body>
-      </nb-card>
-    </div>
-
-    <!-- Informations -->
-    <div class="col-lg-4">
-      <nb-card class="mb-4">
-        <nb-card-header>
-          <h5 class="mb-0">
-            <nb-icon icon="info-circle-outline" class="me-2"></nb-icon>
-            Informations
-          </h5>
-        </nb-card-header>
-        <nb-card-body>
-          <div class="mb-3">
-            <h6>Format PDF</h6>
-            <ul class="text-muted small">
-              <li>Format standard pour les relevés</li>
-              <li>Peut être imprimé ou sauvegardé</li>
-              <li>Signature numérique incluse</li>
-              <li>Conforme aux normes bancaires</li>
-            </ul>
-          </div>
-          
-          <div class="mb-3">
-            <h6>Format CSV</h6>
-            <ul class="text-muted small">
-              <li>Idéal pour l'analyse dans Excel</li>
-              <li>Inclut toutes les colonnes de données</li>
-              <li>Peut être importé dans d'autres logiciels</li>
-            </ul>
-          </div>
-          
-          <div>
-            <h6>Format HTML</h6>
-            <ul class="text-muted small">
-              <li>Affichage direct dans le navigateur</li>
-              <li>Facile à consulter en ligne</li>
-              <li>Peut être sauvegardé au format web</li>
-            </ul>
-          </div>
-        </nb-card-body>
-      </nb-card>
-
-      <!-- Aperçu -->
-      <nb-card>
-        <nb-card-header>
-          <h5 class="mb-0">
-            <nb-icon icon="eye-outline" class="me-2"></nb-icon>
-            Aperçu
-          </h5>
-        </nb-card-header>
-        <nb-card-body>
-          <div class="statement-preview text-center p-4">
-            <div class="preview-icon mb-3">
-              <nb-icon icon="file-text-outline" size="giant" class="text-primary"></nb-icon>
-            </div>
-            <h6>Relevé Bancaire</h6>
-            <p class="text-muted small mb-2">
-              Période du {{ formatDateDisplay(startDate) }} au {{ formatDateDisplay(endDate) }}
-            </p>
-            <div class="preview-details">
-              <div class="d-flex justify-content-between small mb-1">
-                <span>Compte :</span>
-                <span class="fw-bold">#{{ accountId }}</span>
-              </div>
-              <div class="d-flex justify-content-between small mb-1">
-                <span>Format :</span>
-                <span class="fw-bold">{{ format.toUpperCase() }}</span>
-              </div>
-              <div class="d-flex justify-content-between small">
-                <span>Transactions :</span>
-                <span class="fw-bold">Toutes incluses</span>
-              </div>
-            </div>
-          </div>
-        </nb-card-body>
-      </nb-card>
+          </nb-card-body>
+        </nb-card>
+      </div>
     </div>
   </div>
 </div>
