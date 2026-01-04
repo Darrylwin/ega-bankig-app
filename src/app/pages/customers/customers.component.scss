@@ -118,9 +118,7 @@
 
       table {
         th {
-          background: #f7f9fc;
           font-weight: 600;
-          color: #222b45;
           padding: 1rem;
           border-bottom: 2px solid #edf1f7;
         }
@@ -132,7 +130,6 @@
         }
 
         tr:hover {
-          background: #f7f9fc;
           cursor: pointer;
         }
 
@@ -147,31 +144,6 @@
 
           i {
             font-size: 1rem;
-          }
-
-          &.badge-success {
-            background: #e8f9f0;
-            color: #00d68f;
-          }
-
-          &.badge-primary {
-            background: #e7f1ff;
-            color: #3366ff;
-          }
-
-          &.badge-warning {
-            background: #fff5e6;
-            color: #ffaa00;
-          }
-
-          &.badge-info {
-            background: #e6f7ff;
-            color: #0095ff;
-          }
-
-          &.badge-basic {
-            background: #edf1f7;
-            color: #8f9bb3;
           }
         }
 
@@ -222,12 +194,10 @@
   align-items: center;
   padding: 1rem 1.5rem;
   border-top: 1px solid #edf1f7;
-  background: #f7f9fc;
 
   .pagination-info {
     font-size: 0.9rem;
     font-weight: 500;
-    color: #222b45;
   }
 
   .pagination-controls {

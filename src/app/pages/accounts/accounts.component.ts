@@ -96,7 +96,7 @@ export class AccountsComponent implements OnInit {
       accountNumber: {
         title: 'N° Compte',
         type:  'string',
-        filter:  true,
+        filter:  false,
         valuePrepareFunction: (value:  string) => {
           return value ?  value.match(/.{1,4}/g)?.join(' ') : value;
         },
@@ -104,7 +104,7 @@ export class AccountsComponent implements OnInit {
       customerFullName: {
         title: 'Titulaire',
         type: 'string',
-        filter: true,
+        filter: false,
       },
       accountType: {
         title: 'Type',

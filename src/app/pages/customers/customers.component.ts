@@ -82,7 +82,7 @@ export class CustomersComponent implements OnInit {
       fullName: {
         title: 'Nom complet',
         type: 'string',
-        filter: true,
+        filter: false,
         valuePrepareFunction: (value:  any, row: Customer) => {
           return `${row.lastName} ${row.firstName}`;
         },
@@ -90,12 +90,12 @@ export class CustomersComponent implements OnInit {
       email: {
         title: 'Email',
         type: 'string',
-        filter: true,
+        filter: false,
       },
       phoneNumber: {
         title: 'Téléphone',
         type: 'string',
-        filter: true,
+        filter: false,
       },
       age: {
         title: 'Âge',
@@ -123,7 +123,7 @@ export class CustomersComponent implements OnInit {
       nationality: {
         title:  'Nationalité',
         type: 'string',
-        filter: true,
+        filter: false,
       },
       createdAt:  {
         title: 'Inscrit le',
