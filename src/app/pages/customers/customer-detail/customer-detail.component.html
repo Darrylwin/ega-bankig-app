@@ -1,161 +1,389 @@
 <div class="customer-detail-container">
-  <div class="customer-detail-header mb-4">
-    <button nbButton ghost size="small" (click)="onBack()" class="mb-3">
-      <nb-icon icon="arrow-back-outline" class="me-2"></nb-icon>
-      Retour à la liste
-    </button>
-    
-    <div class="row align-items-center">
-      <div class="col-md-8">
-        <h2>Détail du Client</h2>
-        <p class="text-muted mb-0">Informations complètes du client</p>
+  <!-- Header -->
+  <div class="detail-header">
+    <div class="header-content">
+      <div class="header-left">
+        <button nbButton ghost size="small" (click)="onBack()" class="back-btn">
+          <nb-icon icon="arrow-back-outline"></nb-icon>
+        </button>
+        <div>
+          <h1 class="detail-title">
+            <nb-icon icon="person-outline"></nb-icon>
+            Fiche Client
+          </h1>
+          <p class="detail-subtitle" *ngIf="customer">
+            {{ customer.firstName }} {{ customer.lastName }}
+          </p>
+        </div>
       </div>
-      <div class="col-md-4 text-end">
-        <button nbButton status="primary" (click)="onEdit()" [disabled]="!customer">
-          <nb-icon icon="edit-outline" class="me-2"></nb-icon>
+      <div class="header-actions" *ngIf="customer">
+        <button nbButton status="primary" (click)="onEdit()">
+          <nb-icon icon="edit-outline"></nb-icon>
           Modifier
+        </button>
+        <button nbButton status="danger" ghost (click)="onDelete()">
+          <nb-icon icon="trash-outline"></nb-icon>
         </button>
       </div>
     </div>
   </div>
 
+  <br/>
+
   <!-- Chargement -->
-  <div *ngIf="isLoading" class="text-center py-5">
+  <div *ngIf="isLoading" class="loading-container">
     <nb-spinner size="giant" status="primary"></nb-spinner>
-    <p class="mt-3">Chargement des informations...</p>
+    <p class="loading-text">Chargement des détails... </p>
   </div>
 
-  <!-- Détail client -->
-  <div *ngIf="customer && !isLoading">
-    <div class="row">
-      <!-- Informations principales -->
-      <div class="col-md-8">
-        <nb-card class="mb-4">
+  <!-- Contenu -->
+  <div *ngIf="! isLoading && customer" class="detail-content">
+    <!-- Carte principale du client -->
+    <div class="customer-main-card">
+      <nb-card class="profile-card">
+        <nb-card-body>
+          <div class="profile-content">
+            <div class="profile-avatar">
+              <nb-icon icon="person-outline"></nb-icon>
+            </div>
+            <div class="profile-info">
+              <h2 class="profile-name">{{ customer.firstName }} {{ customer.lastName }}</h2>
+              <div class="profile-badges">
+                <nb-badge
+                  [text]="getGenderLabel(customer.gender)"
+                  [status]="getGenderColor(customer.gender)">
+                </nb-badge>
+                <nb-badge
+                  [text]="customer.age + ' ans'"
+                  [status]="customer.age < 18 ? 'warning' : customer.age >= 65 ? 'info' : 'success'">
+                </nb-badge>
+                <nb-badge
+                  [text]="customer.nationality"
+                  status="basic">
+                </nb-badge>
+              </div>
+              <div class="profile-contact">
+                <div class="contact-item">
+                  <nb-icon icon="email-outline"></nb-icon>
+                  <span>{{ customer. email }}</span>
+                </div>
+                <div class="contact-item">
+                  <nb-icon icon="phone-outline"></nb-icon>
+                  <span>{{ customer.phoneNumber }}</span>
+                </div>
+                <div class="contact-item">
+                  <nb-icon icon="pin-outline"></nb-icon>
+                  <span>{{ customer. address }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </nb-card-body>
+      </nb-card>
+    </div>
+
+    <!-- Actions rapides -->
+    <div class="quick-actions">
+      <button nbButton status="primary" size="large" (click)="onCreateAccount()" class="action-btn">
+        <nb-icon icon="plus-outline"></nb-icon>
+        <span>Ouvrir un compte</span>
+      </button>
+      <button nbButton status="info" size="large" (click)="onViewTransactions()" class="action-btn">
+        <nb-icon icon="list-outline"></nb-icon>
+        <span>Transactions</span>
+      </button>
+      <button nbButton status="success" size="large" (click)="onEdit()" class="action-btn">
+        <nb-icon icon="edit-outline"></nb-icon>
+        <span>Modifier</span>
+      </button>
+    </div>
+
+    <!-- Grille de contenu -->
+    <div class="detail-grid">
+      <!-- Colonne principale -->
+      <div class="detail-main">
+        <!-- Informations personnelles -->
+        <nb-card class="info-card">
           <nb-card-header>
-            <h4 class="mb-0">
-              <nb-icon icon="person-outline" class="me-2"></nb-icon>
+            <h6>
+              <nb-icon icon="person-outline"></nb-icon>
               Informations Personnelles
-            </h4>
+            </h6>
           </nb-card-header>
           <nb-card-body>
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label class="text-muted small">Nom</label>
-                <div class="fw-bold">{{ customer.lastName }}</div>
+            <div class="info-grid">
+              <div class="info-item">
+                <div class="info-label">
+                  <nb-icon icon="calendar-outline"></nb-icon>
+                  Date de naissance
+                </div>
+                <div class="info-value">{{ formatDate(customer.dateOfBirth) }}</div>
               </div>
-              <div class="col-md-6 mb-3">
-                <label class="text-muted small">Prénom</label>
-                <div class="fw-bold">{{ customer.firstName }}</div>
+              <div class="info-item">
+                <div class="info-label">
+                  <nb-icon icon="activity-outline"></nb-icon>
+                  Âge
+                </div>
+                <div class="info-value">{{ customer.age }} ans</div>
               </div>
-              <div class="col-md-6 mb-3">
-                <label class="text-muted small">Date de naissance</label>
-                <div class="fw-bold">{{ formatDate(customer.dateOfBirth) }}</div>
+              <div class="info-item">
+                <div class="info-label">
+                  <nb-icon icon="person-outline"></nb-icon>
+                  Genre
+                </div>
+                <div class="info-value">{{ getGenderLabel(customer.gender) }}</div>
               </div>
-              <div class="col-md-6 mb-3">
-                <label class="text-muted small">Âge</label>
-                <div class="fw-bold">{{ customer.age }} ans</div>
+              <div class="info-item">
+                <div class="info-label">
+                  <nb-icon icon="flag-outline"></nb-icon>
+                  Nationalité
+                </div>
+                <div class="info-value">{{ customer.nationality }}</div>
               </div>
-              <div class="col-md-6 mb-3">
-                <label class="text-muted small">Genre</label>
-                <div class="fw-bold">{{ getGenderLabel(customer.gender) }}</div>
+              <div class="info-item">
+                <div class="info-label">
+                  <nb-icon icon="clock-outline"></nb-icon>
+                  Client depuis
+                </div>
+                <div class="info-value">
+                  {{ formatDate(customer. createdAt) }}
+                  <small class="text-muted">({{ customerStats.accountAge }} jours)</small>
+                </div>
               </div>
-              <div class="col-md-6 mb-3">
-                <label class="text-muted small">Nationalité</label>
-                <div class="fw-bold">{{ customer.nationality }}</div>
+              <div class="info-item">
+                <div class="info-label">
+                  <nb-icon icon="hash-outline"></nb-icon>
+                  ID Client
+                </div>
+                <div class="info-value">#{{ customer.id }}</div>
               </div>
             </div>
           </nb-card-body>
         </nb-card>
 
-        <!-- Coordonnées -->
-        <nb-card>
+        <!-- Comptes bancaires -->
+        <nb-card class="accounts-card">
           <nb-card-header>
-            <h4 class="mb-0">
-              <nb-icon icon="pin-outline" class="me-2"></nb-icon>
-              Coordonnées
-            </h4>
+            <div class="card-header-flex">
+              <h6>
+                <nb-icon icon="credit-card-outline"></nb-icon>
+                Comptes Bancaires
+                <nb-badge [text]="formatNumber(customerStats.totalAccounts)" status="primary" class="ms-2"></nb-badge>
+              </h6>
+              <button nbButton ghost size="tiny" (click)="onCreateAccount()">
+                <nb-icon icon="plus-outline"></nb-icon>
+                Nouveau compte
+              </button>
+            </div>
           </nb-card-header>
           <nb-card-body>
-            <div class="row">
-              <div class="col-12 mb-3">
-                <label class="text-muted small">Adresse</label>
-                <div class="fw-bold">{{ customer.address }}</div>
+            <div *ngIf="isLoadingAccounts" class="loading-accounts">
+              <nb-spinner size="large" status="primary"></nb-spinner>
+            </div>
+
+            <div *ngIf="! isLoadingAccounts && customerAccounts.length > 0" class="accounts-list">
+              <div *ngFor="let account of customerAccounts" class="account-item" (click)="onViewAccount(account)">
+                <div class="account-icon" [ngClass]="'icon-' + (account.accountType === 'SAVINGS' ? 'success' : 'primary')">
+                  <nb-icon [icon]="getAccountTypeIcon(account.accountType)"></nb-icon>
+                </div>
+                <div class="account-info">
+                  <div class="account-type">{{ getAccountTypeLabel(account.accountType) }}</div>
+                  <small class="account-number">{{ formatAccountNumber(account.accountNumber) }}</small>
+                </div>
+                <div class="account-balance">
+                  <div class="balance-value" [ngClass]="{
+                    'positive': account.balance > 0,
+                    'zero': account.balance === 0,
+                    'negative': account. balance < 0
+                  }">
+                    {{ formatCurrency(account.balance) }}
+                  </div>
+                  <nb-badge
+                    [text]="getStatusLabel(account.status)"
+                    [status]="getStatusColor(account.status)"
+                    size="tiny">
+                  </nb-badge>
+                </div>
+                <div class="account-action">
+                  <nb-icon icon="chevron-right-outline"></nb-icon>
+                </div>
               </div>
-              <div class="col-md-6 mb-3">
-                <label class="text-muted small">Téléphone</label>
-                <div class="fw-bold">{{ customer.phoneNumber }}</div>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label class="text-muted small">Email</label>
-                <div class="fw-bold">{{ customer.email }}</div>
-              </div>
+            </div>
+
+            <div *ngIf="! isLoadingAccounts && customerAccounts.length === 0" class="no-accounts">
+              <nb-icon icon="credit-card-outline"></nb-icon>
+              <p>Aucun compte bancaire</p>
+              <button nbButton status="primary" size="small" (click)="onCreateAccount()">
+                Ouvrir un compte
+              </button>
             </div>
           </nb-card-body>
         </nb-card>
+
+        <!-- Graphiques -->
+        <div class="charts-row" *ngIf="customerAccounts.length > 0">
+          <nb-card class="chart-card">
+            <nb-card-header>
+              <h6>
+                <nb-icon icon="pie-chart-outline"></nb-icon>
+                Types de Comptes
+              </h6>
+            </nb-card-header>
+            <nb-card-body>
+              <ngx-charts-pie-chart
+                *ngIf="accountTypeChartData. length > 0"
+                [view]="[undefined, 250]"
+                [scheme]="colorScheme"
+                [results]="accountTypeChartData"
+                [legend]="true"
+                [labels]="true"
+                [doughnut]="true">
+              </ngx-charts-pie-chart>
+            </nb-card-body>
+          </nb-card>
+
+          <nb-card class="chart-card">
+            <nb-card-header>
+              <h6>
+                <nb-icon icon="bar-chart-outline"></nb-icon>
+                Répartition des Soldes
+              </h6>
+            </nb-card-header>
+            <nb-card-body>
+              <ngx-charts-bar-vertical
+                *ngIf="balanceChartData.length > 0"
+                [view]="[undefined, 250]"
+                [scheme]="colorScheme"
+                [results]="balanceChartData"
+                [xAxis]="true"
+                [yAxis]="true"
+                [legend]="false"
+                [showXAxisLabel]="false"
+                [showYAxisLabel]="false">
+              </ngx-charts-bar-vertical>
+            </nb-card-body>
+          </nb-card>
+        </div>
       </div>
 
-      <!-- Informations secondaires -->
-      <div class="col-md-4">
-        <!-- Statut -->
-        <nb-card class="mb-4">
+      <!-- Sidebar -->
+      <div class="detail-sidebar">
+        <!-- Statistiques financières -->
+        <nb-card class="stats-card">
           <nb-card-header>
-            <h4 class="mb-0">
-              <nb-icon icon="info-outline" class="me-2"></nb-icon>
-              Informations Système
-            </h4>
+            <h6>
+              <nb-icon icon="bar-chart-outline"></nb-icon>
+              Statistiques Financières
+            </h6>
           </nb-card-header>
           <nb-card-body>
-            <div class="mb-3">
-              <label class="text-muted small">ID Client</label>
-              <div class="fw-bold">#{{ customer.id }}</div>
-            </div>
-            <div class="mb-3">
-              <label class="text-muted small">Inscrit le</label>
-              <div class="fw-bold">{{ formatDate(customer.createdAt) }}</div>
-            </div>
-            <div>
-              <label class="text-muted small">Statut</label>
-              <div>
-                <nb-badge text="Actif" status="success" class="me-2"></nb-badge>
-                <small class="text-muted">Client vérifié</small>
+            <div class="stat-item">
+              <div class="stat-label">
+                <nb-icon icon="wallet-outline"></nb-icon>
+                Solde total
               </div>
+              <div class="stat-value text-primary">{{ formatCurrency(customerStats.totalBalance) }}</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">
+                <nb-icon icon="trending-up-outline"></nb-icon>
+                Solde moyen
+              </div>
+              <div class="stat-value">{{ formatCurrency(customerStats. averageBalance) }}</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">
+                <nb-icon icon="credit-card-outline"></nb-icon>
+                Comptes actifs
+              </div>
+              <div class="stat-value text-success">{{ customerStats.activeAccounts }} / {{ customerStats.totalAccounts }}</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">
+                <nb-icon icon="archive-outline"></nb-icon>
+                Comptes épargne
+              </div>
+              <div class="stat-value">{{ customerStats.savingsAccounts }}</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">
+                <nb-icon icon="card-outline"></nb-icon>
+                Comptes courants
+              </div>
+              <div class="stat-value">{{ customerStats.currentAccounts }}</div>
             </div>
           </nb-card-body>
         </nb-card>
 
         <!-- Actions -->
-        <nb-card>
+        <nb-card class="actions-card">
           <nb-card-header>
-            <h4 class="mb-0">
-              <nb-icon icon="settings-outline" class="me-2"></nb-icon>
+            <h6>
+              <nb-icon icon="options-outline"></nb-icon>
               Actions
-            </h4>
+            </h6>
           </nb-card-header>
           <nb-card-body>
-            <div class="d-grid gap-2">
-              <button nbButton fullWidth status="primary" routerLink="/pages/accounts" [queryParams]="{ customerId: customer.id }">
-                <nb-icon icon="credit-card-outline" class="me-2"></nb-icon>
-                Voir les comptes
+            <div class="action-list">
+              <button nbButton fullWidth ghost (click)="onCreateAccount()">
+                <nb-icon icon="plus-circle-outline"></nb-icon>
+                Ouvrir un nouveau compte
               </button>
-              
-              <button nbButton fullWidth status="info" routerLink="/pages/transactions" [queryParams]="{ customerId: customer.id }">
-                <nb-icon icon="repeat-outline" class="me-2"></nb-icon>
-                Voir les transactions
+              <button nbButton fullWidth ghost (click)="onViewTransactions()">
+                <nb-icon icon="repeat-outline"></nb-icon>
+                Voir toutes les transactions
               </button>
-              
-              <button nbButton fullWidth status="success" (click)="onEdit()">
-                <nb-icon icon="edit-outline" class="me-2"></nb-icon>
-                Modifier
+              <button nbButton fullWidth ghost (click)="onEdit()">
+                <nb-icon icon="edit-outline"></nb-icon>
+                Modifier les informations
               </button>
-              
-              <button nbButton fullWidth status="warning" disabled>
-                <nb-icon icon="lock-outline" class="me-2"></nb-icon>
-                Bloquer le compte
+              <button nbButton fullWidth ghost status="warning" disabled>
+                <nb-icon icon="lock-outline"></nb-icon>
+                Bloquer le client
               </button>
+              <button nbButton fullWidth ghost status="danger" (click)="onDelete()">
+                <nb-icon icon="trash-outline"></nb-icon>
+                Supprimer le client
+              </button>
+            </div>
+          </nb-card-body>
+        </nb-card>
+
+        <!-- Informations système -->
+        <nb-card class="system-card">
+          <nb-card-header>
+            <h6>
+              <nb-icon icon="settings-outline"></nb-icon>
+              Informations Système
+            </h6>
+          </nb-card-header>
+          <nb-card-body>
+            <div class="system-item">
+              <small>Statut du compte</small>
+              <nb-badge text="Actif" status="success"></nb-badge>
+            </div>
+            <div class="system-item">
+              <small>Dernière connexion</small>
+              <div class="text-muted">Non disponible</div>
+            </div>
+            <div class="system-item">
+              <small>Dernière modification</small>
+              <div class="text-muted">{{ formatDate(customer.createdAt) }}</div>
             </div>
           </nb-card-body>
         </nb-card>
       </div>
     </div>
+  </div>
+
+  <!-- Message d'erreur -->
+  <div *ngIf="! isLoading && !customer" class="error-container">
+    <nb-icon icon="alert-circle-outline" class="error-icon"></nb-icon>
+    <h4>Client introuvable</h4>
+    <p>Le client demandé n'existe pas ou a été supprimé</p>
+    <button nbButton status="primary" size="large" (click)="onBack()">
+      <nb-icon icon="arrow-back-outline"></nb-icon>
+      Retour à la liste
+    </button>
   </div>
 </div>

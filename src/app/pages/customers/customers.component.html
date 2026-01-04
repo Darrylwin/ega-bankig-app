@@ -1,523 +1,606 @@
 <div class="customers-container">
-  <!-- En-tête -->
-  <div class="customers-header mb-4">
-    <div class="row align-items-center">
-      <div class="col-md-6">
-        <h2>Gestion des Clients</h2>
-        <p class="text-muted mb-0">
-          {{ totalItems }} client{{ totalItems > 1 ? "s" : "" }} enregistré{{
+  <!-- En-tête moderne -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-left">
+        <h1 class="page-title">
+          <nb-icon icon="people-outline" class="title-icon"></nb-icon>
+          Gestion des Clients
+        </h1>
+        <p class="page-subtitle">
+          <span class="badge badge-primary">{{ totalItems }}</span>
+          client{{ totalItems > 1 ? "s" : "" }} enregistré{{
             totalItems > 1 ? "s" : ""
           }}
         </p>
       </div>
-      <div class="col-md-6 text-end">
-        <div
-          class="d-flex justify-content-end align-items-center gap-2 flex-wrap"
-        >
-          <!-- Sélecteur de vue -->
-          <nb-button-group>
-            <button
-              nbButton
-              size="small"
-              [status]="viewMode === 'table' ? 'primary' : 'basic'"
-              (click)="setViewMode('table')"
-              nbTooltip="Vue tableau"
-            >
-              <nb-icon icon="list-outline"></nb-icon>
-            </button>
-            <button
-              nbButton
-              size="small"
-              [status]="viewMode === 'grid' ? 'primary' : 'basic'"
-              (click)="setViewMode('grid')"
-              nbTooltip="Vue grille"
-            >
-              <nb-icon icon="grid-outline"></nb-icon>
-            </button>
-            <button
-              nbButton
-              size="small"
-              [status]="viewMode === 'stats' ? 'primary' : 'basic'"
-              (click)="setViewMode('stats')"
-              nbTooltip="Statistiques"
-            >
-              <nb-icon icon="bar-chart-outline"></nb-icon>
-            </button>
-          </nb-button-group>
-
-          <!-- Recherche -->
-          <div class="search-box">
-            <div class="input-group">
-              <input
-                type="text"
-                nbInput
-                fullWidth
-                placeholder="Rechercher..."
-                [(ngModel)]="searchTerm"
-                (keyup.enter)="onSearch()"
-              />
-              <button
-                nbButton
-                ghost
-                size="small"
-                (click)="onSearch()"
-                [disabled]="!searchTerm"
-              >
-                <nb-icon icon="search-outline"></nb-icon>
-              </button>
-              <button
-                nbButton
-                ghost
-                size="small"
-                *ngIf="searchTerm"
-                (click)="clearSearch()"
-              >
-                <nb-icon icon="close-outline"></nb-icon>
-              </button>
-            </div>
-          </div>
-
-          <!-- Actions -->
-          <button nbButton status="primary" (click)="onCreate()">
-            <nb-icon icon="person-add-outline" class="me-2"></nb-icon>
-            Nouveau
+      <div class="header-actions">
+        <!-- Sélecteur de vue -->
+        <nb-button-group>
+          <button
+            nbButton
+            size="small"
+            [status]="viewMode === 'table' ? 'primary' : 'basic'"
+            (click)="setViewMode('table')"
+            nbTooltip="Tableau"
+          >
+            <nb-icon icon="list-outline"></nb-icon>
           </button>
+          <button
+            nbButton
+            size="small"
+            [status]="viewMode === 'cards' ? 'primary' : 'basic'"
+            (click)="setViewMode('cards')"
+            nbTooltip="Cartes"
+          >
+            <nb-icon icon="grid-outline"></nb-icon>
+          </button>
+          <button
+            nbButton
+            size="small"
+            [status]="viewMode === 'stats' ? 'primary' : 'basic'"
+            (click)="setViewMode('stats')"
+            nbTooltip="Statistiques"
+          >
+            <nb-icon icon="bar-chart-outline"></nb-icon>
+          </button>
+        </nb-button-group>
 
-          <!-- Menu export -->
-          <nb-actions size="small">
-            <nb-action icon="download-outline" nbTooltip="Exporter">
-              <button nbButton ghost size="small" (click)="exportToCSV()">
-                <nb-icon icon="file-text-outline" class="me-2"></nb-icon>
-                CSV
-              </button>
-              <button nbButton ghost size="small" (click)="exportToPDF()">
-                <nb-icon icon="file-outline" class="me-2"></nb-icon>
-                PDF
-              </button>
-            </nb-action>
-          </nb-actions>
-        </div>
+        <button nbButton status="primary" (click)="onCreate()">
+          <nb-icon icon="person-add-outline"></nb-icon>
+          Nouveau Client
+        </button>
+
+        <button
+          nbButton
+          ghost
+          (click)="exportToCSV()"
+          nbTooltip="Exporter en CSV"
+        >
+          <nb-icon icon="download-outline"></nb-icon>
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- Indicateur de chargement -->
-  <div *ngIf="isLoading" class="text-center py-5">
+  <!-- Barre de recherche -->
+  <nb-card class="search-card" *ngIf="viewMode === 'table'">
+    <nb-card-body>
+      <div class="search-bar">
+        <input
+          type="text"
+          nbInput
+          fullWidth
+          placeholder="Rechercher par nom, prénom, email ou téléphone..."
+          [(ngModel)]="searchTerm"
+          (keyup.enter)="onSearch()"
+        />
+        <button
+          nbButton
+          ghost
+          size="tiny"
+          (click)="onSearch()"
+          [disabled]="!searchTerm"
+        >
+          <nb-icon icon="search-outline"></nb-icon>
+        </button>
+        <button
+          nbButton
+          ghost
+          size="tiny"
+          *ngIf="searchTerm"
+          (click)="clearSearch()"
+        >
+          <nb-icon icon="close-outline"></nb-icon>
+        </button>
+      </div>
+    </nb-card-body>
+  </nb-card>
+
+  <!-- Chargement -->
+  <div *ngIf="isLoading" class="loading-container">
     <nb-spinner size="giant" status="primary"></nb-spinner>
-    <p class="mt-3">Chargement des clients...</p>
+    <p class="loading-text">Chargement des clients...</p>
   </div>
 
-  <!-- Contenu principal -->
+  <!-- Contenu -->
   <div *ngIf="!isLoading">
     <!-- VUE TABLEAU -->
     <div *ngIf="viewMode === 'table'">
       <nb-card>
+        <nb-card-body class="table-card-body">
+          <ng2-smart-table
+            [settings]="settings"
+            [source]="source"
+            (edit)="onEdit($event)"
+            (delete)="onDelete($event)"
+            (userRowSelect)="onView($event)"
+          >
+          </ng2-smart-table>
+
+          <!-- Pagination personnalisée -->
+          <div class="custom-pagination">
+            <div class="pagination-info">
+              Page {{ currentPageDisplay }} sur {{ totalPages }}
+              <span class="text-muted ms-2"
+                >({{ totalItems }} résultat{{
+                  totalItems > 1 ? "s" : ""
+                }})</span
+              >
+            </div>
+            <div class="pagination-controls">
+              <button
+                nbButton
+                ghost
+                size="tiny"
+                [disabled]="currentPage === 0"
+                (click)="goToFirstPage()"
+              >
+                <nb-icon icon="arrowhead-left-outline"></nb-icon>
+              </button>
+              <button
+                nbButton
+                ghost
+                size="tiny"
+                [disabled]="currentPage === 0"
+                (click)="goToPreviousPage()"
+              >
+                <nb-icon icon="chevron-left-outline"></nb-icon>
+              </button>
+              <button
+                nbButton
+                ghost
+                size="tiny"
+                [disabled]="currentPage >= totalPages - 1"
+                (click)="goToNextPage()"
+              >
+                <nb-icon icon="chevron-right-outline"></nb-icon>
+              </button>
+              <button
+                nbButton
+                ghost
+                size="tiny"
+                [disabled]="currentPage >= totalPages - 1"
+                (click)="goToLastPage()"
+              >
+                <nb-icon icon="arrowhead-right-outline"></nb-icon>
+              </button>
+            </div>
+          </div>
+        </nb-card-body>
+      </nb-card>
+    </div>
+
+    <!-- VUE CARTES -->
+    <div *ngIf="viewMode === 'cards'" class="cards-grid">
+      <nb-card
+        *ngFor="let customer of customers"
+        class="customer-card"
+        (click)="onView({ data: customer })"
+      >
         <nb-card-body>
-          <div class="table-responsive">
-            <ng2-smart-table
-              [settings]="settings"
-              [source]="source"
-              (create)="onCreate()"
-              (edit)="onEdit($event)"
-              (delete)="onDelete($event)"
-              (userRowSelect)="onView($event)"
+          <div class="customer-avatar">
+            <nb-icon icon="person-outline"></nb-icon>
+          </div>
+
+          <div class="customer-name">
+            {{ customer.lastName }} {{ customer.firstName }}
+          </div>
+
+          <div class="customer-email">{{ customer.email }}</div>
+
+          <div class="customer-info">
+            <div class="info-item">
+              <nb-icon icon="phone-outline"></nb-icon>
+              <span>{{ customer.phoneNumber }}</span>
+            </div>
+            <div class="info-item">
+              <nb-icon icon="calendar-outline"></nb-icon>
+              <span>{{ customer.age }} ans</span>
+            </div>
+            <div class="info-item">
+              <nb-icon icon="flag-outline"></nb-icon>
+              <span>{{ customer.nationality }}</span>
+            </div>
+          </div>
+
+          <div class="customer-badges">
+            <nb-badge
+              [text]="getGenderLabel(customer.gender)"
+              [status]="
+                customer.gender === 'MALE'
+                  ? 'primary'
+                  : customer.gender === 'FEMALE'
+                  ? 'success'
+                  : 'basic'
+              "
             >
-            </ng2-smart-table>
+            </nb-badge>
+            <nb-badge
+              [text]="
+                customer.age < 18
+                  ? 'Mineur'
+                  : customer.age >= 65
+                  ? 'Senior'
+                  : 'Adulte'
+              "
+              [status]="
+                customer.age < 18
+                  ? 'warning'
+                  : customer.age >= 65
+                  ? 'info'
+                  : 'success'
+              "
+            >
+            </nb-badge>
           </div>
         </nb-card-body>
 
-        <!-- Pagination -->
-        <nb-card-footer
-          class="d-flex justify-content-between align-items-center"
-        >
-          <div>
-            <span class="text-muted">
-              {{ totalItems }} client{{ totalItems > 1 ? "s" : "" }} au total
-            </span>
-          </div>
-          <div>
-            <span class="text-muted me-3">
-              Page {{ currentPageDisplay }} sur {{ totalPages }}
-            </span>
+        <nb-card-footer>
+          <button
+            nbButton
+            size="small"
+            status="primary"
+            fullWidth
+            (click)="onView({ data: customer })"
+          >
+            <nb-icon icon="eye-outline"></nb-icon>
+            Détails
+          </button>
+          <div class="footer-actions">
             <button
               nbButton
-              size="small"
               ghost
-              [disabled]="currentPage === 0"
-              (click)="goToFirstPage()"
+              size="tiny"
+              (click)="onEdit({ data: customer }); $event.stopPropagation()"
             >
-              <nb-icon icon="skip-back-outline"></nb-icon>
+              <nb-icon icon="edit-outline"></nb-icon>
             </button>
             <button
               nbButton
-              size="small"
               ghost
-              [disabled]="currentPage === 0"
-              (click)="goToPreviousPage()"
+              size="tiny"
+              status="danger"
+              (click)="onDelete({ data: customer }); $event.stopPropagation()"
             >
-              <nb-icon icon="chevron-left-outline"></nb-icon>
-            </button>
-            <button
-              nbButton
-              size="small"
-              ghost
-              [disabled]="currentPage >= totalPages - 1"
-              (click)="goToNextPage()"
-            >
-              <nb-icon icon="chevron-right-outline"></nb-icon>
-            </button>
-            <button
-              nbButton
-              size="small"
-              ghost
-              [disabled]="currentPage >= totalPages - 1"
-              (click)="goToLastPage()"
-            >
-              <nb-icon icon="skip-forward-outline"></nb-icon>
+              <nb-icon icon="trash-outline"></nb-icon>
             </button>
           </div>
         </nb-card-footer>
       </nb-card>
-    </div>
 
-    <!-- VUE GRILLE -->
-    <div *ngIf="viewMode === 'grid'" class="grid-view">
-      <div class="row">
-        <div
-          class="col-lg-3 col-md-4 col-sm-6 mb-4"
-          *ngFor="let customer of customers"
-        >
-          <nb-card class="customer-card" (click)="onView({ data: customer })">
-            <nb-card-body class="text-center">
-              <div class="customer-avatar mb-3">
-                <nb-icon icon="person-outline" class="avatar-icon"></nb-icon>
-              </div>
-              <h5 class="mb-1">
-                {{ customer.firstName }} {{ customer.lastName }}
-              </h5>
-              <p class="text-muted small mb-2">{{ customer.email }}</p>
-              <div class="customer-info">
-                <nb-badge
-                  [text]="customer.age + ' ans'"
-                  status="info"
-                  class="me-2"
-                ></nb-badge>
-                <nb-badge
-                  [text]="
-                    customer.gender === 'MALE'
-                      ? 'H'
-                      : customer.gender === 'FEMALE'
-                      ? 'F'
-                      : 'A'
-                  "
-                  status="basic"
-                ></nb-badge>
-              </div>
-              <div class="customer-actions mt-3">
-                <button
-                  nbButton
-                  size="tiny"
-                  status="primary"
-                  (click)="onEdit({ data: customer }); $event.stopPropagation()"
-                >
-                  <nb-icon icon="edit-outline"></nb-icon>
-                </button>
-                <button
-                  nbButton
-                  size="tiny"
-                  status="danger"
-                  (click)="
-                    onDelete({ data: customer }); $event.stopPropagation()
-                  "
-                >
-                  <nb-icon icon="trash-outline"></nb-icon>
-                </button>
-              </div>
-            </nb-card-body>
-          </nb-card>
-        </div>
-      </div>
-
-      <!-- Pagination grille -->
-      <div class="d-flex justify-content-center mt-4">
+      <!-- Pagination cartes -->
+      <div class="cards-pagination">
         <button
           nbButton
-          size="small"
           ghost
+          size="small"
           [disabled]="currentPage === 0"
           (click)="goToFirstPage()"
-          class="me-2"
         >
-          <nb-icon icon="skip-back-outline"></nb-icon>
+          <nb-icon icon="arrowhead-left-outline"></nb-icon>
         </button>
         <button
           nbButton
-          size="small"
           ghost
+          size="small"
           [disabled]="currentPage === 0"
           (click)="goToPreviousPage()"
-          class="me-2"
         >
           <nb-icon icon="chevron-left-outline"></nb-icon>
         </button>
-        <span class="align-self-center mx-3"
-          >Page {{ currentPageDisplay }} / {{ totalPages }}</span
-        >
+        <span>Page {{ currentPageDisplay }} / {{ totalPages }}</span>
         <button
           nbButton
-          size="small"
           ghost
+          size="small"
           [disabled]="currentPage >= totalPages - 1"
           (click)="goToNextPage()"
-          class="ms-2"
         >
           <nb-icon icon="chevron-right-outline"></nb-icon>
         </button>
         <button
           nbButton
-          size="small"
           ghost
+          size="small"
           [disabled]="currentPage >= totalPages - 1"
           (click)="goToLastPage()"
-          class="ms-2"
         >
-          <nb-icon icon="skip-forward-outline"></nb-icon>
+          <nb-icon icon="arrowhead-right-outline"></nb-icon>
         </button>
       </div>
     </div>
 
     <!-- VUE STATISTIQUES -->
-    <div *ngIf="viewMode === 'stats'">
-      <!-- Statistiques rapides -->
-      <div class="row mb-4">
-        <div class="col-lg-3 col-md-6 mb-4">
-          <nb-card status="primary" class="stat-card">
-            <nb-card-body class="text-center">
-              <nb-icon icon="people-outline" class="stat-icon mb-3"></nb-icon>
-              <h2 class="mb-1">
+    <div *ngIf="viewMode === 'stats'" class="stats-view">
+      <!-- KPIs principaux -->
+      <div class="kpi-grid">
+        <nb-card class="kpi-card kpi-primary">
+          <nb-card-body>
+            <div class="kpi-icon">
+              <nb-icon icon="people-outline"></nb-icon>
+            </div>
+            <div class="kpi-content">
+              <div class="kpi-value">
                 {{ formatNumber(customerStats.totalCustomers) }}
-              </h2>
-              <p class="text-muted mb-0">Total Clients</p>
-            </nb-card-body>
-          </nb-card>
-        </div>
+              </div>
+              <div class="kpi-label">Total Clients</div>
+            </div>
+          </nb-card-body>
+        </nb-card>
 
-        <div class="col-lg-3 col-md-6 mb-4">
-          <nb-card status="success" class="stat-card">
-            <nb-card-body class="text-center">
-              <nb-icon
-                icon="person-add-outline"
-                class="stat-icon mb-3"
-              ></nb-icon>
-              <h2 class="mb-1">
+        <nb-card class="kpi-card kpi-success">
+          <nb-card-body>
+            <div class="kpi-icon">
+              <nb-icon icon="person-add-outline"></nb-icon>
+            </div>
+            <div class="kpi-content">
+              <div class="kpi-value">
                 {{ formatNumber(customerStats.newThisMonth) }}
-              </h2>
-              <p class="text-muted mb-0">Nouveaux ce mois</p>
-            </nb-card-body>
-          </nb-card>
-        </div>
+              </div>
+              <div class="kpi-label">Nouveaux ce Mois</div>
+              <div class="kpi-detail">
+                {{ customerStats.newThisWeek }} cette semaine
+              </div>
+            </div>
+          </nb-card-body>
+        </nb-card>
 
-        <div class="col-lg-3 col-md-6 mb-4">
-          <nb-card status="info" class="stat-card">
-            <nb-card-body class="text-center">
-              <nb-icon icon="activity-outline" class="stat-icon mb-3"></nb-icon>
-              <h2 class="mb-1">{{ customerStats.averageAge }}</h2>
-              <p class="text-muted mb-0">Âge moyen</p>
-            </nb-card-body>
-          </nb-card>
-        </div>
+        <nb-card class="kpi-card kpi-info">
+          <nb-card-body>
+            <div class="kpi-icon">
+              <nb-icon icon="activity-outline"></nb-icon>
+            </div>
+            <div class="kpi-content">
+              <div class="kpi-value">{{ customerStats.averageAge }} ans</div>
+              <div class="kpi-label">Âge Moyen</div>
+              <div class="kpi-detail">
+                De {{ customerStats.youngestCustomer?.age }} à
+                {{ customerStats.oldestCustomer?.age }} ans
+              </div>
+            </div>
+          </nb-card-body>
+        </nb-card>
 
-        <div class="col-lg-3 col-md-6 mb-4">
-          <nb-card status="warning" class="stat-card">
-            <nb-card-body class="text-center">
-              <nb-icon icon="globe-outline" class="stat-icon mb-3"></nb-icon>
-              <h2 class="mb-1">{{ customerStats.topNationalities.length }}</h2>
-              <p class="text-muted mb-0">Nationalités</p>
-            </nb-card-body>
-          </nb-card>
-        </div>
+        <nb-card class="kpi-card kpi-warning">
+          <nb-card-body>
+            <div class="kpi-icon">
+              <nb-icon icon="globe-outline"></nb-icon>
+            </div>
+            <div class="kpi-content">
+              <div class="kpi-value">
+                {{ customerStats.topNationalities.length }}
+              </div>
+              <div class="kpi-label">Nationalités</div>
+              <div class="kpi-detail">
+                {{ customerStats.topNationalities[0]?.name || "N/A" }} en tête
+              </div>
+            </div>
+          </nb-card-body>
+        </nb-card>
       </div>
 
       <!-- Graphiques -->
-      <div class="row mb-4">
+      <div class="charts-grid">
         <!-- Répartition par genre -->
-        <div class="col-lg-6 mb-4">
-          <nb-card>
-            <nb-card-header>
-              <h5>
-                <nb-icon icon="people-outline" class="me-2"></nb-icon>
-                Répartition par Genre
-              </h5>
-            </nb-card-header>
-            <nb-card-body>
-              <ngx-charts-pie-chart
-                [view]="[undefined, 300]"
-                [scheme]="colorScheme"
-                [results]="genderDistributionData"
-                [legend]="true"
-                [labels]="true"
-                [doughnut]="true"
-              >
-              </ngx-charts-pie-chart>
+        <nb-card>
+          <nb-card-header>
+            <div class="chart-header">
+              <h6>Répartition par Genre</h6>
+              <nb-icon icon="pie-chart-outline"></nb-icon>
+            </div>
+          </nb-card-header>
+          <nb-card-body>
+            <ngx-charts-pie-chart
+              [view]="[undefined, 300]"
+              [scheme]="colorScheme"
+              [results]="genderDistributionData"
+              [legend]="true"
+              [labels]="true"
+              [doughnut]="true"
+            >
+            </ngx-charts-pie-chart>
 
-              <div class="chart-summary mt-3">
-                <div class="row text-center">
-                  <div class="col-4">
-                    <small class="text-muted">Hommes</small>
-                    <div class="fw-bold">{{ customerStats.maleCount }}</div>
-                    <small
-                      >{{
-                        calculatePercentage(
-                          customerStats.maleCount,
-                          customerStats.totalCustomers
-                        )
-                      }}%</small
-                    >
-                  </div>
-                  <div class="col-4">
-                    <small class="text-muted">Femmes</small>
-                    <div class="fw-bold">{{ customerStats.femaleCount }}</div>
-                    <small
-                      >{{
-                        calculatePercentage(
-                          customerStats.femaleCount,
-                          customerStats.totalCustomers
-                        )
-                      }}%</small
-                    >
-                  </div>
-                  <div class="col-4">
-                    <small class="text-muted">Autre</small>
-                    <div class="fw-bold">{{ customerStats.otherCount }}</div>
-                    <small
-                      >{{
-                        calculatePercentage(
-                          customerStats.otherCount,
-                          customerStats.totalCustomers
-                        )
-                      }}%</small
-                    >
-                  </div>
-                </div>
+            <div class="chart-summary">
+              <div class="summary-item">
+                <span class="summary-label">Hommes: </span>
+                <span class="summary-value"
+                  >{{ customerStats.maleCount }} ({{
+                    calculatePercentage(
+                      customerStats.maleCount,
+                      customerStats.totalCustomers
+                    )
+                  }}%)</span
+                >
               </div>
-            </nb-card-body>
-          </nb-card>
-        </div>
+              <div class="summary-item">
+                <span class="summary-label">Femmes: </span>
+                <span class="summary-value"
+                  >{{ customerStats.femaleCount }} ({{
+                    calculatePercentage(
+                      customerStats.femaleCount,
+                      customerStats.totalCustomers
+                    )
+                  }}%)</span
+                >
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Autre:</span>
+                <span class="summary-value"
+                  >{{ customerStats.otherCount }} ({{
+                    calculatePercentage(
+                      customerStats.otherCount,
+                      customerStats.totalCustomers
+                    )
+                  }}%)</span
+                >
+              </div>
+            </div>
+          </nb-card-body>
+        </nb-card>
 
         <!-- Répartition par âge -->
-        <div class="col-lg-6 mb-4">
-          <nb-card>
-            <nb-card-header>
-              <h5>
-                <nb-icon icon="person-outline" class="me-2"></nb-icon>
-                Répartition par Âge
-              </h5>
-            </nb-card-header>
-            <nb-card-body>
-              <ngx-charts-bar-vertical
-                [view]="[undefined, 300]"
-                [scheme]="colorScheme"
-                [results]="ageDistributionData"
-                [xAxis]="true"
-                [yAxis]="true"
-                [legend]="false"
-                [showXAxisLabel]="true"
-                [showYAxisLabel]="true"
-                [xAxisLabel]="'Catégorie'"
-                [yAxisLabel]="'Nombre'"
-              >
-              </ngx-charts-bar-vertical>
+        <nb-card>
+          <nb-card-header>
+            <div class="chart-header">
+              <h6>Répartition par Âge</h6>
+              <nb-icon icon="person-outline"></nb-icon>
+            </div>
+          </nb-card-header>
+          <nb-card-body>
+            <ngx-charts-bar-vertical
+              [view]="[undefined, 300]"
+              [scheme]="colorScheme"
+              [results]="ageDistributionData"
+              [xAxis]="true"
+              [yAxis]="true"
+              [legend]="false"
+              [showXAxisLabel]="false"
+              [showYAxisLabel]="true"
+              [yAxisLabel]="'Nombre'"
+            >
+            </ngx-charts-bar-vertical>
 
-              <div class="chart-summary mt-3">
-                <div class="row text-center">
-                  <div class="col-4">
-                    <small class="text-muted">Mineurs</small>
-                    <div class="fw-bold">{{ customerStats.minorsCount }}</div>
-                  </div>
-                  <div class="col-4">
-                    <small class="text-muted">Adultes</small>
-                    <div class="fw-bold">{{ customerStats.adultsCount }}</div>
-                  </div>
-                  <div class="col-4">
-                    <small class="text-muted">Seniors</small>
-                    <div class="fw-bold">{{ customerStats.seniorsCount }}</div>
-                  </div>
-                </div>
+            <div class="chart-summary">
+              <div class="summary-item">
+                <span class="summary-label">Mineurs (<18):</span>
+                <span class="summary-value">{{
+                  customerStats.minorsCount
+                }}</span>
               </div>
-            </nb-card-body>
-          </nb-card>
-        </div>
-      </div>
+              <div class="summary-item">
+                <span class="summary-label">Adultes (18-64):</span>
+                <span class="summary-value">{{
+                  customerStats.adultsCount
+                }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Seniors (65+):</span>
+                <span class="summary-value">{{
+                  customerStats.seniorsCount
+                }}</span>
+              </div>
+            </div>
+          </nb-card-body>
+        </nb-card>
 
-      <!-- Graphiques secondaires -->
-      <div class="row">
         <!-- Top nationalités -->
-        <div class="col-lg-6 mb-4">
-          <nb-card>
-            <nb-card-header>
-              <h5>
-                <nb-icon icon="flag-outline" class="me-2"></nb-icon>
-                Top 5 Nationalités
-              </h5>
-            </nb-card-header>
-            <nb-card-body>
-              <ngx-charts-bar-horizontal
-                [view]="[undefined, 300]"
-                [scheme]="colorScheme"
-                [results]="nationalityDistributionData"
-                [xAxis]="true"
-                [yAxis]="true"
-                [legend]="false"
-                [showXAxisLabel]="true"
-                [showYAxisLabel]="true"
-                [xAxisLabel]="'Nombre de clients'"
-                [yAxisLabel]="'Nationalité'"
-              >
-              </ngx-charts-bar-horizontal>
-            </nb-card-body>
-          </nb-card>
-        </div>
+        <nb-card>
+          <nb-card-header>
+            <div class="chart-header">
+              <h6>Top 5 Nationalités</h6>
+              <nb-icon icon="flag-outline"></nb-icon>
+            </div>
+          </nb-card-header>
+          <nb-card-body>
+            <ngx-charts-bar-horizontal
+              [view]="[undefined, 300]"
+              [scheme]="colorScheme"
+              [results]="nationalityDistributionData"
+              [xAxis]="true"
+              [yAxis]="true"
+              [legend]="false"
+              [showXAxisLabel]="false"
+              [showYAxisLabel]="true"
+            >
+            </ngx-charts-bar-horizontal>
+          </nb-card-body>
+        </nb-card>
 
         <!-- Tendance inscriptions -->
-        <div class="col-lg-6 mb-4">
-          <nb-card>
-            <nb-card-header>
-              <h5>
-                <nb-icon icon="trending-up-outline" class="me-2"></nb-icon>
-                Tendance des Inscriptions
-              </h5>
-            </nb-card-header>
-            <nb-card-body>
-              <ngx-charts-line-chart
-                [view]="[undefined, 300]"
-                [scheme]="colorScheme"
-                [results]="registrationTrendData"
-                [xAxis]="true"
-                [yAxis]="true"
-                [legend]="false"
-                [showXAxisLabel]="true"
-                [showYAxisLabel]="true"
-                [xAxisLabel]="'Mois'"
-                [yAxisLabel]="'Nouveaux clients'"
-              >
-              </ngx-charts-line-chart>
-            </nb-card-body>
-          </nb-card>
-        </div>
+        <nb-card>
+          <nb-card-header>
+            <div class="chart-header">
+              <h6>Tendance des Inscriptions</h6>
+              <nb-icon icon="trending-up-outline"></nb-icon>
+            </div>
+          </nb-card-header>
+          <nb-card-body>
+            <ngx-charts-line-chart
+              [view]="[undefined, 300]"
+              [scheme]="colorScheme"
+              [results]="registrationTrendData"
+              [xAxis]="true"
+              [yAxis]="true"
+              [legend]="false"
+              [showXAxisLabel]="false"
+              [showYAxisLabel]="true"
+              [yAxisLabel]="'Nouveaux clients'"
+            >
+            </ngx-charts-line-chart>
+          </nb-card-body>
+        </nb-card>
       </div>
+
+      <!-- Détails supplémentaires -->
+      <nb-card>
+        <nb-card-header>
+          <h6>
+            <nb-icon icon="info-outline" class="me-2"></nb-icon>
+            Informations Détaillées
+          </h6>
+        </nb-card-header>
+        <nb-card-body>
+          <div class="info-grid">
+            <div class="info-item" *ngIf="customerStats.youngestCustomer">
+              <div class="info-label">Client le plus jeune</div>
+              <div class="info-value">
+                {{ customerStats.youngestCustomer.firstName }}
+                {{ customerStats.youngestCustomer.lastName }}
+                <small>({{ customerStats.youngestCustomer.age }} ans)</small>
+              </div>
+            </div>
+            <div class="info-item" *ngIf="customerStats.oldestCustomer">
+              <div class="info-label">Client le plus âgé</div>
+              <div class="info-value">
+                {{ customerStats.oldestCustomer.firstName }}
+                {{ customerStats.oldestCustomer.lastName }}
+                <small>({{ customerStats.oldestCustomer.age }} ans)</small>
+              </div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Répartition hommes/femmes</div>
+              <div class="info-value">
+                {{
+                  calculatePercentage(
+                    customerStats.maleCount,
+                    customerStats.totalCustomers
+                  )
+                }}% /
+                {{
+                  calculatePercentage(
+                    customerStats.femaleCount,
+                    customerStats.totalCustomers
+                  )
+                }}%
+              </div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Taux de croissance (ce mois)</div>
+              <div class="info-value text-success">
+                +{{ customerStats.newThisMonth }}
+                <small
+                  >({{
+                    calculatePercentage(
+                      customerStats.newThisMonth,
+                      customerStats.totalCustomers
+                    )
+                  }}%)</small
+                >
+              </div>
+            </div>
+          </div>
+        </nb-card-body>
+      </nb-card>
     </div>
 
-    <!-- Aucune donnée -->
-    <div *ngIf="customers.length === 0" class="text-center py-5">
-      <nb-icon
-        icon="people-outline"
-        size="giant"
-        class="text-muted mb-3"
-      ></nb-icon>
+    <!-- Message si vide -->
+    <div *ngIf="customers.length === 0" class="empty-state">
+      <nb-icon icon="people-outline" class="empty-icon"></nb-icon>
       <h4>Aucun client trouvé</h4>
-      <p class="text-muted mb-4">Commencez par ajouter votre premier client</p>
+      <p>Commencez par ajouter votre premier client</p>
       <button nbButton status="primary" size="large" (click)="onCreate()">
-        <nb-icon icon="person-add-outline" class="me-2"></nb-icon>
+        <nb-icon icon="person-add-outline"></nb-icon>
         Ajouter un client
       </button>
     </div>

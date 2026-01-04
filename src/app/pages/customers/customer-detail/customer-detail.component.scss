@@ -1,0 +1,538 @@
+.customer-detail-container {
+  min-height: 100vh;
+}
+
+// Header
+.detail-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 2rem;
+  margin: -1 5rem -1.5rem 2rem -1.5rem;
+  border-radius: 0 0 1rem 1rem;
+  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+
+  .header-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex: 1;
+
+    .back-btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+    }
+  }
+
+  .detail-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    nb-icon {
+      font-size: 2rem;
+    }
+  }
+
+  .detail-subtitle {
+    font-size: 0.95rem;
+    opacity: 0.9;
+    margin: 0;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 0.75rem;
+
+    button {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+  }
+}
+
+// Loading & Error
+.loading-container,
+.error-container {
+  text-align: center;
+  padding: 4rem 0;
+
+  .loading-text {
+    margin-top: 1rem;
+    color: #8f9bb3;
+  }
+
+  .error-icon {
+    font-size: 4rem;
+    color: #ff3d71;
+    margin-bottom: 1.5rem;
+  }
+
+  h4 {
+    color: #222b45;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    color: #8f9bb3;
+    margin-bottom: 2rem;
+  }
+}
+
+// Content
+.detail-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+// Carte principale du profil
+.customer-main-card {
+  margin-bottom: 2rem;
+}
+
+.profile-card {
+  border-radius: 1rem;
+  border: none;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+
+  nb-card-body {
+    padding: 2rem;
+  }
+
+  .profile-content {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    nb-icon {
+      font-size: 4rem;
+    }
+  }
+
+  .profile-info {
+    flex: 1;
+  }
+
+  .profile-name {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 1rem 0;
+  }
+
+  .profile-badges {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+
+    nb-badge {
+      font-size: 0.9rem;
+      padding: 0.5rem 1rem;
+    }
+  }
+
+  .profile-contact {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.95rem;
+
+      nb-icon {
+        font-size: 1.25rem;
+        opacity: 0.8;
+      }
+    }
+  }
+}
+
+// Actions rapides
+.quick-actions {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+
+  .action-btn {
+    flex: 1;
+    min-width: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1.5rem 1rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s;
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    nb-icon {
+      font-size: 1.75rem;
+    }
+
+    span {
+      font-weight: 600;
+    }
+  }
+}
+
+// Grille de détails
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 2rem;
+}
+
+// Cards
+.info-card,
+.accounts-card,
+.chart-card,
+.stats-card,
+.actions-card,
+.system-card {
+  border-radius: 1rem;
+  border: none;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  margin-bottom: 1.5rem;
+
+  nb-card-header {
+    background: #f7f9fc;
+    border-bottom: 1px solid #edf1f7;
+
+    h6 {
+      margin: 0;
+      font-weight: 600;
+      color: #222b45;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      nb-icon {
+        font-size: 1.25rem;
+      }
+    }
+
+    .card-header-flex {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  }
+
+  nb-card-body {
+    padding: 1.5rem;
+  }
+}
+
+// Info grid
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.info-item {
+  .info-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: #8f9bb3;
+    margin-bottom: 0.5rem;
+
+    nb-icon {
+      font-size: 1rem;
+    }
+  }
+
+  .info-value {
+    font-weight: 600;
+    color: #222b45;
+    font-size: 0.95rem;
+
+    small {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 400;
+      margin-top: 0.25rem;
+    }
+  }
+}
+
+// Comptes
+.loading-accounts {
+  text-align: center;
+  padding: 3rem 0;
+}
+
+.accounts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.account-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: #f7f9fc;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #edf1f7;
+    transform: translateX(4px);
+  }
+
+  .account-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    nb-icon {
+      font-size: 1.5rem;
+    }
+
+    &.icon-success {
+      background: #e8f9f0;
+      color: #00d68f;
+    }
+
+    &.icon-primary {
+      background: #e7f1ff;
+      color: #3366ff;
+    }
+  }
+
+  .account-info {
+    flex: 1;
+
+    .account-type {
+      font-weight: 600;
+      color: #222b45;
+      margin-bottom: 0.25rem;
+    }
+
+    .account-number {
+      font-size: 0.8rem;
+      color: #8f9bb3;
+      font-family: "Courier New", monospace;
+    }
+  }
+
+  .account-balance {
+    text-align: right;
+
+    .balance-value {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+
+      &.positive {
+        color: #00d68f;
+      }
+
+      &.zero {
+        color: #8f9bb3;
+      }
+
+      &.negative {
+        color: #ff3d71;
+      }
+    }
+  }
+
+  .account-action {
+    color: #8f9bb3;
+
+    nb-icon {
+      font-size: 1.5rem;
+    }
+  }
+}
+
+.no-accounts {
+  text-align: center;
+  padding: 3rem 0;
+
+  nb-icon {
+    font-size: 3rem;
+    color: #c5cee0;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    color: #8f9bb3;
+    margin-bottom: 1.5rem;
+  }
+}
+
+// Graphiques
+.charts-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+// Sidebar
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #edf1f7;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .stat-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: #8f9bb3;
+
+    nb-icon {
+      font-size: 1rem;
+    }
+  }
+
+  .stat-value {
+    font-weight: 700;
+    color: #222b45;
+    font-size: 0.95rem;
+  }
+}
+
+.action-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  button {
+    justify-content: flex-start;
+    text-align: left;
+
+    nb-icon {
+      margin-right: 0.75rem;
+    }
+  }
+}
+
+.system-item {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #edf1f7;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  small {
+    display: block;
+    color: #8f9bb3;
+    font-size: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+}
+
+// Responsive
+@media (max-width: 1200px) {
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .charts-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .detail-header {
+    .header-content {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .header-actions {
+      width: 100%;
+      justify-content: stretch;
+
+      button {
+        flex: 1;
+      }
+    }
+  }
+
+  .profile-content {
+    flex-direction: column;
+    text-align: center;
+
+    .profile-info {
+      width: 100%;
+    }
+
+    .profile-badges {
+      justify-content: center;
+    }
+
+    .profile-contact {
+      align-items: center;
+    }
+  }
+
+  .quick-actions {
+    .action-btn {
+      min-width: calc(50% - 0.5rem);
+    }
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+}

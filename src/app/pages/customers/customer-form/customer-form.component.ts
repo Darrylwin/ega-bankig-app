@@ -3,12 +3,12 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NbToastrService } from '@nebular/theme';
 import { CustomerRequest, Customer } from '../../../@core/data/models/index';
-import { CustomerApiService} from '../../../@core/data/api/index';
+import { CustomerApiService } from '../../../@core/data/api/index';
 
 @Component({
   selector: 'ngx-customer-form',
   templateUrl: './customer-form.component.html',
-  styleUrls: ['./customer-form.component.scss']
+  styleUrls: ['./customer-form.component.scss'],
 })
 export class CustomerFormComponent implements OnInit {
   customerForm: FormGroup;
@@ -17,11 +17,13 @@ export class CustomerFormComponent implements OnInit {
   isLoading = false;
   isSubmitting = false;
 
+  today:  string = '';
+
   // Options
   genderOptions = [
-    { value: 'MALE', label: 'Homme' },
-    { value: 'FEMALE', label: 'Femme' },
-    { value: 'OTHER', label: 'Autre' }
+    { value:  'MALE', label: 'Homme', icon: 'person-outline', color: 'primary' },
+    { value: 'FEMALE', label: 'Femme', icon: 'person-outline', color: 'success' },
+    { value: 'OTHER', label: 'Autre', icon: 'person-outline', color: 'basic' },
   ];
 
   constructor(
@@ -35,6 +37,8 @@ export class CustomerFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.today = this.formatDateForInput(new Date());
+    
     const mode = this.route.snapshot.data['mode'];
     this.isEditMode = mode === 'edit';
 
@@ -50,20 +54,13 @@ export class CustomerFormComponent implements OnInit {
   private createForm(): FormGroup {
     return this.fb.group({
       lastName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
-      firstName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
+      firstName: ['', [Validators.required, Validators. minLength(2), Validators.maxLength(50)]],
       dateOfBirth: ['', [Validators.required]],
       gender: ['MALE', [Validators.required]],
       address: ['', [Validators.required, Validators.maxLength(200)]],
-      phoneNumber: ['', [
-        Validators.required,
-        Validators.pattern(/^\+[1-9]\d{1,14}$/)
-      ]],
-      email: ['', [
-        Validators.required,
-        Validators.email,
-        Validators.maxLength(100)
-      ]],
-      nationality: ['', [Validators.required, Validators.maxLength(50)]]
+      phoneNumber: ['', [Validators. required, Validators.pattern(/^\+[1-9]\d{1,14}$/)]],
+      email: ['', [Validators.required, Validators.email, Validators.maxLength(100)]],
+      nationality: ['', [Validators.required, Validators.maxLength(50)]],
     });
   }
 
@@ -71,27 +68,26 @@ export class CustomerFormComponent implements OnInit {
    * Charge les données du client (mode édition)
    */
   private loadCustomerData(): void {
-    if (!this.customerId) return;
+    if (! this.customerId) return;
 
     this.isLoading = true;
 
     this.customerApi.getCustomerById(this.customerId).subscribe({
-      next: (customer: Customer) => {
-        // Formatte la date pour l'input date
-        const formattedDate = customer.dateOfBirth.split('T')[0];
-        
+      next: (customer:  Customer) => {
+        const formattedDate = customer.dateOfBirth. split('T')[0];
+
         this.customerForm.patchValue({
-          ...customer,
-          dateOfBirth: formattedDate
+          ... customer,
+          dateOfBirth: formattedDate,
         });
-        
+
         this.isLoading = false;
       },
       error: (error) => {
         this.isLoading = false;
         this.toastr.danger('Erreur lors du chargement du client', 'Erreur');
-        console.error('Erreur chargement client:', error);
-      }
+        this.router.navigate(['/pages/customers']);
+      },
     });
   }
 
@@ -100,7 +96,8 @@ export class CustomerFormComponent implements OnInit {
    */
   onSubmit(): void {
     if (this.customerForm.invalid) {
-      this.markFormGroupTouched(this.customerForm);
+      this.markFormGroupTouched(this. customerForm);
+      this.toastr.warning('Veuillez remplir tous les champs correctement', 'Attention');
       return;
     }
 
@@ -122,19 +119,22 @@ export class CustomerFormComponent implements OnInit {
     this.customerApi.createCustomer(data).subscribe({
       next: (customer) => {
         this.isSubmitting = false;
-        this.toastr.success(`Client ${customer.firstName} ${customer.lastName} créé avec succès`, 'Succès');
-        this.router.navigate(['/pages/customers']);
+        this.toastr.success(
+          `Client ${customer.firstName} ${customer.lastName} créé avec succès`,
+          'Succès'
+        );
+        this.router.navigate(['/pages/customers/detail', customer.id]);
       },
       error: (error) => {
         this.isSubmitting = false;
-        
+
         if (error.status === 409) {
           this.toastr.warning('Un client avec cet email existe déjà', 'Attention');
           this.customerForm.get('email')?.setErrors({ duplicate: true });
         } else {
-          this.toastr.danger('Erreur lors de la création du client', 'Erreur');
+          this.toastr. danger('Erreur lors de la création du client', 'Erreur');
         }
-      }
+      },
     });
   }
 
@@ -147,13 +147,16 @@ export class CustomerFormComponent implements OnInit {
     this.customerApi.updateCustomer(this.customerId, data).subscribe({
       next: (customer) => {
         this.isSubmitting = false;
-        this.toastr.success(`Client ${customer.firstName} ${customer.lastName} mis à jour`, 'Succès');
-        this.router.navigate(['/pages/customers/detail', customer.id]);
+        this.toastr.success(
+          `Client ${customer.firstName} ${customer.lastName} mis à jour`,
+          'Succès'
+        );
+        this.router. navigate(['/pages/customers/detail', customer.id]);
       },
       error: (error) => {
         this.isSubmitting = false;
         this.toastr.danger('Erreur lors de la mise à jour du client', 'Erreur');
-      }
+      },
     });
   }
 
@@ -161,15 +164,19 @@ export class CustomerFormComponent implements OnInit {
    * Annule et retourne à la liste
    */
   onCancel(): void {
-    this.router.navigate(['/pages/customers']);
+    if (this.isEditMode && this.customerId) {
+      this.router.navigate(['/pages/customers/detail', this.customerId]);
+    } else {
+      this. router.navigate(['/pages/customers']);
+    }
   }
 
   /**
-   * Marque tous les champs comme touchés pour afficher les erreurs
+   * Marque tous les champs comme touchés
    */
   private markFormGroupTouched(formGroup: FormGroup): void {
-    Object.values(formGroup.controls).forEach(control => {
-      control.markAsTouched();
+    Object.values(formGroup.controls).forEach((control) => {
+      control. markAsTouched();
       if (control instanceof FormGroup) {
         this.markFormGroupTouched(control);
       }
@@ -177,25 +184,25 @@ export class CustomerFormComponent implements OnInit {
   }
 
   /**
-   * Raccourci pour accéder aux contrôles du formulaire
+   * Raccourci pour accéder aux contrôles
    */
   get f() {
     return this.customerForm.controls;
   }
 
   /**
-   * Calcule l'âge à partir de la date de naissance
+   * Calcule l'âge
    */
   calculateAge(): number {
     const birthDate = new Date(this.customerForm.value.dateOfBirth);
     const today = new Date();
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-    
+
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
       age--;
     }
-    
+
     return age >= 0 ? age : 0;
   }
 
@@ -207,9 +214,16 @@ export class CustomerFormComponent implements OnInit {
   }
 
   /**
-   * Retourne la date maximale (aujourd'hui)
+   * Retourne le genre sélectionné
    */
-  getMaxDate(): string {
-    return new Date().toISOString().split('T')[0];
+  getSelectedGender() {
+    return this.genderOptions.find((g) => g.value === this.f. gender. value);
+  }
+
+  /**
+   * Helpers
+   */
+  formatDateForInput(date: Date): string {
+    return date.toISOString().split('T')[0];
   }
 }
