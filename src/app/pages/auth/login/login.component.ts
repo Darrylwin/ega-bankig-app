@@ -1,12 +1,12 @@
-import { LoginRequest,  } from './../../../@core/data/models/auth.models';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NbToastrService } from '@nebular/theme';
 import { AuthApiService } from '../../../@core/data/api';
+import { LoginRequest } from '../../../@core/data/models';
 
 @Component({
-  selector: 'ngx-login',
+  selector:  'ngx-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
@@ -36,44 +36,44 @@ export class LoginComponent implements OnInit {
   }
 
   /**
-   * Soumission du formulaire de connexion
+   * ✅ Soumission du formulaire - Appelle l'API
    */
   onSubmit(): void {
     if (this.loginForm.invalid) {
-      this.markFormGroupTouched(this.loginForm);
+      this.markFormGroupTouched(this. loginForm);
       return;
     }
 
     this.isLoading = true;
 
     const credentials: LoginRequest = {
-      email: this.loginForm.value.email,
-      password: this.loginForm.value.password
+      email: this.loginForm.value. email,
+      password: this. loginForm.value.password
     };
 
-    this.authApi.login(credentials).subscribe({
+    console.log('🔵 Login attempt with:', credentials. email);
+
+    // ✅ APPELLE LE SERVICE QUI APPELLE L'API
+    this. authApi.login(credentials).subscribe({
       next: (response) => {
         this.isLoading = false;
+        console.log('✅ Login successful:', response);
         
-        // Message de succès
-        this.toastr.success(`Bienvenue ${response.username} !`, 'Connexion réussie');
-        
-        // Redirection vers le dashboard
-        this.router.navigate(['/pages/dashboard']);
+        this.toastr.success(`Bienvenue ${response.username} ! `, 'Connexion réussie');
+        this.router. navigate(['/pages/dashboard']);
       },
       error: (error) => {
         this.isLoading = false;
+        console.error('❌ Login error:', error);
         
-        // Gestion des erreurs spécifiques
         if (error.status === 401) {
           this.toastr.danger('Email ou mot de passe incorrect', 'Erreur de connexion');
         } else if (error.status === 0) {
-          this.toastr.danger('Impossible de joindre le serveur', 'Erreur réseau');
+          this.toastr.danger('Impossible de joindre le serveur.  Vérifiez que l\'API est démarrée.', 'Erreur réseau');
         } else {
           this.toastr.danger('Une erreur est survenue', 'Erreur');
         }
         
-        // Réinitialise le mot de passe
         this.loginForm.patchValue({ password: '' });
       }
     });
@@ -87,7 +87,7 @@ export class LoginComponent implements OnInit {
   }
 
   /**
-   * Marque tous les champs comme touchés pour afficher les erreurs
+   * Marque tous les champs comme touchés
    */
   private markFormGroupTouched(formGroup: FormGroup): void {
     Object.values(formGroup.controls).forEach(control => {
@@ -99,9 +99,9 @@ export class LoginComponent implements OnInit {
   }
 
   /**
-   * Raccourci pour accéder aux contrôles du formulaire
+   * Raccourci pour accéder aux contrôles
    */
   get f() {
-    return this.loginForm.controls;
+    return this.loginForm. controls;
   }
 }

@@ -19,21 +19,27 @@ export class AuthApiService {
   constructor(private http: HttpClient) {}
 
   /**
-   * Connexion
+   * CONNEXION - Appel API
    */
-  login(credentials:  LoginRequest): Observable<LoginResponse> {
+  login(credentials: LoginRequest): Observable<LoginResponse> {
+    console.log('🔵 Calling API:', `${this.API_URL}/login`);
+    console.log('📤 Credentials:', credentials);
+
     return this.http.post<LoginResponse>(`${this.API_URL}/login`, credentials)
       .pipe(
         tap(response => {
-          // Ajouter les rôles par défaut si absents
-          if (!response.roles) {
-            response.roles = ['user'];  // Rôle par défaut
+          console.log('📥 API Response:', response);
+
+          // Ajouter les rôles par défaut si le backend ne les envoie pas
+          if (!response.roles || response.roles.length === 0) {
+            response.roles = ['user'];
+            console.log('⚠️ No roles from API, using default:  [user]');
           }
           
           this.saveToken(response.token);
           this.saveUser(response);
           this.currentUserSubject.next(response);
-          console.log('✅ Login successful, token saved, roles:', response.roles);
+          console.log('✅ Login successful, token saved');
         })
       );
   }
@@ -45,38 +51,36 @@ export class AuthApiService {
     localStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem(this.USER_KEY);
     this.currentUserSubject. next(null);
-    console.log('🔓 Logout successful, token removed');
+    console.log('🔓 Logout successful');
   }
 
   /**
    * Vérifie si l'utilisateur est authentifié
    */
   isAuthenticated(): boolean {
-    const token = this.getToken();
-    const isAuth = !!token;
-    console.log('isAuthenticated:', isAuth);
-    return isAuth;
+    const token = this. getToken();
+    return !!token;
   }
 
   /**
    * Récupère le token
    */
   getToken(): string | null {
-    return localStorage.getItem(this. TOKEN_KEY);
+    return localStorage.getItem(this.TOKEN_KEY);
   }
 
   /**
    * Sauvegarde le token
    */
-  private saveToken(token: string): void {
-    localStorage.setItem(this.TOKEN_KEY, token);
+  private saveToken(token:  string): void {
+    localStorage. setItem(this.TOKEN_KEY, token);
   }
 
   /**
-   * Sauvegarde l'utilisateur avec ses rôles
+   * Sauvegarde l'utilisateur
    */
   private saveUser(user: LoginResponse): void {
-    localStorage. setItem(this.USER_KEY, JSON.stringify(user));
+    localStorage.setItem(this. USER_KEY, JSON.stringify(user));
   }
 
   /**
@@ -91,7 +95,7 @@ export class AuthApiService {
    * Récupère les rôles de l'utilisateur
    */
   getRoles(): string[] {
-    const user = this.getCurrentUser();
+    const user = this. getCurrentUser();
     return user?.roles || ['guest'];
   }
 }
