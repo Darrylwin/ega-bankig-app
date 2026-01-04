@@ -53,11 +53,9 @@ export class AccountFormComponent implements OnInit {
   ];
 
   currencies = [
+    { value: "CFA", label: "Franc CFA (CFA)", symbol: "CFA", flag: "🇨🇫" },
     { value: "EUR", label: "Euro (€)", symbol: "€", flag: "🇪🇺" },
     { value: "USD", label: "Dollar ($)", symbol: "$", flag: "🇺🇸" },
-    { value: "GBP", label: "Livre Sterling (£)", symbol: "£", flag: "🇬🇧" },
-    { value: "CHF", label: "Franc Suisse (CHF)", symbol: "CHF", flag: "🇨🇭" },
-    { value: "JPY", label: "Yen (¥)", symbol: "¥", flag: "🇯🇵" },
   ];
 
   constructor(

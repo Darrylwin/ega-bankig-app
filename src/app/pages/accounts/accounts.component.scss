@@ -4,12 +4,16 @@
 
 // En-tête moderne
 .page-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: linear-gradient(
+    135deg,
+    var(--color-primary-400) 0%,
+    var(--color-primary-600) 100%
+  );
+  color: var(--text-control-color);
   padding: 2rem;
   margin: -1 5rem -1.5rem 1.5rem -1.5rem;
   border-radius: 0 0 1rem 1rem;
-  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 20px rgba(var(--color-primary-400-rgb), 0.3);
 
   .header-content {
     display: flex;
@@ -42,8 +46,8 @@
     margin: 0;
 
     .badge {
-      background: rgba(255, 255, 255, 0.2);
-      color: white;
+      background: rgba(var(--text-control-color-rgb), 0.2);
+      color: var(--text-control-color);
       font-weight: 600;
       padding: 0.25rem 0.75rem;
       border-radius: 1rem;
@@ -63,7 +67,7 @@
   margin-bottom: 1.5rem;
   border-radius: 0.75rem;
   border: none;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow);
 
   nb-card-body {
     padding: 1rem;
@@ -105,7 +109,7 @@
 
   .loading-text {
     margin-top: 1rem;
-    color: #8f9bb3;
+    color: var(--text-hint-color);
   }
 }
 
@@ -121,17 +125,16 @@
 
       table {
         th {
-          // background: #f7f9fc;
           font-weight: 600;
-          color: #222b45;
+          color: var(--text-basic-color);
           padding: 1rem;
-          border-bottom: 2px solid #edf1f7;
+          border-bottom: 2px solid var(--border-basic-color-3);
         }
 
         td {
           padding: 1rem;
           vertical-align: middle;
-          border-bottom: 1px solid #edf1f7;
+          border-bottom: 1px solid var(--border-basic-color-3);
         }
 
         .badge {
@@ -164,22 +167,20 @@
             }
 
             &.ng2-smart-action-edit-edit {
-              background: #e7f1ff;
-              color: #3366ff;
+              color: var(--color-primary-500);
 
               &:hover {
-                background: #3366ff;
-                color: white;
+                background: var(--color-primary-500);
+                color: var(--text-control-color);
               }
             }
 
             &.ng2-smart-action-delete-delete {
-              background: #ffe8ed;
-              color: #ff3d71;
+              color: var(--color-danger-500);
 
               &:hover {
-                background: #ff3d71;
-                color: white;
+                background: var(--color-danger-500);
+                color: var(--text-control-color);
               }
             }
           }
@@ -200,7 +201,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem 1.5rem;
-  border-top: 1px solid #edf1f7;
+  border-top: 1px solid var(--border-basic-color-3);
 
   .pagination-info {
     font-size: 0.9rem;
@@ -223,31 +224,30 @@
 .account-card {
   border-radius: 1rem;
   border: none;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow);
   transition: all 0.3s;
   overflow: hidden;
   border-left: 4px solid transparent;
 
   &.status-active {
-    border-left-color: #00d68f;
+    border-left-color: var(--color-success-500);
   }
 
   &.status-blocked {
-    border-left-color: #ff3d71;
+    border-left-color: var(--color-danger-500);
   }
 
   &.status-closed {
-    border-left-color: #ffaa00;
+    border-left-color: var(--color-warning-500);
   }
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--shadow-hover);
   }
 
   nb-card-header {
-    background: #f7f9fc;
-    border-bottom: 1px solid #edf1f7;
+    border-bottom: 1px solid var(--border-basic-color-3);
     padding: 1rem 1.25rem;
 
     .card-header-content {
@@ -261,11 +261,11 @@
       align-items: center;
       gap: 0.5rem;
       font-weight: 600;
-      color: #222b45;
+      color: var(--text-basic-color);
 
       .type-icon {
         font-size: 1.25rem;
-        color: #3366ff;
+        color: var(--color-primary-500);
       }
     }
   }
@@ -283,7 +283,7 @@
       .label {
         display: block;
         font-size: 0.75rem;
-        color: #8f9bb3;
+        color: var(--text-hint-color);
         text-transform: uppercase;
         letter-spacing: 0.5px;
         margin-bottom: 0.5rem;
@@ -291,7 +291,7 @@
 
       .value {
         font-weight: 600;
-        color: #222b45;
+        color: var(--text-basic-color);
 
         &.mono {
           font-family: "Courier New", monospace;
@@ -302,7 +302,11 @@
     }
 
     .account-balance {
-      background: linear-gradient(135deg, #f7f9fc 0%, #edf1f7 100%);
+      background: linear-gradient(
+        135deg,
+        rgba(var(--color-primary-500-rgb), 0.08) 0%,
+        rgba(var(--color-primary-500-rgb), 0.13) 100%
+      );
       border-radius: 0.75rem;
       padding: 1.25rem;
       text-align: center;
@@ -311,7 +315,7 @@
       .label {
         display: block;
         font-size: 0.75rem;
-        color: #8f9bb3;
+        color: var(--text-hint-color);
         text-transform: uppercase;
         letter-spacing: 0.5px;
         margin-bottom: 0.5rem;
@@ -322,21 +326,17 @@
         font-weight: 700;
         margin-bottom: 0.25rem;
 
-        &.positive {
-          color: #00d68f;
-        }
-
         &.zero {
-          color: #8f9bb3;
+          color: var(--text-hint-color);
         }
 
         &.negative {
-          color: #ff3d71;
+          color: var(--color-danger-500);
         }
       }
 
       .currency {
-        color: #8f9bb3;
+        color: var(--text-hint-color);
         font-size: 0.85rem;
       }
     }
@@ -347,7 +347,7 @@
       align-items: center;
       gap: 0.5rem;
       font-size: 0.9rem;
-      color: #8f9bb3;
+      color: var(--text-hint-color);
       margin-bottom: 0.75rem;
 
       nb-icon {
@@ -357,8 +357,7 @@
   }
 
   nb-card-footer {
-    background: #f7f9fc;
-    border-top: 1px solid #edf1f7;
+    border-top: 1px solid var(--border-basic-color-3);
     padding: 0.75rem 1.25rem;
   }
 }
@@ -371,18 +370,18 @@
 
   .empty-icon {
     font-size: 4rem;
-    color: #c5cee0;
+    color: var(--color-basic-400);
     margin-bottom: 1.5rem;
   }
 
   h4 {
     font-weight: 600;
-    color: #222b45;
+    color: var(--text-basic-color);
     margin-bottom: 0.5rem;
   }
 
   p {
-    color: #8f9bb3;
+    color: var(--text-hint-color);
     margin-bottom: 1.5rem;
   }
 }
@@ -403,7 +402,7 @@
 .kpi-card {
   border-radius: 1rem;
   border: none;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow);
   overflow: hidden;
   position: relative;
 
@@ -418,19 +417,19 @@
   }
 
   &.kpi-primary {
-    --kpi-color: #3366ff;
+    --kpi-color: var(--color-primary-500);
   }
 
   &.kpi-success {
-    --kpi-color: #00d68f;
+    --kpi-color: var(--color-success-500);
   }
 
   &.kpi-info {
-    --kpi-color: #0095ff;
+    --kpi-color: var(--color-info-500);
   }
 
   &.kpi-warning {
-    --kpi-color: #ffaa00;
+    --kpi-color: var(--color-warning-500);
   }
 
   nb-card-body {
@@ -468,13 +467,13 @@
   .kpi-value {
     font-size: 1.75rem;
     font-weight: 700;
-    color: #222b45;
+    color: var(--text-basic-color);
     margin-bottom: 0.25rem;
   }
 
   .kpi-label {
     font-size: 0.85rem;
-    color: #8f9bb3;
+    color: var(--text-hint-color);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     font-weight: 600;
@@ -482,7 +481,7 @@
 
   .kpi-detail {
     font-size: 0.8rem;
-    color: #8f9bb3;
+    color: var(--text-hint-color);
     margin-top: 0.25rem;
   }
 }
@@ -495,11 +494,10 @@
   nb-card {
     border-radius: 1rem;
     border: none;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 
     nb-card-header {
-      background: #f7f9fc;
-      border-bottom: 1px solid #edf1f7;
+      // background: var(--color-basic-100);
+      border-bottom: 1px solid var(--border-basic-color-3);
 
       .chart-header {
         display: flex;
@@ -509,11 +507,11 @@
         h6 {
           margin: 0;
           font-weight: 600;
-          color: #222b45;
+          color: var(--text-basic-color);
         }
 
         nb-icon {
-          color: #8f9bb3;
+          color: var(--text-hint-color);
         }
       }
     }
@@ -532,13 +530,13 @@
 
 .info-item {
   padding: 1rem;
-  background: #f7f9fc;
+  background: rgba(var(--color-basic-100-rgb), 0.7);
   border-radius: 0.75rem;
   text-align: center;
 
   .info-label {
     font-size: 0.85rem;
-    color: #8f9bb3;
+    color: var(--text-hint-color);
     margin-bottom: 0.5rem;
   }
 

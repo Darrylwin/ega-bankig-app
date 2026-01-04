@@ -29,6 +29,7 @@
             [status]="autoRefreshEnabled ? 'success' : 'basic'"
             (click)="toggleAutoRefresh()"
             nbTooltip="Rafraîchissement automatique"
+            class="refresh-toggle"
           >
             <nb-icon
               [icon]="
@@ -48,11 +49,11 @@
             (click)="loadDashboardData()"
             [disabled]="isLoading"
             nbTooltip="Rafraîchir les données"
+            class="refresh-btn"
           >
             <nb-icon
               [icon]="isLoading ? 'sync-outline' : 'refresh-outline'"
-              [class.
-              spin]="isLoading"
+              [class.spin]="isLoading"
             ></nb-icon>
             Rafraîchir
           </button>
@@ -216,7 +217,7 @@
             <div class="kpi-description">Capital total déposé</div>
           </div>
           <div class="kpi-footer">
-            <button nbButton ghost size="tiny">
+            <button nbButton ghost size="tiny" routerLink="/pages/accounts">
               Détails <nb-icon icon="arrow-forward-outline"></nb-icon>
             </button>
           </div>
@@ -241,6 +242,7 @@
               ghost
               size="small"
               routerLink="/pages/transactions"
+              class="view-all-btn"
             >
               <nb-icon icon="arrow-forward-outline"></nb-icon>
             </button>
@@ -249,8 +251,8 @@
         <nb-card-body>
           <div class="activity-grid">
             <!-- Transactions -->
-            <div class="activity-item">
-              <div class="activity-icon primary">
+            <div class="activity-item primary">
+              <div class="activity-icon">
                 <nb-icon icon="activity-outline"></nb-icon>
               </div>
               <div class="activity-content">
@@ -283,8 +285,8 @@
             </div>
 
             <!-- Dépôts -->
-            <div class="activity-item">
-              <div class="activity-icon success">
+            <div class="activity-item success">
+              <div class="activity-icon">
                 <nb-icon icon="trending-up-outline"></nb-icon>
               </div>
               <div class="activity-content">
@@ -317,8 +319,8 @@
             </div>
 
             <!-- Retraits -->
-            <div class="activity-item">
-              <div class="activity-icon danger">
+            <div class="activity-item danger">
+              <div class="activity-icon">
                 <nb-icon icon="trending-down-outline"></nb-icon>
               </div>
               <div class="activity-content">
@@ -372,18 +374,20 @@
           </div>
         </nb-card-header>
         <nb-card-body>
-          <ngx-charts-pie-chart
-            [view]="accountDistributionView"
-            [scheme]="colorScheme"
-            [results]="accountDistributionData"
-            [legend]="true"
-            [labels]="true"
-            [doughnut]="true"
-            [arcWidth]="0.4"
-            [tooltipDisabled]="false"
-            (select)="onChartSelect($event)"
-          >
-          </ngx-charts-pie-chart>
+          <div class="chart-container">
+            <ngx-charts-pie-chart
+              [view]="accountDistributionView"
+              [scheme]="colorScheme"
+              [results]="accountDistributionData"
+              [legend]="true"
+              [labels]="true"
+              [doughnut]="true"
+              [arcWidth]="0.4"
+              [tooltipDisabled]="false"
+              (select)="onChartSelect($event)"
+            >
+            </ngx-charts-pie-chart>
+          </div>
 
           <div class="chart-summary">
             <div class="summary-item">
@@ -425,22 +429,24 @@
           </div>
         </nb-card-header>
         <nb-card-body>
-          <ngx-charts-line-chart
-            [view]="[undefined, 300]"
-            [scheme]="colorScheme"
-            [results]="balanceEvolutionData"
-            [xAxis]="showXAxis"
-            [yAxis]="showYAxis"
-            [legend]="false"
-            [showXAxisLabel]="false"
-            [showYAxisLabel]="false"
-            [gradient]="gradient"
-            [curve]="'basis'"
-            [tooltipDisabled]="false"
-            [yAxisTickFormatting]="formatCurrencyForChart"
-            (select)="onChartSelect($event)"
-          >
-          </ngx-charts-line-chart>
+          <div class="chart-container">
+            <ngx-charts-line-chart
+              [view]="[undefined, 300]"
+              [scheme]="colorScheme"
+              [results]="balanceEvolutionData"
+              [xAxis]="showXAxis"
+              [yAxis]="showYAxis"
+              [legend]="false"
+              [showXAxisLabel]="false"
+              [showYAxisLabel]="false"
+              [gradient]="gradient"
+              [curve]="'basis'"
+              [tooltipDisabled]="false"
+              [yAxisTickFormatting]="formatCurrencyForChart"
+              (select)="onChartSelect($event)"
+            >
+            </ngx-charts-line-chart>
+          </div>
 
           <div class="chart-summary">
             <div class="summary-item">
@@ -450,7 +456,7 @@
             <div class="summary-item">
               <small>Variation</small>
               <strong
-                [class]="
+                [ngClass]="
                   'text-' + getValueColor(calculatedStats.balanceChangePercent)
                 "
               >
@@ -478,20 +484,22 @@
           </div>
         </nb-card-header>
         <nb-card-body>
-          <ngx-charts-bar-vertical
-            [view]="[undefined, 300]"
-            [scheme]="colorScheme"
-            [results]="transactionsByPeriodData"
-            [xAxis]="showXAxis"
-            [yAxis]="showYAxis"
-            [legend]="false"
-            [showXAxisLabel]="false"
-            [showYAxisLabel]="false"
-            [gradient]="gradient"
-            [barPadding]="20"
-            (select)="onChartSelect($event)"
-          >
-          </ngx-charts-bar-vertical>
+          <div class="chart-container">
+            <ngx-charts-bar-vertical
+              [view]="[undefined, 300]"
+              [scheme]="colorScheme"
+              [results]="transactionsByPeriodData"
+              [xAxis]="showXAxis"
+              [yAxis]="showYAxis"
+              [legend]="false"
+              [showXAxisLabel]="false"
+              [showYAxisLabel]="false"
+              [gradient]="gradient"
+              [barPadding]="20"
+              (select)="onChartSelect($event)"
+            >
+            </ngx-charts-bar-vertical>
+          </div>
         </nb-card-body>
       </nb-card>
 
@@ -506,22 +514,24 @@
           </div>
         </nb-card-header>
         <nb-card-body>
-          <ngx-charts-bar-vertical-2d
-            [view]="[undefined, 300]"
-            [scheme]="colorScheme"
-            [results]="depositsVsWithdrawalsData"
-            [xAxis]="showXAxis"
-            [yAxis]="showYAxis"
-            [legend]="true"
-            [showXAxisLabel]="false"
-            [showYAxisLabel]="false"
-            [gradient]="gradient"
-            [barPadding]="8"
-            [groupPadding]="16"
-            [yAxisTickFormatting]="formatCurrencyForChart"
-            (select)="onChartSelect($event)"
-          >
-          </ngx-charts-bar-vertical-2d>
+          <div class="chart-container">
+            <ngx-charts-bar-vertical-2d
+              [view]="[undefined, 300]"
+              [scheme]="colorScheme"
+              [results]="depositsVsWithdrawalsData"
+              [xAxis]="showXAxis"
+              [yAxis]="showYAxis"
+              [legend]="true"
+              [showXAxisLabel]="false"
+              [showYAxisLabel]="false"
+              [gradient]="gradient"
+              [barPadding]="8"
+              [groupPadding]="16"
+              [yAxisTickFormatting]="formatCurrencyForChart"
+              (select)="onChartSelect($event)"
+            >
+            </ngx-charts-bar-vertical-2d>
+          </div>
         </nb-card-body>
       </nb-card>
     </div>
@@ -544,9 +554,7 @@
                   <nb-icon icon="repeat-outline"></nb-icon>
                   Transactions
                 </span>
-                <span class="stat-value">{{
-                  formatNumber(stats.transactionsThisWeek)
-                }}</span>
+                <span class="stat-value">{{ formatNumber(stats.transactionsThisWeek) }}</span>
               </div>
               <nb-progress-bar
                 [value]="
@@ -650,9 +658,7 @@
                   <nb-icon icon="repeat-outline"></nb-icon>
                   Transactions
                 </span>
-                <span class="stat-value">{{
-                  formatNumber(stats.transactionsThisMonth)
-                }}</span>
+                <span class="stat-value">{{ formatNumber(stats.transactionsThisMonth) }}</span>
               </div>
               <nb-progress-bar
                 [value]="100"
@@ -716,6 +722,7 @@
               fullWidth
               status="primary"
               routerLink="/pages/customers/new"
+              class="action-btn"
             >
               <nb-icon icon="person-add-outline"></nb-icon>
               <span>Nouveau Client</span>
@@ -726,6 +733,7 @@
               fullWidth
               status="success"
               routerLink="/pages/accounts/new"
+              class="action-btn"
             >
               <nb-icon icon="plus-circle-outline"></nb-icon>
               <span>Ouvrir un Compte</span>
@@ -736,6 +744,7 @@
               fullWidth
               status="info"
               routerLink="/pages/transactions/deposit"
+              class="action-btn"
             >
               <nb-icon icon="trending-up-outline"></nb-icon>
               <span>Effectuer un Dépôt</span>
@@ -746,6 +755,7 @@
               fullWidth
               status="warning"
               routerLink="/pages/transactions/history"
+              class="action-btn"
             >
               <nb-icon icon="archive-outline"></nb-icon>
               <span>Voir l'Historique</span>
@@ -798,7 +808,7 @@
                 <div class="insight-label">Taux de croissance</div>
                 <div
                   class="insight-value"
-                  [class]="'text-' + getGrowthStatus()"
+                  [ngClass]="'text-' + getGrowthStatus()"
                 >
                   {{
                     (calculatedStats.growthRate > 0 ? "+" : "") +

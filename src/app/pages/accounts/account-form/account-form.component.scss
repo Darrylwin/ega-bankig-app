@@ -4,12 +4,16 @@
 
 // Header
 .form-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: linear-gradient(
+    135deg,
+    var(--color-primary-400) 0%,
+    var(--color-primary-600) 100%
+  );
+  color: var(--text-control-color);
   padding: 2rem;
   margin: -1 5rem -1.5rem 2rem -1.5rem;
   border-radius: 0 0 1rem 1rem;
-  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 20px rgba(var(--color-primary-400-rgb), 0.3);
 
   .header-content {
     max-width: 1400px;
@@ -22,12 +26,12 @@
     gap: 1.5rem;
 
     .back-btn {
-      background: rgba(255, 255, 255, 0.2);
+      background: rgba(var(--text-control-color-rgb), 0.2);
       border: none;
-      color: white;
+      color: var(--text-control-color);
 
       &:hover {
-        background: rgba(255, 255, 255, 0.3);
+        background: rgba(var(--text-control-color-rgb), 0.3);
       }
     }
   }
@@ -59,7 +63,7 @@
 
   .loading-text {
     margin-top: 1rem;
-    color: #8f9bb3;
+    color: var(--text-hint-color);
   }
 }
 
@@ -81,11 +85,10 @@
   margin-bottom: 1.5rem;
   border-radius: 1rem;
   border: none;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow);
 
   nb-card-header {
-    background: #f7f9fc;
-    border-bottom: 1px solid #edf1f7;
+    border-bottom: 1px solid var(--border-basic-color-3);
 
     .card-header-content {
       display: flex;
@@ -96,8 +99,12 @@
         width: 40px;
         height: 40px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
+        background: linear-gradient(
+          135deg,
+          var(--color-primary-400) 0%,
+          var(--color-primary-600) 100%
+        );
+        color: var(--text-control-color);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -109,7 +116,7 @@
       h5 {
         margin: 0 0 0.25rem 0;
         font-weight: 600;
-        color: #222b45;
+        color: var(--text-basic-color);
       }
 
       p {
@@ -130,13 +137,13 @@
   .form-label {
     display: block;
     font-weight: 600;
-    color: #222b45;
+    color: var(--text-basic-color);
     margin-bottom: 0.5rem;
     font-size: 0.9rem;
 
     &.required::after {
       content: " *";
-      color: #ff3d71;
+      color: var(--color-danger-500);
     }
   }
 
@@ -144,7 +151,7 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    color: #ff3d71;
+    color: var(--color-danger-500);
     font-size: 0.85rem;
     margin-top: 0.5rem;
 
@@ -165,14 +172,14 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: #e7f1ff;
+    background: var(--color-primary-100);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
 
     nb-icon {
-      color: #3366ff;
+      color: var(--color-primary-500);
       font-size: 1.25rem;
     }
   }
@@ -182,7 +189,7 @@
 
     .customer-name {
       font-weight: 600;
-      color: #222b45;
+      color: var(--text-basic-color);
     }
 
     small {
@@ -194,18 +201,17 @@
 // Customer preview
 .customer-preview {
   margin-top: 1 5rem;
-  background: linear-gradient(135deg, #e8f9f0 0%, #e7f1ff 100%);
   border-radius: 0.75rem;
   overflow: hidden;
 
   .preview-header {
-    background: rgba(0, 214, 143, 0.1);
+    background: rgba(var(--color-success-500-rgb), 0.1);
     padding: 1rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
     font-weight: 600;
-    color: #00d68f;
+    color: var(--color-success-500);
 
     nb-icon {
       font-size: 1.5rem;
@@ -220,7 +226,7 @@
     display: flex;
     justify-content: space-between;
     padding: 0.5rem 0;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid rgba(var(--text-basic-color-rgb), 0.05);
 
     &:last-child {
       border-bottom: none;
@@ -228,12 +234,12 @@
 
     .preview-label {
       font-size: 0.85rem;
-      color: #8f9bb3;
+      color: var(--text-hint-color);
     }
 
     .preview-value {
       font-weight: 600;
-      color: #222b45;
+      color: var(--text-basic-color);
       text-align: right;
     }
   }
@@ -248,29 +254,26 @@
 
 .account-type-card {
   position: relative;
-  border: 2px solid #edf1f7;
+  border: 2px solid var(--border-basic-color-3);
   border-radius: 1rem;
   padding: 2rem;
   cursor: pointer;
   transition: all 0.3s;
-  background: white;
+  background: var(--background-basic-color-1);
 
   &:hover {
-    border-color: #c5cee0;
+    border-color: var(--border-basic-color-2);
     transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-hover);
   }
 
   &.selected {
-    border-color: #3366ff;
-    background: linear-gradient(135deg, #e7f1ff 0%, #f7f9fc 100%);
-    box-shadow: 0 8px 24px rgba(51, 102, 255, 0.2);
+    border-color: var(--color-primary-500);
+    box-shadow: 0 8px 24px rgba(var(--color-primary-500-rgb), 0.2);
 
     .type-icon-wrapper {
-      background: #3366ff;
-
       nb-icon {
-        color: white;
+        color: var(--text-control-color);
       }
     }
   }
@@ -290,18 +293,14 @@
     transition: all 0.3s;
 
     &.type-success {
-      background: #e8f9f0;
-
       nb-icon {
-        color: #00d68f;
+        color: var(--color-success-500);
       }
     }
 
     &.type-primary {
-      background: #e7f1ff;
-
       nb-icon {
-        color: #3366ff;
+        color: var(--color-primary-500);
       }
     }
 
@@ -312,12 +311,12 @@
 
   .type-title {
     font-weight: 600;
-    color: #222b45;
+    color: var(--text-basic-color);
     margin-bottom: 0.5rem;
   }
 
   .type-description {
-    color: #8f9bb3;
+    color: var(--text-hint-color);
     font-size: 0.85rem;
     margin-bottom: 1rem;
   }
@@ -333,7 +332,7 @@
       gap: 0.5rem;
       padding: 0.5rem 0;
       font-size: 0.85rem;
-      color: #222b45;
+      color: var(--text-basic-color);
 
       nb-icon {
         font-size: 1rem;
@@ -346,7 +345,7 @@
     position: absolute;
     top: 1rem;
     right: 1rem;
-    color: #00d68f;
+    color: var(--color-success-500);
 
     nb-icon {
       font-size: 2rem;
@@ -363,24 +362,21 @@
 
 .currency-card {
   position: relative;
-  border: 2px solid #edf1f7;
+  border: 2px solid var(--border-basic-color-3);
   border-radius: 0.75rem;
   padding: 1.5rem 1rem;
   cursor: pointer;
   transition: all 0.3s;
   text-align: center;
-  background: white;
 
   &:hover {
-    border-color: #c5cee0;
+    border-color: var(--border-basic-color-2);
     transform: translateY(-4px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-hover);
   }
 
   &.selected {
-    border-color: #3366ff;
-    background: linear-gradient(135deg, #e7f1ff 0%, #f7f9fc 100%);
-    box-shadow: 0 4px 12px rgba(51, 102, 255, 0.2);
+    box-shadow: 0 4px 12px rgba(var(--color-primary-500-rgb), 0.2);
   }
 
   .currency-radio {
@@ -394,21 +390,21 @@
 
   .currency-code {
     font-weight: 700;
-    color: #222b45;
+    color: var(--text-basic-color);
     font-size: 1.1rem;
     margin-bottom: 0.25rem;
   }
 
   .currency-name {
     font-size: 0.75rem;
-    color: #8f9bb3;
+    color: var(--text-hint-color);
   }
 
   .currency-check {
     position: absolute;
     top: 0.5rem;
     right: 0.5rem;
-    color: #00d68f;
+    color: var(--color-success-500);
 
     nb-icon {
       font-size: 1.5rem;
@@ -438,19 +434,18 @@
   .info-card {
     border-radius: 1rem;
     border: none;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--shadow);
     margin-bottom: 1.5rem;
     position: sticky;
     top: 1rem;
 
     nb-card-header {
-      background: #f7f9fc;
-      border-bottom: 1px solid #edf1f7;
+      border-bottom: 1px solid var(--border-basic-color-3);
 
       h6 {
         margin: 0;
         font-weight: 600;
-        color: #222b45;
+        color: var(--text-basic-color);
         display: flex;
         align-items: center;
         gap: 0.5rem;
@@ -470,7 +465,7 @@
     align-items: center;
     gap: 0.5rem;
     font-size: 0.85rem;
-    color: #8f9bb3;
+    color: var(--text-hint-color);
     margin-bottom: 0.5rem;
 
     nb-icon {
@@ -480,14 +475,14 @@
 
   .summary-value {
     font-weight: 600;
-    color: #222b45;
+    color: var(--text-basic-color);
     font-size: 0.95rem;
   }
 }
 
 .summary-divider {
   height: 1px;
-  background: #edf1f7;
+  background: var(--border-basic-color-3);
   margin: 1rem 0;
 }
 
@@ -511,7 +506,7 @@
   display: flex;
   gap: 1rem;
   padding: 1rem 0;
-  border-bottom: 1px solid #edf1f7;
+  border-bottom: 1px solid var(--border-basic-color-3);
 
   &:last-child {
     border-bottom: none;
@@ -525,13 +520,13 @@
 
   strong {
     display: block;
-    color: #222b45;
+    color: var(--text-basic-color);
     margin-bottom: 0.25rem;
   }
 
   p {
     font-size: 0.85rem;
-    color: #8f9bb3;
+    color: var(--text-hint-color);
     margin: 0;
     line-height: 1.5;
   }
