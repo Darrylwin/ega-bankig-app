@@ -53,3 +53,32 @@ export interface CreateAdminRequest {
   email: string;
   password: string;
 }
+
+/**
+ * Modèle pour la requête de connexion
+ */
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+/**
+ * Modèle pour la réponse de connexion
+ */
+export interface LoginResponse {
+  token: string;
+  username: string;
+  email: string;
+  roles?:  string[];
+  expiresIn?: number;
+}
+
+/**
+ * Modèle pour l'utilisateur courant
+ */
+export interface CurrentUser {
+  username: string;
+  email: string;
+  roles: string[];
+  token: string;
+}

@@ -5,11 +5,7 @@ import { PagesComponent } from "./pages.component";
 import { PagesRoutingModule } from "./pages-routing.module";
 
 @NgModule({
-  imports: [
-    PagesRoutingModule, // ← Les routes sont ici
-    ThemeModule,
-    NbMenuModule,
-  ],
+  imports: [PagesRoutingModule, ThemeModule, NbMenuModule],
   declarations: [PagesComponent],
 })
 export class PagesModule {}

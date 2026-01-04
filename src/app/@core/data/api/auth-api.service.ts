@@ -1,113 +1,97 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { Observable, BehaviorSubject } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { ApiService } from './api.service';
-import {
-  LoginRequest,
-  AuthResponse,
-  UserProfile,
-  ChangePasswordRequest,
-  CreateAdminRequest,
-} from '../models';
+import { environment } from '../../../../environments/environment';
+import { LoginRequest, LoginResponse } from '../models/auth.models';
 
-/**
- * Service API pour l'authentification
- * Gère login, profil, changement de mot de passe
- */
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class AuthApiService {
+  private readonly API_URL = environment.apiUrl + '/auth';
+  private readonly TOKEN_KEY = 'auth_token';
+  private readonly USER_KEY = 'current_user';
 
-  constructor(private apiService: ApiService) {}
+  private currentUserSubject = new BehaviorSubject<LoginResponse | null>(this.getCurrentUser());
+  public currentUser$ = this.currentUserSubject. asObservable();
 
-  /**
-   * POST /api/auth/login
-   * Connecte un utilisateur
-   * 
-   * . pipe(tap(... )) permet d'exécuter du code quand on reçoit la réponse
-   * sans modifier la réponse elle-même
-   */
-  login(credentials: LoginRequest): Observable<AuthResponse> {
-    return this.apiService.post<AuthResponse>('/auth/login', credentials).pipe(
-      tap((response: AuthResponse) => {
-        // Stocke le token dans le localStorage pour les prochaines requêtes
-        localStorage.setItem('token', response.token);
-        
-        // Stocke aussi les infos utilisateur (optionnel)
-        localStorage.setItem('user', JSON.stringify({
-          id: response.id,
-          username: response.username,
-          email: response.email,
-          roles: response.roles,
-        }));
-      }),
-    );
-  }
+  constructor(private http: HttpClient) {}
 
   /**
-   * GET /api/auth/me
-   * Récupère le profil de l'utilisateur connecté
+   * Connexion
    */
-  getProfile(): Observable<UserProfile> {
-    return this.apiService.get<UserProfile>('/auth/me');
-  }
-
-  /**
-   * PUT /api/auth/change-password
-   * Change le mot de passe de l'utilisateur connecté
-   */
-  changePassword(data: ChangePasswordRequest): Observable<string> {
-    return this.apiService.put<string>('/auth/change-password', data);
-  }
-
-  /**
-   * POST /api/auth/admin/create
-   * Crée un nouvel administrateur (ADMIN uniquement)
-   */
-  createAdmin(data: CreateAdminRequest): Observable<AuthResponse> {
-    return this.apiService.post<AuthResponse>('/auth/admin/create', data);
+  login(credentials:  LoginRequest): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${this.API_URL}/login`, credentials)
+      .pipe(
+        tap(response => {
+          // Ajouter les rôles par défaut si absents
+          if (!response.roles) {
+            response.roles = ['user'];  // Rôle par défaut
+          }
+          
+          this.saveToken(response.token);
+          this.saveUser(response);
+          this.currentUserSubject.next(response);
+          console.log('✅ Login successful, token saved, roles:', response.roles);
+        })
+      );
   }
 
   /**
    * Déconnexion
-   * Supprime le token et les infos utilisateur du localStorage
    */
   logout(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    localStorage.removeItem(this.TOKEN_KEY);
+    localStorage.removeItem(this.USER_KEY);
+    this.currentUserSubject. next(null);
+    console.log('🔓 Logout successful, token removed');
   }
 
   /**
-   * Vérifie si l'utilisateur est connecté
-   * @returns true si un token existe
+   * Vérifie si l'utilisateur est authentifié
    */
   isAuthenticated(): boolean {
-    return !!localStorage.getItem('token');
+    const token = this.getToken();
+    const isAuth = !!token;
+    console.log('isAuthenticated:', isAuth);
+    return isAuth;
   }
 
   /**
-   * Récupère les infos utilisateur stockées localement
-   * @returns Les infos utilisateur ou null
+   * Récupère le token
    */
-  getCurrentUser(): any {
-    const userStr = localStorage.getItem('user');
-    return userStr ? JSON.parse(userStr) : null;
+  getToken(): string | null {
+    return localStorage.getItem(this. TOKEN_KEY);
   }
 
   /**
-   * Vérifie si l'utilisateur a un rôle spécifique
-   * @param role - Le rôle à vérifier (ex: 'ROLE_ADMIN')
+   * Sauvegarde le token
    */
-  hasRole(role: string): boolean {
+  private saveToken(token: string): void {
+    localStorage.setItem(this.TOKEN_KEY, token);
+  }
+
+  /**
+   * Sauvegarde l'utilisateur avec ses rôles
+   */
+  private saveUser(user: LoginResponse): void {
+    localStorage. setItem(this.USER_KEY, JSON.stringify(user));
+  }
+
+  /**
+   * Récupère l'utilisateur courant
+   */
+  getCurrentUser(): LoginResponse | null {
+    const user = localStorage.getItem(this.USER_KEY);
+    return user ? JSON.parse(user) : null;
+  }
+
+  /**
+   * Récupère les rôles de l'utilisateur
+   */
+  getRoles(): string[] {
     const user = this.getCurrentUser();
-    return user && user.roles && user.roles.includes(role);
-  }
-
-  /**
-   * Vérifie si l'utilisateur est admin
-   */
-  isAdmin(): boolean {
-    return this.hasRole('ROLE_ADMIN');
+    return user?.roles || ['guest'];
   }
 }
