@@ -1,12 +1,13 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NgModule } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 
 // Modules Nebular
-import { 
-  NbCardModule, 
-  NbIconModule, 
-  NbButtonModule, 
+import {
+  NbCardModule,
+  NbIconModule, // ← VÉRIFIER ICI
+  NbButtonModule,
+  NbButtonGroupModule,
   NbInputModule,
   NbSelectModule,
   NbDatepickerModule,
@@ -21,21 +22,23 @@ import {
   NbProgressBarModule,
   NbRadioModule,
   NbCheckboxModule,
-  NbStepperModule
-} from '@nebular/theme';
+  NbStepperModule,
+} from "@nebular/theme";
+
+import { NbEvaIconsModule } from "@nebular/eva-icons"; // ← AJOUTER ICI
 
 // Tableau intelligent
-import { Ng2SmartTableModule } from 'ng2-smart-table';
+import { Ng2SmartTableModule } from "ng2-smart-table";
 
-// Graphiques (optionnel)
-import { NgxChartsModule } from '@swimlane/ngx-charts';
+// Graphiques
+import { NgxChartsModule } from "@swimlane/ngx-charts";
 
-import { TransactionsRoutingModule } from './transactions-routing.module';
-import { TransactionsComponent } from './transactions.component';
-import { DepositComponent } from './deposit/deposit.component';
-import { WithdrawalComponent } from './withdrawal/withdrawal.component';
-import { TransferComponent } from './transfer/transfer.component';
-import { HistoryComponent } from './history/history.component';
+import { TransactionsRoutingModule } from "./transactions-routing.module";
+import { TransactionsComponent } from "./transactions.component";
+import { DepositComponent } from "./deposit/deposit.component";
+import { WithdrawalComponent } from "./withdrawal/withdrawal.component";
+import { TransferComponent } from "./transfer/transfer.component";
+import { HistoryComponent } from "./history/history.component";
 
 @NgModule({
   declarations: [
@@ -50,11 +53,13 @@ import { HistoryComponent } from './history/history.component';
     FormsModule,
     ReactiveFormsModule,
     TransactionsRoutingModule,
-    
+
     // Modules Nebular UI
     NbCardModule,
-    NbIconModule,
+    NbIconModule, // ← VÉRIFIER ICI
+    NbEvaIconsModule, // ← AJOUTER ICI
     NbButtonModule,
+    NbButtonGroupModule,
     NbInputModule,
     NbSelectModule,
     NbDatepickerModule,
@@ -70,12 +75,12 @@ import { HistoryComponent } from './history/history.component';
     NbRadioModule,
     NbCheckboxModule,
     NbStepperModule,
-    
+
     // Tableau intelligent
     Ng2SmartTableModule,
-    
+
     // Graphiques
-    NgxChartsModule
+    NgxChartsModule,
   ],
 })
-export class TransactionsModule { }
+export class TransactionsModule {}

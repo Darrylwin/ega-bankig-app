@@ -1,130 +1,351 @@
-<!-- src/app/pages/transactions/transactions.component.html -->
 <div class="transactions-container">
-  <!-- En-tête -->
-  <div class="transactions-header mb-4">
-    <div class="row align-items-center">
-      <div class="col-md-8">
-        <h2>Opérations Bancaires</h2>
-        <p class="text-muted mb-0">Effectuez et gérez les transactions bancaires</p>
+  <!-- Header moderne -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-left">
+        <h1 class="page-title">
+          <nb-icon icon="repeat-outline" class="title-icon"></nb-icon>
+          Opérations Bancaires
+        </h1>
+        <p class="page-subtitle">
+          Gérez toutes vos transactions bancaires en toute sécurité
+        </p>
+      </div>
+      <div class="header-actions">
+        <button
+          nbButton
+          status="info"
+          ghost
+          [routerLink]="['/pages/transactions/history']"
+        >
+          <nb-icon icon="clock-outline"></nb-icon>
+          Historique
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- Statistiques rapides -->
-  <div class="row mb-4">
-    <div class="col-12">
-      <nb-card>
-        <nb-card-body>
-          <div class="row">
-            <div class="col-xl-3 col-lg-6 col-md-6 mb-3" *ngFor="let stat of quickStats">
-              <div class="quick-stat">
-                <div class="d-flex justify-content-between align-items-start">
-                  <div>
-                    <h5 class="mb-1">{{ stat.value }}</h5>
-                    <p class="text-muted small mb-0">{{ stat.label }}</p>
-                  </div>
-                  <span class="badge" [ngClass]="{
-                    'bg-success': stat.change.startsWith('+'),
-                    'bg-danger': stat.change.startsWith('-'),
-                    'bg-info': !stat.change.startsWith('+') && !stat.change.startsWith('-')
-                  }">
-                    {{ stat.change }}
-                  </span>
-                </div>
-              </div>
-            </div>
+  <br />
+
+  <!-- KPIs du jour -->
+  <div class="kpi-section">
+    <div class="kpi-grid">
+      <div class="kpi-card kpi-primary">
+        <div class="kpi-icon">
+          <nb-icon icon="activity-outline"></nb-icon>
+        </div>
+        <div class="kpi-content">
+          <div class="kpi-value">
+            {{ formatNumber(todayStats.totalTransactions) }}
           </div>
-        </nb-card-body>
-      </nb-card>
+          <div class="kpi-label">Transactions Aujourd'hui</div>
+          <div class="kpi-trend positive">
+            <nb-icon icon="trending-up-outline"></nb-icon>
+            <span>+12%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="kpi-card kpi-success">
+        <div class="kpi-icon">
+          <nb-icon icon="arrow-upward-outline"></nb-icon>
+        </div>
+        <div class="kpi-content">
+          <div class="kpi-value">
+            {{ formatCurrency(todayStats.depositsAmount) }}
+          </div>
+          <div class="kpi-label">Dépôts du Jour</div>
+          <div class="kpi-detail">
+            {{ todayStats.totalDeposits }} opération(s)
+          </div>
+        </div>
+      </div>
+
+      <div class="kpi-card kpi-danger">
+        <div class="kpi-icon">
+          <nb-icon icon="arrow-downward-outline"></nb-icon>
+        </div>
+        <div class="kpi-content">
+          <div class="kpi-value">
+            {{ formatCurrency(todayStats.withdrawalsAmount) }}
+          </div>
+          <div class="kpi-label">Retraits du Jour</div>
+          <div class="kpi-detail">
+            {{ todayStats.totalWithdrawals }} opération(s)
+          </div>
+        </div>
+      </div>
+
+      <div class="kpi-card kpi-info">
+        <div class="kpi-icon">
+          <nb-icon icon="trending-up-outline"></nb-icon>
+        </div>
+        <div class="kpi-content">
+          <div
+            class="kpi-value"
+            [class.positive]="todayStats.netFlow > 0"
+            [class.negative]="todayStats.netFlow < 0"
+          >
+            {{ formatCurrency(abs(todayStats.netFlow)) }}
+          </div>
+          <div class="kpi-label">Flux Net</div>
+          <div
+            class="kpi-detail"
+            [class.text-success]="todayStats.netFlow > 0"
+            [class.text-danger]="todayStats.netFlow < 0"
+          >
+            {{ todayStats.netFlow > 0 ? "Positif" : "Négatif" }}
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- Opérations -->
-  <div class="row mb-4">
-    <div class="col-12">
-      <h4 class="mb-3">Opérations Disponibles</h4>
+  <!-- Opérations disponibles -->
+  <div class="operations-section">
+    <div class="section-header">
+      <h2 class="section-title">
+        <nb-icon icon="grid-outline"></nb-icon>
+        Opérations Disponibles
+      </h2>
+      <p class="section-subtitle">
+        Sélectionnez l'opération que vous souhaitez effectuer
+      </p>
     </div>
-    
-    <div class="col-xl-3 col-lg-6 col-md-6 mb-4" *ngFor="let op of operations">
-      <nb-card class="operation-card" [status]="op.color" (click)="navigateTo(op.route)">
-        <nb-card-header>
-          <div class="d-flex align-items-center">
-            <div class="operation-icon me-3">
-              <nb-icon [icon]="op.icon" [status]="op.color"></nb-icon>
+
+    <div class="operations-grid">
+      <div
+        *ngFor="let op of operations"
+        class="operation-card"
+        (click)="navigateTo(op.route)"
+      >
+        <div class="operation-header" [ngClass]="'header-' + op.color">
+          <div class="operation-icon-wrapper">
+            <nb-icon [icon]="op.icon"></nb-icon>
+          </div>
+          <div class="operation-badge">
+            <nb-badge
+              [text]="op.quickStats.today.toString()"
+              [status]="op.color"
+            ></nb-badge>
+          </div>
+        </div>
+
+        <div class="operation-body">
+          <h3 class="operation-title">{{ op.title }}</h3>
+          <p class="operation-description">{{ op.description }}</p>
+          <small class="operation-subtitle">{{ op.subtitle }}</small>
+
+          <div class="operation-stats">
+            <div class="stat-item">
+              <small>Aujourd'hui</small>
+              <strong>{{ op.quickStats.today }}</strong>
             </div>
-            <div>
-              <h5 class="mb-0">{{ op.title }}</h5>
-              <small class="text-muted">{{ op.description }}</small>
+            <div class="stat-item">
+              <small>Montant</small>
+              <strong>{{ formatCurrency(op.quickStats.amount) }}</strong>
             </div>
           </div>
-        </nb-card-header>
-        <nb-card-body>
-          <ul class="features-list mb-0">
+
+          <ul class="operation-features">
             <li *ngFor="let feature of op.features">
-              <nb-icon icon="checkmark-circle-outline" class="text-success me-2"></nb-icon>
-              {{ feature }}
+              <nb-icon icon="checkmark-circle-outline"></nb-icon>
+              <span>{{ feature }}</span>
             </li>
           </ul>
-        </nb-card-body>
-        <nb-card-footer class="text-center">
+        </div>
+
+        <div class="operation-footer">
           <button nbButton [status]="op.color" fullWidth>
-            <nb-icon icon="arrow-forward-outline" class="me-2"></nb-icon>
+            <nb-icon icon="arrow-forward-outline"></nb-icon>
             Accéder
           </button>
-        </nb-card-footer>
-      </nb-card>
+        </div>
+
+        <div class="operation-overlay" [ngClass]="'overlay-' + op.color"></div>
+      </div>
     </div>
   </div>
 
-  <!-- Transactions récentes -->
-  <div class="row">
-    <div class="col-12">
-      <nb-card>
-        <nb-card-header>
-          <h4 class="mb-0">Transactions Récentes</h4>
-        </nb-card-header>
-        <nb-card-body>
-          <div class="table-responsive">
-            <table class="table table-hover">
-              <thead>
-                <tr>
-                  <th>Heure</th>
-                  <th>Type</th>
-                  <th>Client</th>
-                  <th>Compte</th>
-                  <th>Montant</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let tx of recentTransactions">
-                  <td>{{ tx.time }}</td>
-                  <td>
-                    <nb-badge [text]="tx.type === 'deposit' ? 'Dépôt' : tx.type === 'withdrawal' ? 'Retrait' : 'Virement'"
-                             [status]="getTransactionColor(tx.type)" class="me-2">
-                    </nb-badge>
-                  </td>
-                  <td>{{ tx.client }}</td>
-                  <td class="font-monospace">{{ tx.account | slice:0:8 }}...</td>
-                  <td [class]="tx.type === 'deposit' ? 'text-success' : 'text-danger'">
-                    {{ formatCurrency(tx.amount) }}
-                  </td>
-                  <td>
-                    <button nbButton size="small" ghost status="basic">
-                      <nb-icon icon="eye-outline"></nb-icon>
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+  <!-- Activité récente -->
+  <div class="recent-activity-section">
+    <nb-card>
+      <nb-card-header>
+        <div class="card-header-flex">
+          <div>
+            <h5>
+              <nb-icon icon="clock-outline"></nb-icon>
+              Activité Récente
+            </h5>
+            <small class="text-muted">Les 10 dernières transactions</small>
           </div>
-        </nb-card-body>
-        <nb-card-footer class="text-center">
-          <button nbButton status="primary" routerLink="/pages/transactions/history">
-            <nb-icon icon="list-outline" class="me-2"></nb-icon>
-            Voir tout l'historique
+          <button
+            nbButton
+            ghost
+            size="small"
+            [routerLink]="['/pages/transactions/history']"
+          >
+            <nb-icon icon="list-outline"></nb-icon>
+            Voir tout
           </button>
-        </nb-card-footer>
+        </div>
+      </nb-card-header>
+
+      <nb-card-body>
+        <!-- Chargement -->
+        <div *ngIf="isLoading" class="loading-state">
+          <nb-spinner size="large" status="primary"></nb-spinner>
+          <p>Chargement des transactions...</p>
+        </div>
+
+        <!-- Liste des transactions -->
+        <div
+          *ngIf="!isLoading && recentTransactions.length > 0"
+          class="transactions-list"
+        >
+          <div *ngFor="let tx of recentTransactions" class="transaction-item">
+            <div
+              class="transaction-icon"
+              [ngClass]="'icon-' + getTransactionColor(tx.type)"
+            >
+              <nb-icon [icon]="getTransactionIcon(tx.type)"></nb-icon>
+            </div>
+
+            <div class="transaction-info">
+              <div class="transaction-type">
+                {{ getTransactionLabel(tx.type) }}
+                <nb-badge
+                  [text]="tx.status === 'SUCCESS' ? 'Succès' : 'En attente'"
+                  [status]="tx.status === 'SUCCESS' ? 'success' : 'warning'"
+                  size="tiny"
+                ></nb-badge>
+              </div>
+              <div class="transaction-details">
+                <span class="client">{{ tx.client }}</span>
+                <span class="separator">•</span>
+                <span class="account"
+                  >{{ tx.account.substring(0, 19) }}...</span
+                >
+              </div>
+            </div>
+
+            <div class="transaction-time">
+              <nb-icon icon="clock-outline"></nb-icon>
+              {{ tx.time }}
+            </div>
+
+            <div
+              class="transaction-amount"
+              [ngClass]="{
+                'amount-positive': tx.type === 'DEPOSIT',
+                'amount-negative': tx.type === 'WITHDRAWAL',
+                'amount-neutral': tx.type === 'TRANSFER'
+              }"
+            >
+              <span class="amount-sign">{{
+                tx.type === "DEPOSIT"
+                  ? "+"
+                  : tx.type === "WITHDRAWAL"
+                  ? "-"
+                  : ""
+              }}</span>
+              {{ formatCurrency(tx.amount) }}
+            </div>
+
+            <div class="transaction-action">
+              <button nbButton ghost size="tiny" nbTooltip="Voir détails">
+                <nb-icon icon="eye-outline"></nb-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- État vide -->
+        <div
+          *ngIf="!isLoading && recentTransactions.length === 0"
+          class="empty-state"
+        >
+          <nb-icon icon="inbox-outline"></nb-icon>
+          <h4>Aucune transaction récente</h4>
+          <p>Les transactions effectuées apparaîtront ici</p>
+        </div>
+      </nb-card-body>
+
+      <nb-card-footer>
+        <div class="footer-stats">
+          <div class="footer-stat">
+            <nb-icon icon="trending-up-outline" class="text-success"></nb-icon>
+            <span>{{ todayStats.totalDeposits }} dépôts</span>
+          </div>
+          <div class="footer-stat">
+            <nb-icon icon="trending-down-outline" class="text-danger"></nb-icon>
+            <span>{{ todayStats.totalWithdrawals }} retraits</span>
+          </div>
+          <div class="footer-stat">
+            <nb-icon
+              icon="swap-horizontal-outline"
+              class="text-primary"
+            ></nb-icon>
+            <span>{{ todayStats.totalTransfers }} virements</span>
+          </div>
+        </div>
+      </nb-card-footer>
+    </nb-card>
+  </div>
+
+  <!-- Informations et assistance -->
+  <div class="info-section">
+    <div class="info-grid">
+      <nb-card class="info-card">
+        <nb-card-body>
+          <div class="info-icon">
+            <nb-icon icon="shield-outline" status="success"></nb-icon>
+          </div>
+          <h6>Sécurité Renforcée</h6>
+          <p>
+            Toutes vos transactions sont cryptées et protégées par nos systèmes
+            de sécurité avancés.
+          </p>
+        </nb-card-body>
+      </nb-card>
+
+      <nb-card class="info-card">
+        <nb-card-body>
+          <div class="info-icon">
+            <nb-icon icon="flash-outline" status="warning"></nb-icon>
+          </div>
+          <h6>Traitement Instantané</h6>
+          <p>
+            Les opérations sont traitées en temps réel pour une disponibilité
+            immédiate des fonds.
+          </p>
+        </nb-card-body>
+      </nb-card>
+
+      <nb-card class="info-card">
+        <nb-card-body>
+          <div class="info-icon">
+            <nb-icon icon="checkmark-circle-outline" status="info"></nb-icon>
+          </div>
+          <h6>Traçabilité Complète</h6>
+          <p>
+            Chaque transaction est enregistrée et consultable dans votre
+            historique détaillé.
+          </p>
+        </nb-card-body>
+      </nb-card>
+
+      <nb-card class="info-card">
+        <nb-card-body>
+          <div class="info-icon">
+            <nb-icon icon="headphones-outline" status="primary"></nb-icon>
+          </div>
+          <h6>Support 24/7</h6>
+          <p>
+            Notre équipe est disponible à tout moment pour vous assister dans
+            vos opérations.
+          </p>
+        </nb-card-body>
       </nb-card>
     </div>
   </div>

@@ -8,6 +8,7 @@ import {
   NbCardModule,
   NbIconModule,
   NbButtonModule,
+  NbButtonGroupModule, // ← AJOUT ICI
   NbProgressBarModule,
   NbSpinnerModule,
   NbAlertModule,
@@ -15,6 +16,7 @@ import {
   NbDatepickerModule,
   NbBadgeModule,
   NbTabsetModule,
+  NbTooltipModule, // ← AJOUT pour les tooltips
 } from "@nebular/theme";
 
 // Charts
@@ -34,12 +36,13 @@ const routes: Routes = [
   imports: [
     CommonModule,
     FormsModule,
-    RouterModule.forChild(routes),
+    RouterModule. forChild(routes),
 
     // Modules Nebular UI
     NbCardModule,
     NbIconModule,
     NbButtonModule,
+    NbButtonGroupModule, // ← AJOUT ICI
     NbProgressBarModule,
     NbSpinnerModule,
     NbAlertModule,
@@ -47,6 +50,7 @@ const routes: Routes = [
     NbDatepickerModule,
     NbBadgeModule,
     NbTabsetModule,
+    NbTooltipModule, // ← AJOUT ICI
 
     // Charts
     NgxChartsModule,

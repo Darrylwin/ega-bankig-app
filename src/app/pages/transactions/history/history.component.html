@@ -1,102 +1,187 @@
 <div class="history-container">
-  <!-- En-tête -->
-  <div class="history-header mb-4">
-    <div class="row align-items-center">
-      <div class="col-md-8">
-        <h2>Historique des Transactions</h2>
-        <p class="text-muted mb-0">
-          Consultez l'historique complet des opérations
-        </p>
-      </div>
-      <div class="col-md-4 text-end">
-        <button
-          nbButton
-          ghost
-          size="small"
-          [routerLink]="['/pages/transactions']"
-          class="mb-3"
-        >
-          <nb-icon icon="arrow-back-outline" class="me-2"></nb-icon>
-          Retour aux opérations
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-left">
+        <button nbButton ghost size="small" [routerLink]="['/pages/transactions']" class="back-btn">
+          <nb-icon icon="arrow-back-outline"></nb-icon>
         </button>
+        <div>
+          <h1 class="page-title">
+            <nb-icon icon="archive-outline"></nb-icon>
+            Historique des Transactions
+          </h1>
+          <p class="page-subtitle">Consultez et analysez toutes vos opérations bancaires</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <!-- Actions rapides -->
+        <nb-button-group>
+          <button nbButton ghost size="small" (click)="print()" nbTooltip="Imprimer">
+            <nb-icon icon="printer-outline"></nb-icon>
+          </button>
+          <button nbButton ghost size="small" (click)="exportToCSV()" nbTooltip="Exporter CSV">
+            <nb-icon icon="download-outline"></nb-icon>
+          </button>
+          <button nbButton ghost size="small" (click)="exportToPDF()" nbTooltip="Exporter PDF">
+            <nb-icon icon="file-text-outline"></nb-icon>
+          </button>
+        </nb-button-group>
       </div>
     </div>
   </div>
 
+  <!-- View Mode Selector -->
+  <div class="view-selector">
+    <nb-button-group>
+      <button
+        nbButton
+        size="small"
+        [status]="viewMode === 'table' ? 'primary' : 'basic'"
+        (click)="setViewMode('table')"
+        nbTooltip="Vue tableau">
+        <nb-icon icon="list-outline"></nb-icon>
+        Tableau
+      </button>
+      <button
+        nbButton
+        size="small"
+        [status]="viewMode === 'cards' ? 'primary' :  'basic'"
+        (click)="setViewMode('cards')"
+        nbTooltip="Vue cartes">
+        <nb-icon icon="grid-outline"></nb-icon>
+        Cartes
+      </button>
+      <button
+        nbButton
+        size="small"
+        [status]="viewMode === 'timeline' ? 'primary' : 'basic'"
+        (click)="setViewMode('timeline')"
+        nbTooltip="Chronologie">
+        <nb-icon icon="clock-outline"></nb-icon>
+        Timeline
+      </button>
+    </nb-button-group>
+  </div>
+
   <!-- Filtres -->
-  <nb-card class="mb-4">
+  <nb-card class="filters-card">
+    <nb-card-header>
+      <div class="filters-header">
+        <h6>
+          <nb-icon icon="funnel-outline"></nb-icon>
+          Filtres de recherche
+        </h6>
+        <button nbButton ghost size="tiny" (click)="resetFilters()" nbTooltip="Réinitialiser">
+          <nb-icon icon="refresh-outline"></nb-icon>
+          Réinitialiser
+        </button>
+      </div>
+    </nb-card-header>
     <nb-card-body>
-      <div class="row">
+      <div class="filters-grid">
         <!-- Compte -->
-        <div class="col-md-3 mb-3">
-          <label class="form-label">Compte</label>
+        <div class="filter-item">
+          <label class="filter-label">
+            <nb-icon icon="credit-card-outline"></nb-icon>
+            Compte
+          </label>
           <nb-select
             fullWidth
+            size="small"
             [(ngModel)]="selectedAccountId"
             (ngModelChange)="loadTransactions()"
-          >
+            placeholder="Sélectionnez un compte">
             <nb-option value="ALL">Tous les comptes</nb-option>
             <nb-option *ngFor="let account of accounts" [value]="account.id">
-              {{ formatAccountNumber(account.accountNumber) }} -
-              {{ account.customerFullName }}
+              {{ formatAccountNumber(account.accountNumber) }} - {{ account.customerFullName }}
             </nb-option>
           </nb-select>
         </div>
 
         <!-- Type -->
-        <div class="col-md-2 mb-3">
-          <label class="form-label">Type</label>
+        <div class="filter-item">
+          <label class="filter-label">
+            <nb-icon icon="list-outline"></nb-icon>
+            Type d'opération
+          </label>
           <nb-select
             fullWidth
+            size="small"
             [(ngModel)]="selectedType"
-            (ngModelChange)="applyFilters()"
-          >
-            <nb-option
-              *ngFor="let type of filterOptions.accountTypes"
-              [value]="type.value"
-            >
-              {{ type.label }}
+            (ngModelChange)="applyFilters()">
+            <nb-option *ngFor="let type of filterOptions.types" [value]="type. value">
+              <span class="option-with-icon">
+                <nb-icon [icon]="type.icon"></nb-icon>
+                {{ type.label }}
+              </span>
+            </nb-option>
+          </nb-select>
+        </div>
+
+        <!-- Statut -->
+        <div class="filter-item">
+          <label class="filter-label">
+            <nb-icon icon="checkmark-circle-outline"></nb-icon>
+            Statut
+          </label>
+          <nb-select
+            fullWidth
+            size="small"
+            [(ngModel)]="selectedStatus"
+            (ngModelChange)="applyFilters()">
+            <nb-option *ngFor="let status of filterOptions.statuses" [value]="status.value">
+              {{ status.label }}
             </nb-option>
           </nb-select>
         </div>
 
         <!-- Date début -->
-        <div class="col-md-2 mb-3">
-          <label class="form-label">Date début</label>
+        <div class="filter-item">
+          <label class="filter-label">
+            <nb-icon icon="calendar-outline"></nb-icon>
+            Date de début
+          </label>
           <input
             type="date"
             nbInput
             fullWidth
+            size="small"
             [(ngModel)]="startDate"
-            (change)="loadTransactions()"
-          />
+            (change)="loadTransactions()">
         </div>
 
         <!-- Date fin -->
-        <div class="col-md-2 mb-3">
-          <label class="form-label">Date fin</label>
+        <div class="filter-item">
+          <label class="filter-label">
+            <nb-icon icon="calendar-outline"></nb-icon>
+            Date de fin
+          </label>
           <input
             type="date"
             nbInput
             fullWidth
+            size="small"
             [(ngModel)]="endDate"
-            (change)="loadTransactions()"
-          />
+            (change)="loadTransactions()">
         </div>
 
         <!-- Recherche -->
-        <div class="col-md-3 mb-3">
-          <label class="form-label">Recherche</label>
-          <div class="input-group">
+        <div class="filter-item">
+          <label class="filter-label">
+            <nb-icon icon="search-outline"></nb-icon>
+            Recherche
+          </label>
+          <div class="search-input">
             <input
               type="text"
               nbInput
               fullWidth
+              size="small"
               placeholder="Référence, description..."
               [(ngModel)]="searchTerm"
-              (keyup.enter)="applyFilters()"
-            />
-            <button nbButton ghost (click)="applyFilters()">
+              (keyup.enter)="applyFilters()">
+            <button nbButton ghost size="tiny" (click)="applyFilters()" *ngIf="searchTerm">
               <nb-icon icon="search-outline"></nb-icon>
             </button>
           </div>
@@ -104,167 +189,312 @@
       </div>
 
       <!-- Périodes rapides -->
-      <div class="row">
-        <div class="col-12">
-          <label class="form-label small mb-2">Périodes rapides</label>
-          <div class="d-flex flex-wrap gap-2">
-            <button
-              nbButton
-              size="small"
-              ghost
-              type="button"
-              (click)="setLast30Days()"
-            >
-              30 derniers jours
-            </button>
-            <button
-              nbButton
-              size="small"
-              ghost
-              type="button"
-              (click)="setCurrentMonth()"
-            >
-              Ce mois
-            </button>
-            <button
-              nbButton
-              size="small"
-              ghost
-              type="button"
-              (click)="setLastMonth()"
-            >
-              Dernier mois
-            </button>
-            <button
-              nbButton
-              size="small"
-              ghost
-              type="button"
-              (click)="resetFilters()"
-            >
-              <nb-icon icon="refresh-outline" class="me-1"></nb-icon>
-              Réinitialiser
-            </button>
-          </div>
+      <div class="quick-periods">
+        <label class="quick-label">Périodes rapides :</label>
+        <div class="period-buttons">
+          <button
+            *ngFor="let period of [
+              { label: 'Aujourd\'hui', value: 'today', action: 'setToday' },
+              { label:  'Hier', value: 'yesterday', action: 'setYesterday' },
+              { label: '7 jours', value: 'week', action: 'setLast7Days' },
+              { label: '30 jours', value: '30days', action: 'setLast30Days' },
+              { label: 'Ce mois', value: 'month', action: 'setCurrentMonth' },
+              { label: 'Mois dernier', value: 'lastMonth', action: 'setLastMonth' },
+              { label: 'Cette année', value: 'year', action: 'setCurrentYear' }
+            ]"
+            nbButton
+            ghost
+            size="tiny"
+            [status]="currentPeriod === period.value ? 'primary' :  'basic'"
+            (click)="period.action === 'setToday' ? setToday() :
+                     period.action === 'setYesterday' ? setYesterday() :
+                     period.action === 'setLast7Days' ? setLast7Days() :
+                     period.action === 'setLast30Days' ? setLast30Days() :
+                     period.action === 'setCurrentMonth' ? setCurrentMonth() :
+                     period. action === 'setLastMonth' ? setLastMonth() :
+                     setCurrentYear()">
+            {{ period.label }}
+          </button>
         </div>
       </div>
     </nb-card-body>
   </nb-card>
 
   <!-- Statistiques -->
-  <div class="row mb-4" *ngIf="transactions.length > 0">
-    <div class="col-12">
+  <div class="stats-grid" *ngIf="filteredTransactions.length > 0">
+    <nb-card class="stat-card primary">
+      <nb-card-body>
+        <div class="stat-icon">
+          <nb-icon icon="repeat-outline"></nb-icon>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{{ formatNumber(stats.totalTransactions) }}</div>
+          <div class="stat-label">Transactions</div>
+        </div>
+      </nb-card-body>
+    </nb-card>
+
+    <nb-card class="stat-card success">
+      <nb-card-body>
+        <div class="stat-icon">
+          <nb-icon icon="trending-up-outline"></nb-icon>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{{ formatCurrency(stats.totalDeposits) }}</div>
+          <div class="stat-label">Dépôts ({{ stats.depositsCount }})</div>
+        </div>
+      </nb-card-body>
+    </nb-card>
+
+    <nb-card class="stat-card danger">
+      <nb-card-body>
+        <div class="stat-icon">
+          <nb-icon icon="trending-down-outline"></nb-icon>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{{ formatCurrency(stats.totalWithdrawals) }}</div>
+          <div class="stat-label">Retraits ({{ stats.withdrawalsCount }})</div>
+        </div>
+      </nb-card-body>
+    </nb-card>
+
+    <nb-card class="stat-card info">
+      <nb-card-body>
+        <div class="stat-icon">
+          <nb-icon icon="bar-chart-outline"></nb-icon>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value" [class.text-success]="getNetBalance() > 0" [class.text-danger]="getNetBalance() < 0">
+            {{ formatCurrency(getNetBalance()) }}
+          </div>
+          <div class="stat-label">Solde net</div>
+        </div>
+      </nb-card-body>
+    </nb-card>
+  </div>
+
+  <!-- Chargement -->
+  <div *ngIf="isLoading" class="loading-container">
+    <nb-spinner size="giant" status="primary"></nb-spinner>
+    <p class="loading-text">Chargement de l'historique... </p>
+  </div>
+
+  <!-- Contenu principal -->
+  <div *ngIf="!isLoading">
+    <!-- VUE TABLEAU -->
+    <div *ngIf="viewMode === 'table'">
+      <nb-card class="table-card">
+        <nb-card-header>
+          <div class="table-header">
+            <div>
+              <h6>Liste des transactions</h6>
+              <small>{{ filteredTransactions.length }} transaction(s) trouvée(s)</small>
+            </div>
+            <div class="table-actions">
+              <button nbButton size="small" ghost (click)="exportToCSV()">
+                <nb-icon icon="download-outline"></nb-icon>
+                CSV
+              </button>
+              <button nbButton size="small" ghost (click)="exportToPDF()">
+                <nb-icon icon="file-text-outline"></nb-icon>
+                PDF
+              </button>
+            </div>
+          </div>
+        </nb-card-header>
+
+        <nb-card-body>
+          <div class="table-responsive">
+            <ng2-smart-table
+              [settings]="settings"
+              [source]="source"
+              (custom)="onCustomAction($event)">
+            </ng2-smart-table>
+          </div>
+        </nb-card-body>
+      </nb-card>
+    </div>
+
+    <!-- VUE CARTES -->
+    <div *ngIf="viewMode === 'cards'" class="cards-view">
+      <div class="transactions-grid">
+        <nb-card *ngFor="let transaction of filteredTransactions" class="transaction-card" [status]="getTransactionColor(transaction.transactionType)">
+          <nb-card-header>
+            <div class="transaction-header">
+              <div class="transaction-type">
+                <nb-icon [icon]="getTransactionIcon(transaction.transactionType)"></nb-icon>
+                <span>{{ transaction.transactionType === 'DEPOSIT' ? 'Dépôt' : transaction.transactionType === 'WITHDRAWAL' ? 'Retrait' : 'Virement' }}</span>
+              </div>
+              <nb-badge
+                [text]="transaction.status === 'SUCCESS' ? 'Succès' : transaction.status === 'PENDING' ? 'En attente' : 'Échoué'"
+                [status]="getStatusColor(transaction.status)">
+              </nb-badge>
+            </div>
+          </nb-card-header>
+
+          <nb-card-body>
+            <div class="transaction-amount">
+              <div class="amount-value" [class.text-success]="transaction.transactionType === 'DEPOSIT'" [class.text-danger]="transaction.transactionType === 'WITHDRAWAL'">
+                {{ transaction.transactionType === 'DEPOSIT' ? '+' : '-' }} {{ formatCurrency(Math.abs(transaction.amount)) }}
+              </div>
+              <div class="amount-label">Montant</div>
+            </div>
+
+            <div class="transaction-details">
+              <div class="detail-row">
+                <small>Date</small>
+                <span>{{ formatDate(transaction.transactionDate) }}</span>
+              </div>
+              <div class="detail-row" *ngIf="transaction.sourceAccountNumber">
+                <small>Compte source</small>
+                <span class="account-number">{{ formatAccountNumber(transaction.sourceAccountNumber) }}</span>
+              </div>
+              <div class="detail-row" *ngIf="transaction.destinationAccountNumber">
+                <small>Compte destination</small>
+                <span class="account-number">{{ formatAccountNumber(transaction.destinationAccountNumber) }}</span>
+              </div>
+              <div class="detail-row">
+                <small>Solde après</small>
+                <span class="fw-bold">{{ formatCurrency(transaction.balanceAfter) }}</span>
+              </div>
+              <div class="detail-row" *ngIf="transaction.description">
+                <small>Description</small>
+                <span>{{ transaction.description }}</span>
+              </div>
+              <div class="detail-row">
+                <small>Référence</small>
+                <span class="reference">{{ transaction.transactionReference }}</span>
+              </div>
+            </div>
+          </nb-card-body>
+
+          <nb-card-footer>
+            <button nbButton ghost size="small" fullWidth (click)="showTransactionDetails(transaction)">
+              <nb-icon icon="eye-outline"></nb-icon>
+              Voir détails
+            </button>
+          </nb-card-footer>
+        </nb-card>
+      </div>
+    </div>
+
+    <!-- VUE TIMELINE -->
+    <div *ngIf="viewMode === 'timeline'" class="timeline-view">
       <nb-card>
         <nb-card-body>
-          <div class="row text-center">
-            <div class="col-md-3 mb-3 mb-md-0">
-              <div class="stat-item">
-                <h3 class="mb-1">{{ transactions.length }}</h3>
-                <p class="text-muted mb-0">Transactions totales</p>
+          <div class="timeline">
+            <div *ngFor="let transaction of filteredTransactions; let i = index" class="timeline-item">
+              <div class="timeline-marker" [class]="getTransactionColor(transaction. transactionType)">
+                <nb-icon [icon]="getTransactionIcon(transaction.transactionType)"></nb-icon>
               </div>
-            </div>
-            <div class="col-md-3 mb-3 mb-md-0">
-              <div class="stat-item">
-                <h3 class="mb-1 text-success">
-                  {{ depositsCount }}
-                </h3>
-                <p class="text-muted mb-0">Dépôts</p>
-              </div>
-            </div>
-            <div class="col-md-3 mb-3 mb-md-0">
-              <div class="stat-item">
-                <h3 class="mb-1 text-danger">
-                  {{ withdrawalsCount }}
-                </h3>
-                <p class="text-muted mb-0">Retraits</p>
-              </div>
-            </div>
-            <div class="col-md-3">
-              <div class="stat-item">
-                <h3 class="mb-1 text-primary">
-                  {{ transfersCount }}
-                </h3>
-                <p class="text-muted mb-0">Virements</p>
+
+              <div class="timeline-content">
+                <div class="timeline-header">
+                  <div class="timeline-date">
+                    {{ formatDate(transaction. transactionDate) }}
+                  </div>
+                  <nb-badge
+                    [text]="transaction.status === 'SUCCESS' ? 'Succès' : transaction.status === 'PENDING' ? 'En attente' : 'Échoué'"
+                    [status]="getStatusColor(transaction.status)"
+                    size="tiny">
+                  </nb-badge>
+                </div>
+
+                <div class="timeline-body">
+                  <div class="timeline-type">
+                    <nb-icon [icon]="getTransactionIcon(transaction.transactionType)"></nb-icon>
+                    <strong>{{ transaction.transactionType === 'DEPOSIT' ? 'Dépôt' : transaction.transactionType === 'WITHDRAWAL' ? 'Retrait' : 'Virement' }}</strong>
+                  </div>
+
+                  <div class="timeline-amount" [class.text-success]="transaction.transactionType === 'DEPOSIT'" [class.text-danger]="transaction.transactionType === 'WITHDRAWAL'">
+                    {{ transaction.transactionType === 'DEPOSIT' ? '+' : '-' }} {{ formatCurrency(Math.abs(transaction. amount)) }}
+                  </div>
+
+                  <div class="timeline-details">
+                    <div *ngIf="transaction.sourceAccountNumber">
+                      <small>De :</small>
+                      <span class="account-number">{{ formatAccountNumber(transaction.sourceAccountNumber) }}</span>
+                    </div>
+                    <div *ngIf="transaction.destinationAccountNumber">
+                      <small>Vers :</small>
+                      <span class="account-number">{{ formatAccountNumber(transaction.destinationAccountNumber) }}</span>
+                    </div>
+                    <div *ngIf="transaction.description">
+                      <small>Description :</small>
+                      <span>{{ transaction.description }}</span>
+                    </div>
+                  </div>
+
+                  <div class="timeline-balance">
+                    Solde après : <strong>{{ formatCurrency(transaction.balanceAfter) }}</strong>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </nb-card-body>
       </nb-card>
     </div>
-  </div>
 
-  <!-- Chargement -->
-  <div *ngIf="isLoading" class="text-center py-5">
-    <nb-spinner size="giant" status="primary"></nb-spinner>
-    <p class="mt-3">Chargement de l'historique...</p>
-  </div>
+    <!-- Graphiques -->
+    <div class="charts-section" *ngIf="filteredTransactions.length > 0">
+      <div class="charts-grid">
+        <!-- Répartition par type -->
+        <nb-card class="chart-card">
+          <nb-card-header>
+            <h6>
+              <nb-icon icon="pie-chart-outline"></nb-icon>
+              Répartition par type
+            </h6>
+          </nb-card-header>
+          <nb-card-body>
+            <ngx-charts-pie-chart
+              [view]="[undefined, 300]"
+              [scheme]="colorScheme"
+              [results]="transactionsByTypeData"
+              [legend]="true"
+              [labels]="true"
+              [doughnut]="true">
+            </ngx-charts-pie-chart>
+          </nb-card-body>
+        </nb-card>
 
-  <!-- Historique -->
-  <div *ngIf="!isLoading">
-    <nb-card>
-      <nb-card-header class="d-flex justify-content-between align-items-center">
-        <div>
-          <h5 class="mb-0">Transactions</h5>
-          <small class="text-muted">
-            {{ transactions.length }} transaction{{
-              transactions.length > 1 ? "s" : ""
-            }}
-            trouvée{{ transactions.length > 1 ? "s" : "" }}
-          </small>
-        </div>
-        <div>
-          <button nbButton status="info" size="small" (click)="exportToCSV()">
-            <nb-icon icon="download-outline" class="me-2"></nb-icon>
-            Exporter CSV
-          </button>
-        </div>
-      </nb-card-header>
+        <!-- Transactions par date -->
+        <nb-card class="chart-card">
+          <nb-card-header>
+            <h6>
+              <nb-icon icon="bar-chart-outline"></nb-icon>
+              Transactions par date
+            </h6>
+          </nb-card-header>
+          <nb-card-body>
+            <ngx-charts-bar-vertical
+              [view]="[undefined, 300]"
+              [scheme]="colorScheme"
+              [results]="transactionsByDateData"
+              [xAxis]="true"
+              [yAxis]="true"
+              [showXAxisLabel]="true"
+              [showYAxisLabel]="true"
+              [xAxisLabel]="'Date'"
+              [yAxisLabel]="'Nombre'">
+            </ngx-charts-bar-vertical>
+          </nb-card-body>
+        </nb-card>
+      </div>
+    </div>
 
-      <nb-card-body>
-        <div class="table-responsive">
-          <ng2-smart-table [settings]="settings" [source]="source">
-          </ng2-smart-table>
-        </div>
-      </nb-card-body>
-
-      <!-- Informations -->
-      <nb-card-footer>
-        <div class="row">
-          <div class="col-md-6">
-            <div class="legend">
-              <small class="text-muted">Légende :</small>
-              <span class="badge badge-success ms-2">Dépôt</span>
-              <span class="badge badge-danger ms-2">Retrait</span>
-              <span class="badge badge-primary ms-2">Virement</span>
-              <span class="badge badge-success ms-2">Succès</span>
-              <span class="badge badge-warning ms-2">En attente</span>
-              <span class="badge badge-danger ms-2">Échoué</span>
-            </div>
-          </div>
-          <div class="col-md-6 text-end">
-            <small class="text-muted">
-              Dernière mise à jour : {{ today | date : "dd/MM/yyyy HH:mm" }}
-            </small>
-          </div>
-        </div>
-      </nb-card-footer>
-    </nb-card>
-  </div>
-
-  <!-- Aucune donnée -->
-  <div *ngIf="!isLoading && transactions.length === 0" class="text-center py-5">
-    <nb-icon
-      icon="archive-outline"
-      size="giant"
-      class="text-muted mb-3"
-    ></nb-icon>
-    <h4>Aucune transaction trouvée</h4>
-    <p class="text-muted mb-4">
-      Aucune transaction ne correspond à vos critères de recherche
-    </p>
-    <button nbButton status="primary" size="large" (click)="resetFilters()">
-      <nb-icon icon="refresh-outline" class="me-2"></nb-icon>
-      Réinitialiser les filtres
-    </button>
+    <!-- État vide -->
+    <div *ngIf="filteredTransactions.length === 0 && !isLoading" class="empty-state">
+      <div class="empty-icon">
+        <nb-icon icon="archive-outline"></nb-icon>
+      </div>
+      <h4>Aucune transaction trouvée</h4>
+      <p>Aucune transaction ne correspond à vos critères de recherche</p>
+      <button nbButton status="primary" size="large" (click)="resetFilters()">
+        <nb-icon icon="refresh-outline"></nb-icon>
+        Réinitialiser les filtres
+      </button>
+    </div>
   </div>
 </div>

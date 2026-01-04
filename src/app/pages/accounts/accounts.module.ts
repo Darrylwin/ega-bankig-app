@@ -7,6 +7,7 @@ import {
   NbCardModule,
   NbIconModule,
   NbButtonModule,
+  NbButtonGroupModule, // ← VÉRIFIER ICI
   NbInputModule,
   NbSelectModule,
   NbDatepickerModule,
@@ -21,7 +22,6 @@ import {
   NbProgressBarModule,
   NbRadioModule,
   NbCheckboxModule,
-  NbButtonGroupModule,
 } from "@nebular/theme";
 
 // Tableau intelligent
@@ -29,6 +29,7 @@ import { Ng2SmartTableModule } from "ng2-smart-table";
 
 // Charts
 import { NgxChartsModule } from "@swimlane/ngx-charts";
+
 import { AccountsRoutingModule } from "./accounts-routing.module";
 import { AccountsComponent } from "./accounts.component";
 import { AccountFormComponent } from "./account-form/account-form.component";
@@ -38,11 +39,11 @@ import { AccountStatementComponent } from "./account-statement/account-statement
 @NgModule({
   declarations: [
     AccountsComponent,
+    AccountFormComponent,
     AccountDetailComponent,
     AccountStatementComponent,
-    AccountFormComponent,
   ],
-  imports: [
+  imports:  [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
@@ -52,12 +53,13 @@ import { AccountStatementComponent } from "./account-statement/account-statement
     NbCardModule,
     NbIconModule,
     NbButtonModule,
+    NbButtonGroupModule, // ← VÉRIFIER ICI
     NbInputModule,
     NbSelectModule,
     NbDatepickerModule,
     NbSpinnerModule,
     NbAlertModule,
-    NbDialogModule.forChild(),
+    NbDialogModule. forChild(),
     NbTooltipModule,
     NbBadgeModule,
     NbTabsetModule,
@@ -66,7 +68,6 @@ import { AccountStatementComponent } from "./account-statement/account-statement
     NbProgressBarModule,
     NbRadioModule,
     NbCheckboxModule,
-    NbButtonGroupModule,
 
     // Tableau intelligent
     Ng2SmartTableModule,

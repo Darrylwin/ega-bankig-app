@@ -1,878 +1,981 @@
 <div class="transfer-container">
-  <!-- En-tête -->
-  <div class="transfer-header mb-4">
-    <div class="row align-items-center">
-      <div class="col-md-8">
-        <h2>Virement Bancaire</h2>
-        <p class="text-muted mb-0">Transférer des fonds entre comptes</p>
-      </div>
-      <div class="col-md-4 text-end">
-        <button nbButton ghost size="small" (click)="onCancel()">
-          <nb-icon icon="arrow-back-outline" class="me-2"></nb-icon>
-          Retour aux opérations
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-left">
+        <button
+          nbButton
+          ghost
+          size="small"
+          (click)="onCancel()"
+          class="back-btn"
+        >
+          <nb-icon icon="arrow-back-outline"></nb-icon>
         </button>
+        <div>
+          <h1 class="page-title">
+            <nb-icon icon="swap-horizontal-outline"></nb-icon>
+            Virement Bancaire
+          </h1>
+          <p class="page-subtitle">
+            Transférer des fonds entre comptes en toute sécurité
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Progress Steps -->
+  <div class="steps-progress">
+    <div class="steps-container">
+      <div
+        class="step-item"
+        [class.active]="currentStep >= 1"
+        [class.completed]="currentStep > 1"
+      >
+        <div class="step-circle">
+          <nb-icon
+            [icon]="currentStep > 1 ? 'checkmark-outline' : 'people-outline'"
+          ></nb-icon>
+          <span>1</span>
+        </div>
+        <div class="step-label">Comptes</div>
+      </div>
+
+      <div class="step-line" [class.active]="currentStep >= 2"></div>
+
+      <div
+        class="step-item"
+        [class.active]="currentStep >= 2"
+        [class.completed]="currentStep > 2"
+      >
+        <div class="step-circle">
+          <nb-icon
+            [icon]="currentStep > 2 ? 'checkmark-outline' : 'cash-outline'"
+          ></nb-icon>
+          <span>2</span>
+        </div>
+        <div class="step-label">Montant</div>
+      </div>
+
+      <div class="step-line" [class.active]="currentStep >= 3"></div>
+
+      <div class="step-item" [class.active]="currentStep >= 3">
+        <div class="step-circle">
+          <nb-icon icon="checkmark-circle-outline"></nb-icon>
+          <span>3</span>
+        </div>
+        <div class="step-label">Confirmation</div>
       </div>
     </div>
   </div>
 
   <!-- Chargement -->
-  <div *ngIf="isLoading" class="text-center py-5">
+  <div *ngIf="isLoading" class="loading-container">
     <nb-spinner size="giant" status="primary"></nb-spinner>
-    <p class="mt-3">Chargement des comptes...</p>
+    <p class="loading-text">Chargement des comptes...</p>
   </div>
 
   <!-- Formulaire -->
-  <div *ngIf="!isLoading">
-    <div class="row">
-      <div class="col-lg-8">
-        <nb-stepper #stepper>
-          <!-- Étape 1 : Comptes -->
-          <nb-step [label]="step1Label" [hidden]="false">
-            <ng-template nbStepLabel>{{ step1Label }}</ng-template>
+  <div *ngIf="!isLoading" class="form-content">
+    <form [formGroup]="transferForm" (ngSubmit)="onSubmit()">
+      <div class="form-grid">
+        <!-- Colonne principale -->
+        <div class="form-main">
+          <!-- ÉTAPE 1: Sélection des comptes -->
+          <nb-card
+            *ngIf="currentStep === 1"
+            class="step-card step-1"
+            [@slideIn]
+          >
+            <nb-card-header>
+              <div class="step-header">
+                <div class="step-badge">Étape 1/3</div>
+                <h3>Sélection des Comptes</h3>
+                <p>Choisissez les comptes source et destination</p>
+              </div>
+            </nb-card-header>
 
-            <div class="step-content">
-              <h4 class="mb-4">Sélection des Comptes</h4>
-
-              <form [formGroup]="transferForm">
-                <!-- Compte source -->
-                <div class="row mb-4">
-                  <div class="col-12">
-                    <label for="sourceAccountId" class="form-label required">
-                      <nb-icon
-                        icon="trending-down-outline"
-                        class="me-2 text-danger"
-                      ></nb-icon>
-                      Compte Source (Débit)
-                    </label>
-                    <nb-select
-                      id="sourceAccountId"
-                      fullWidth
-                      formControlName="sourceAccountId"
-                      placeholder="Sélectionnez le compte à débiter..."
-                      [status]="
-                        f.sourceAccountId.invalid && f.sourceAccountId.touched
-                          ? 'danger'
-                          : 'basic'
-                      "
-                      (selectedChange)="onSourceAccountSelect()"
-                    >
-                      <nb-option
-                        *ngFor="let account of sourceAccounts"
-                        [value]="account.id"
-                      >
-                        {{ formatAccountNumber(account.accountNumber) }} -
-                        {{ account.customerFullName }} ({{
-                          formatCurrency(account.balance)
-                        }})
-                      </nb-option>
-                    </nb-select>
-
-                    <div
-                      *ngIf="
-                        f.sourceAccountId.invalid && f.sourceAccountId.touched
-                      "
-                      class="text-danger mt-1 small"
-                    >
-                      <span *ngIf="f.sourceAccountId.errors?.['required']">
-                        Le compte source est obligatoire
-                      </span>
-                    </div>
-
-                    <!-- Info compte source -->
-                    <div *ngIf="selectedSourceAccount" class="mt-3">
-                      <nb-alert status="info" size="small">
-                        <div
-                          class="d-flex justify-content-between align-items-center"
-                        >
-                          <div>
-                            <strong>Compte source sélectionné :</strong>
-                            {{
-                              formatAccountNumber(
-                                selectedSourceAccount.accountNumber
-                              )
-                            }}
-                            <br />
-                            <small class="text-muted">
-                              Client :
-                              {{ selectedSourceAccount.customerFullName }} |
-                              Solde disponible :
-                              {{
-                                formatCurrency(selectedSourceAccount.balance)
-                              }}
-                            </small>
-                          </div>
-                          <nb-badge
-                            [text]="
-                              selectedSourceAccount.status === 'ACTIVE'
-                                ? 'Actif'
-                                : 'Bloqué'
-                            "
-                            [status]="
-                              selectedSourceAccount.status === 'ACTIVE'
-                                ? 'success'
-                                : 'danger'
-                            "
-                          >
-                          </nb-badge>
+            <nb-card-body>
+              <!-- Compte source -->
+              <div class="form-section">
+                <label for="sourceAccountId" class="form-label required">
+                  <nb-icon
+                    icon="trending-down-outline"
+                    class="label-icon text-danger"
+                  ></nb-icon>
+                  Compte Source (Débit)
+                </label>
+                <nb-select
+                  id="sourceAccountId"
+                  fullWidth
+                  size="large"
+                  formControlName="sourceAccountId"
+                  placeholder="Compte à débiter..."
+                  [status]="
+                    f.sourceAccountId.invalid && f.sourceAccountId.touched
+                      ? 'danger'
+                      : 'basic'
+                  "
+                  (selectedChange)="onSourceAccountSelect()"
+                >
+                  <nb-option
+                    *ngFor="let account of sourceAccounts"
+                    [value]="account.id"
+                  >
+                    <div class="account-option">
+                      <div class="account-icon source">
+                        <nb-icon icon="arrow-downward-outline"></nb-icon>
+                      </div>
+                      <div class="account-details">
+                        <div class="account-number">
+                          {{ formatAccountNumber(account.accountNumber) }}
                         </div>
-                      </nb-alert>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Compte destination -->
-                <div class="row mb-4">
-                  <div class="col-12">
-                    <label
-                      for="destinationAccountId"
-                      class="form-label required"
-                    >
-                      <nb-icon
-                        icon="trending-up-outline"
-                        class="me-2 text-success"
-                      ></nb-icon>
-                      Compte Destination (Crédit)
-                    </label>
-                    <nb-select
-                      id="destinationAccountId"
-                      fullWidth
-                      formControlName="destinationAccountId"
-                      placeholder="Sélectionnez le compte à créditer..."
-                      [status]="
-                        f.destinationAccountId.invalid &&
-                        f.destinationAccountId.touched
-                          ? 'danger'
-                          : 'basic'
-                      "
-                      [disabled]="!f.sourceAccountId.value"
-                      (selectedChange)="onDestAccountSelect()"
-                    >
-                      <nb-option
-                        *ngFor="let account of destinationAccounts"
-                        [value]="account.id"
-                      >
-                        {{ formatAccountNumber(account.accountNumber) }} -
-                        {{ account.customerFullName }}
-                      </nb-option>
-
-                      <nb-option *ngIf="!f.sourceAccountId.value" disabled>
-                        Sélectionnez d'abord un compte source
-                      </nb-option>
-                    </nb-select>
-
-                    <div
-                      *ngIf="
-                        f.destinationAccountId.invalid &&
-                        f.destinationAccountId.touched
-                      "
-                      class="text-danger mt-1 small"
-                    >
-                      <span *ngIf="f.destinationAccountId.errors?.['required']">
-                        Le compte destination est obligatoire
-                      </span>
-                    </div>
-
-                    <!-- Info compte destination -->
-                    <div *ngIf="selectedDestAccount" class="mt-3">
-                      <nb-alert status="success" size="small">
-                        <div
-                          class="d-flex justify-content-between align-items-center"
-                        >
-                          <div>
-                            <strong>Compte destination sélectionné :</strong>
-                            {{
-                              formatAccountNumber(
-                                selectedDestAccount.accountNumber
-                              )
-                            }}
-                            <br />
-                            <small class="text-muted">
-                              Client :
-                              {{ selectedDestAccount.customerFullName }}
-                            </small>
-                          </div>
-                          <nb-badge
-                            [text]="
-                              selectedDestAccount.accountType === 'SAVINGS'
-                                ? 'Épargne'
-                                : 'Courant'
-                            "
-                            [status]="
-                              selectedDestAccount.accountType === 'SAVINGS'
-                                ? 'success'
-                                : 'primary'
-                            "
-                          >
-                          </nb-badge>
-                        </div>
-                      </nb-alert>
-                    </div>
-
-                    <!-- Validation comptes différents -->
-                    <div
-                      *ngIf="
-                        f.sourceAccountId.value &&
-                        f.destinationAccountId.value &&
-                        f.sourceAccountId.value === f.destinationAccountId.value
-                      "
-                      class="mt-3"
-                    >
-                      <nb-alert status="danger" size="small">
-                        <nb-icon
-                          icon="alert-circle-outline"
-                          class="me-2"
-                        ></nb-icon>
-                        Les comptes source et destination doivent être
-                        différents
-                      </nb-alert>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Type de virement -->
-                <div class="row mb-4">
-                  <div class="col-12">
-                    <label class="form-label required">Type de virement</label>
-                    <div class="d-flex gap-3">
-                      <div *ngFor="let type of transferTypes" class="flex-fill">
-                        <input
-                          type="radio"
-                          [id]="'type-' + type.value"
-                          class="btn-check"
-                          name="transferType"
-                          [value]="type.value"
-                          formControlName="transferType"
-                          autocomplete="off"
-                        />
-
-                        <label
-                          [for]="'type-' + type.value"
-                          class="transfer-type-card d-flex flex-column align-items-center justify-content-center p-3 w-100"
-                          [class.selected]="f.transferType.value === type.value"
-                        >
-                          <nb-icon [icon]="type.icon" class="mb-2"></nb-icon>
-                          <span class="fw-bold">{{ type.label }}</span>
-                        </label>
+                        <small>{{ account.customerFullName }}</small>
+                      </div>
+                      <div class="account-balance">
+                        {{ formatCurrency(account.balance) }}
                       </div>
                     </div>
+                  </nb-option>
+                </nb-select>
 
-                    <!-- Date programmée -->
-                    <div
-                      *ngIf="f.transferType.value === 'SCHEDULED'"
-                      class="mt-3"
-                    >
-                      <label for="scheduledDate" class="form-label required"
-                        >Date d'exécution</label
-                      >
-                      <input
-                        type="date"
-                        id="scheduledDate"
-                        nbInput
-                        fullWidth
-                        formControlName="scheduledDate"
-                        [min]="getTomorrowDate()"
-                      />
-                      <small class="text-muted"
-                        >Le virement sera exécuté à cette date</small
-                      >
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Navigation étapes -->
-                <div class="row mt-4">
-                  <div class="col-12">
-                    <div class="d-flex justify-content-between">
-                      <button nbButton status="basic" (click)="onCancel()">
-                        Annuler
-                      </button>
-
-                      <button
-                        nbButton
-                        status="primary"
-                        (click)="stepper.next()"
-                        [disabled]="
-                          f.sourceAccountId.invalid ||
-                          f.destinationAccountId.invalid ||
-                          !validateDifferentAccounts()
-                        "
-                      >
-                        Suivant : Montant
-                        <nb-icon
-                          icon="arrow-forward-outline"
-                          class="ms-2"
-                        ></nb-icon>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </form>
-            </div>
-          </nb-step>
-
-          <!-- Étape 2 : Montant -->
-          <nb-step [label]="step2Label">
-            <ng-template nbStepLabel>{{ step2Label }}</ng-template>
-
-            <div class="step-content">
-              <h4 class="mb-4">Montant du Virement</h4>
-
-              <form [formGroup]="transferForm">
-                <!-- Montant -->
-                <div class="row mb-4">
-                  <div class="col-12">
-                    <label for="amount" class="form-label required"
-                      >Montant à transférer (€)</label
-                    >
-                    <div class="input-group input-group-lg">
-                      <span class="input-group-text">€</span>
-                      <input
-                        type="number"
-                        id="amount"
-                        nbInput
-                        fullWidth
-                        formControlName="amount"
-                        placeholder="0.00"
-                        step="0.01"
-                        min="0.01"
-                        [status]="
-                          f.amount.invalid && f.amount.touched
-                            ? 'danger'
-                            : 'basic'
-                        "
-                      />
-                    </div>
-
-                    <div
-                      *ngIf="f.amount.invalid && f.amount.touched"
-                      class="text-danger mt-1 small"
-                    >
-                      <span *ngIf="f.amount.errors?.['required']">
-                        Le montant est obligatoire
-                      </span>
-                      <span *ngIf="f.amount.errors?.['min']">
-                        Le montant minimum est 0.01 €
-                      </span>
-                    </div>
-
-                    <!-- Montants suggérés -->
-                    <div class="mt-3">
-                      <label class="form-label small">Montants rapides</label>
-                      <div class="d-flex flex-wrap gap-2">
-                        <button
-                          nbButton
-                          size="small"
-                          ghost
-                          *ngFor="let quickAmount of [50, 100, 200, 500, 1000]"
-                          (click)="
-                            transferForm.patchValue({ amount: quickAmount })
-                          "
-                        >
-                          {{ formatCurrency(quickAmount) }}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Référence et description -->
-                <div class="row mb-4">
-                  <div class="col-md-6 mb-3">
-                    <label for="reference" class="form-label">Référence</label>
-                    <input
-                      type="text"
-                      id="reference"
-                      nbInput
-                      fullWidth
-                      formControlName="reference"
-                      readonly
-                      [status]="'basic'"
-                    />
-                    <small class="text-muted"
-                      >Référence unique générée automatiquement</small
-                    >
-                  </div>
-
-                  <div class="col-md-6 mb-3">
-                    <label for="description" class="form-label"
-                      >Description</label
-                    >
-                    <input
-                      type="text"
-                      id="description"
-                      nbInput
-                      fullWidth
-                      formControlName="description"
-                      placeholder="Motif du virement"
-                      maxlength="200"
-                    />
-                    <small class="text-muted"
-                      >Optionnel - visible dans l'historique</small
-                    >
-                  </div>
-                </div>
-
-                <!-- Récapitulatif -->
                 <div
-                  class="row mb-4"
+                  *ngIf="f.sourceAccountId.invalid && f.sourceAccountId.touched"
+                  class="field-error"
+                >
+                  <nb-icon icon="alert-circle-outline"></nb-icon>
+                  <span>Le compte source est obligatoire</span>
+                </div>
+
+                <!-- Carte compte source -->
+                <div
+                  *ngIf="selectedSourceAccount"
+                  class="selected-account-card source-card"
+                >
+                  <div class="account-card-header">
+                    <div class="card-badge">
+                      <nb-icon icon="trending-down-outline"></nb-icon>
+                      <span>Compte Source</span>
+                    </div>
+                    <nb-badge
+                      [text]="
+                        selectedSourceAccount.accountType === 'SAVINGS'
+                          ? 'Épargne'
+                          : 'Courant'
+                      "
+                      [status]="
+                        selectedSourceAccount.accountType === 'SAVINGS'
+                          ? 'success'
+                          : 'primary'
+                      "
+                    >
+                    </nb-badge>
+                  </div>
+
+                  <div class="account-card-body">
+                    <div class="account-info-row">
+                      <div class="info-item">
+                        <small>Titulaire</small>
+                        <strong>{{
+                          selectedSourceAccount.customerFullName
+                        }}</strong>
+                      </div>
+                      <div class="info-item">
+                        <small>Solde disponible</small>
+                        <strong class="balance">{{
+                          formatCurrency(selectedSourceAccount.balance)
+                        }}</strong>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Flèche de transfert -->
+              <div
+                class="transfer-arrow"
+                *ngIf="selectedSourceAccount && selectedDestAccount"
+              >
+                <div class="arrow-circle">
+                  <nb-icon icon="arrow-downward-outline"></nb-icon>
+                </div>
+                <div class="arrow-label">Virement</div>
+              </div>
+
+              <!-- Compte destination -->
+              <div class="form-section">
+                <label for="destinationAccountId" class="form-label required">
+                  <nb-icon
+                    icon="trending-up-outline"
+                    class="label-icon text-success"
+                  ></nb-icon>
+                  Compte Destination (Crédit)
+                </label>
+                <nb-select
+                  id="destinationAccountId"
+                  fullWidth
+                  size="large"
+                  formControlName="destinationAccountId"
+                  placeholder="Compte à créditer..."
+                  [status]="
+                    f.destinationAccountId.invalid &&
+                    f.destinationAccountId.touched
+                      ? 'danger'
+                      : 'basic'
+                  "
+                  [disabled]="!f.sourceAccountId.value"
+                  (selectedChange)="onDestAccountSelect()"
+                >
+                  <nb-option
+                    *ngFor="let account of destinationAccounts"
+                    [value]="account.id"
+                  >
+                    <div class="account-option">
+                      <div class="account-icon destination">
+                        <nb-icon icon="arrow-upward-outline"></nb-icon>
+                      </div>
+                      <div class="account-details">
+                        <div class="account-number">
+                          {{ formatAccountNumber(account.accountNumber) }}
+                        </div>
+                        <small>{{ account.customerFullName }}</small>
+                      </div>
+                      <div class="account-type">
+                        <nb-badge
+                          [text]="
+                            account.accountType === 'SAVINGS'
+                              ? 'Épargne'
+                              : 'Courant'
+                          "
+                          [status]="
+                            account.accountType === 'SAVINGS'
+                              ? 'success'
+                              : 'primary'
+                          "
+                          size="tiny"
+                        >
+                        </nb-badge>
+                      </div>
+                    </div>
+                  </nb-option>
+
+                  <nb-option *ngIf="!f.sourceAccountId.value" disabled>
+                    Sélectionnez d'abord un compte source
+                  </nb-option>
+                </nb-select>
+
+                <div
                   *ngIf="
-                    selectedSourceAccount &&
-                    selectedDestAccount &&
-                    f.amount.value &&
-                    f.amount.valid
+                    f.destinationAccountId.invalid &&
+                    f.destinationAccountId.touched
+                  "
+                  class="field-error"
+                >
+                  <nb-icon icon="alert-circle-outline"></nb-icon>
+                  <span>Le compte destination est obligatoire</span>
+                </div>
+
+                <!-- Carte compte destination -->
+                <div
+                  *ngIf="selectedDestAccount"
+                  class="selected-account-card destination-card"
+                >
+                  <div class="account-card-header">
+                    <div class="card-badge">
+                      <nb-icon icon="trending-up-outline"></nb-icon>
+                      <span>Compte Destination</span>
+                    </div>
+                    <nb-badge
+                      [text]="
+                        selectedDestAccount.accountType === 'SAVINGS'
+                          ? 'Épargne'
+                          : 'Courant'
+                      "
+                      [status]="
+                        selectedDestAccount.accountType === 'SAVINGS'
+                          ? 'success'
+                          : 'primary'
+                      "
+                    >
+                    </nb-badge>
+                  </div>
+
+                  <div class="account-card-body">
+                    <div class="account-info-row">
+                      <div class="info-item">
+                        <small>Titulaire</small>
+                        <strong>{{
+                          selectedDestAccount.customerFullName
+                        }}</strong>
+                      </div>
+                      <div class="info-item">
+                        <small>Solde actuel</small>
+                        <strong>{{
+                          formatCurrency(selectedDestAccount.balance)
+                        }}</strong>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Alerte comptes identiques -->
+                <nb-alert
+                  *ngIf="
+                    f.sourceAccountId.value &&
+                    f.destinationAccountId.value &&
+                    f.sourceAccountId.value === f.destinationAccountId.value
+                  "
+                  status="danger"
+                  size="small"
+                >
+                  <nb-icon icon="alert-circle-outline"></nb-icon>
+                  Les comptes source et destination doivent être différents
+                </nb-alert>
+              </div>
+            </nb-card-body>
+
+            <nb-card-footer>
+              <div class="step-actions">
+                <button
+                  nbButton
+                  status="basic"
+                  type="button"
+                  (click)="onCancel()"
+                >
+                  <nb-icon icon="close-outline"></nb-icon>
+                  Annuler
+                </button>
+                <button
+                  nbButton
+                  status="primary"
+                  type="button"
+                  (click)="nextStep()"
+                  [disabled]="
+                    f.sourceAccountId.invalid ||
+                    f.destinationAccountId.invalid ||
+                    !areAccountsDifferent()
                   "
                 >
-                  <div class="col-12">
-                    <nb-card status="info">
-                      <nb-card-header>
-                        <h5 class="mb-0">
-                          <nb-icon icon="repeat-outline" class="me-2"></nb-icon>
-                          Récapitulatif du Virement
-                        </h5>
-                      </nb-card-header>
-                      <nb-card-body>
-                        <div class="transfer-summary">
-                          <!-- De -->
-                          <div class="transfer-from text-center mb-4">
-                            <div class="transfer-arrow">
-                              <nb-icon
-                                icon="arrow-downward-outline"
-                                class="text-danger"
-                              ></nb-icon>
-                            </div>
-                            <div class="fw-bold text-danger">
-                              {{ formatCurrency(f.amount.value) }}
-                            </div>
-                            <small class="text-muted">DE</small>
-                            <div class="fw-bold">
-                              {{
-                                formatAccountNumber(
-                                  selectedSourceAccount.accountNumber
-                                )
-                              }}
-                            </div>
-                            <small class="text-muted">{{
-                              selectedSourceAccount.customerFullName
-                            }}</small>
-                          </div>
-
-                          <!-- Vers -->
-                          <div class="transfer-to text-center">
-                            <div class="transfer-arrow">
-                              <nb-icon
-                                icon="arrow-upward-outline"
-                                class="text-success"
-                              ></nb-icon>
-                            </div>
-                            <div class="fw-bold text-success">
-                              {{ formatCurrency(f.amount.value) }}
-                            </div>
-                            <small class="text-muted">VERS</small>
-                            <div class="fw-bold">
-                              {{
-                                formatAccountNumber(
-                                  selectedDestAccount.accountNumber
-                                )
-                              }}
-                            </div>
-                            <small class="text-muted">{{
-                              selectedDestAccount.customerFullName
-                            }}</small>
-                          </div>
-
-                          <!-- Informations -->
-                          <div class="transfer-info mt-4 pt-4 border-top">
-                            <div class="row">
-                              <div class="col-6">
-                                <small class="text-muted">Type</small>
-                                <div class="fw-bold">
-                                  {{ getSelectedTransferTypeLabel() }}
-                                </div>
-                              </div>
-                              <div class="col-6">
-                                <small class="text-muted">Référence</small>
-                                <div class="fw-bold font-monospace">
-                                  {{ f.reference.value }}
-                                </div>
-                              </div>
-                            </div>
-
-                            <!-- Solde après -->
-                            <div class="row mt-3">
-                              <div class="col-6">
-                                <small class="text-muted"
-                                  >Nouveau solde source</small
-                                >
-                                <div class="fw-bold">
-                                  {{
-                                    formatCurrency(
-                                      selectedSourceAccount.balance -
-                                        f.amount.value
-                                    )
-                                  }}
-                                </div>
-                              </div>
-                              <div class="col-6">
-                                <small class="text-muted"
-                                  >Nouveau solde destination</small
-                                >
-                                <div class="fw-bold">
-                                  {{
-                                    formatCurrency(
-                                      selectedDestAccount.balance +
-                                        f.amount.value
-                                    )
-                                  }}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </nb-card-body>
-                    </nb-card>
-                  </div>
-                </div>
-
-                <!-- Navigation étapes -->
-                <div class="row mt-4">
-                  <div class="col-12">
-                    <div class="d-flex justify-content-between">
-                      <button
-                        nbButton
-                        status="basic"
-                        (click)="stepper.previous()"
-                      >
-                        <nb-icon
-                          icon="arrow-back-outline"
-                          class="me-2"
-                        ></nb-icon>
-                        Retour
-                      </button>
-
-                      <button
-                        nbButton
-                        status="primary"
-                        (click)="stepper.next()"
-                        [disabled]="f.amount.invalid"
-                      >
-                        Suivant : Confirmation
-                        <nb-icon
-                          icon="arrow-forward-outline"
-                          class="ms-2"
-                        ></nb-icon>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </form>
-            </div>
-          </nb-step>
-
-          <!-- Étape 3 : Confirmation -->
-          <nb-step [label]="step3Label">
-            <ng-template nbStepLabel>{{ step3Label }}</ng-template>
-
-            <div class="step-content">
-              <h4 class="mb-4">Confirmation du Virement</h4>
-
-              <!-- Dernier récapitulatif -->
-              <div class="row mb-4">
-                <div class="col-12">
-                  <nb-card status="success">
-                    <nb-card-header>
-                      <div
-                        class="d-flex justify-content-between align-items-center"
-                      >
-                        <h5 class="mb-0">
-                          <nb-icon
-                            icon="checkmark-circle-outline"
-                            class="me-2"
-                          ></nb-icon>
-                          Confirmer le virement
-                        </h5>
-                        <nb-badge
-                          text="Prêt à exécuter"
-                          status="success"
-                        ></nb-badge>
-                      </div>
-                    </nb-card-header>
-                    <nb-card-body>
-                      <div class="text-center mb-4">
-                        <nb-icon
-                          icon="swap-horizontal-outline"
-                          size="giant"
-                          class="text-primary mb-3"
-                        ></nb-icon>
-                        <h4>{{ formatCurrency(f.amount.value) }}</h4>
-                        <p class="text-muted">Montant du transfert</p>
-                      </div>
-
-                      <div class="confirmation-details">
-                        <div class="row">
-                          <div class="col-md-6">
-                            <div class="detail-item mb-3">
-                              <small class="text-muted">Compte Source</small>
-                              <div class="fw-bold">
-                                {{
-                                  formatAccountNumber(
-                                    selectedSourceAccount!.accountNumber
-                                  )
-                                }}
-                              </div>
-                              <small class="text-muted">{{
-                                selectedSourceAccount!.customerFullName
-                              }}</small>
-                            </div>
-
-                            <div class="detail-item mb-3">
-                              <small class="text-muted">Nouveau solde</small>
-                              <div class="fw-bold text-danger">
-                                {{
-                                  formatCurrency(
-                                    selectedSourceAccount!.balance -
-                                      f.amount.value
-                                  )
-                                }}
-                              </div>
-                            </div>
-                          </div>
-
-                          <div class="col-md-6">
-                            <div class="detail-item mb-3">
-                              <small class="text-muted"
-                                >Compte Destination</small
-                              >
-                              <div class="fw-bold">
-                                {{
-                                  formatAccountNumber(
-                                    selectedDestAccount!.accountNumber
-                                  )
-                                }}
-                              </div>
-                              <small class="text-muted">{{
-                                selectedDestAccount!.customerFullName
-                              }}</small>
-                            </div>
-
-                            <div class="detail-item mb-3">
-                              <small class="text-muted">Nouveau solde</small>
-                              <div class="fw-bold text-success">
-                                {{
-                                  formatCurrency(
-                                    selectedDestAccount!.balance +
-                                      f.amount.value
-                                  )
-                                }}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div class="row mt-3">
-                          <div class="col-12">
-                            <div class="detail-item">
-                              <small class="text-muted">Référence</small>
-                              <div class="fw-bold font-monospace">
-                                {{ f.reference.value }}
-                              </div>
-                            </div>
-
-                            <div class="detail-item mt-3">
-                              <small class="text-muted">Description</small>
-                              <div class="fw-bold">
-                                {{ f.description.value || "—" }}
-                              </div>
-                            </div>
-
-                            <div class="detail-item mt-3">
-                              <small class="text-muted">Type de virement</small>
-                              <div class="fw-bold">
-                                {{ getSelectedTransferTypeLabel() }}
-                                <span
-                                  *ngIf="f.transferType.value === 'SCHEDULED'"
-                                  class="text-warning"
-                                >
-                                  (Programmé pour le
-                                  {{
-                                    f.scheduledDate.value | date : "dd/MM/yyyy"
-                                  }})
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </nb-card-body>
-                  </nb-card>
-                </div>
+                  Suivant
+                  <nb-icon icon="arrow-forward-outline"></nb-icon>
+                </button>
               </div>
+            </nb-card-footer>
+          </nb-card>
 
-              <!-- Avertissements -->
-              <div class="row mb-4">
-                <div class="col-12">
-                  <nb-alert status="warning" size="small">
-                    <nb-icon icon="alert-circle-outline" class="me-2"></nb-icon>
-                    <strong>Les virements sont définitifs</strong>
-                    <p class="small mb-0 mt-1">
-                      Une fois confirmé, le virement sera exécuté immédiatement
-                      et ne pourra pas être annulé. Vérifiez attentivement
-                      toutes les informations avant de confirmer.
-                    </p>
-                  </nb-alert>
-                </div>
+          <!-- ÉTAPE 2: Montant et options -->
+          <nb-card
+            *ngIf="currentStep === 2"
+            class="step-card step-2"
+            [@slideIn]
+          >
+            <nb-card-header>
+              <div class="step-header">
+                <div class="step-badge">Étape 2/3</div>
+                <h3>Montant et Options</h3>
+                <p>Définissez le montant et le type de virement</p>
               </div>
+            </nb-card-header>
 
-              <!-- Actions finales -->
-              <div class="row">
-                <div class="col-12">
-                  <div class="d-flex justify-content-between">
+            <nb-card-body>
+              <!-- Montant -->
+              <div class="form-section">
+                <label for="amount" class="form-label required"
+                  >Montant du virement (€)</label
+                >
+                <div class="amount-input-wrapper">
+                  <nb-icon icon="euro-outline" class="input-icon"></nb-icon>
+                  <input
+                    type="number"
+                    id="amount"
+                    nbInput
+                    fullWidth
+                    size="giant"
+                    formControlName="amount"
+                    placeholder="0.00"
+                    step="0.01"
+                    min="0.01"
+                    [attr.max]="selectedSourceAccount?.balance"
+                    [status]="
+                      f.amount.invalid && f.amount.touched ? 'danger' : 'basic'
+                    "
+                  />
+                </div>
+
+                <div
+                  *ngIf="f.amount.invalid && f.amount.touched"
+                  class="field-error"
+                >
+                  <nb-icon icon="alert-circle-outline"></nb-icon>
+                  <span *ngIf="f.amount. errors?.['required']"
+                    >Le montant est obligatoire</span
+                  >
+                  <span *ngIf="f. amount.errors?.['min']"
+                    >Montant minimum: 0.01 €</span
+                  >
+                  <span *ngIf="f. amount.errors?.['max']">
+                    Solde insuffisant (Max:
+                    {{ formatCurrency(selectedSourceAccount!.balance) }})
+                  </span>
+                </div>
+
+                <!-- Montants rapides -->
+                <div class="quick-amounts">
+                  <label class="quick-label">Montants rapides</label>
+                  <div class="quick-buttons">
                     <button
+                      *ngFor="let quickAmount of quickAmounts"
                       nbButton
-                      status="basic"
-                      (click)="stepper.previous()"
+                      ghost
+                      size="small"
+                      type="button"
+                      [disabled]="
+                        !selectedSourceAccount ||
+                        quickAmount > selectedSourceAccount.balance
+                      "
+                      (click)="applyQuickAmount(quickAmount)"
                     >
-                      <nb-icon icon="arrow-back-outline" class="me-2"></nb-icon>
-                      Retour
+                      {{ formatCurrency(quickAmount) }}
                     </button>
+                  </div>
+                </div>
+              </div>
 
-                    <div class="d-flex gap-2">
-                      <button
-                        nbButton
-                        status="basic"
-                        type="button"
-                        (click)="onCancel()"
-                        [disabled]="isSubmitting"
-                      >
-                        Annuler
-                      </button>
+              <!-- Type de virement -->
+              <div class="form-section">
+                <label class="form-label required">Type de virement</label>
+                <div class="transfer-types-grid">
+                  <div
+                    *ngFor="let type of transferTypes"
+                    class="transfer-type-card"
+                    [class.selected]="f.transferType.value === type.value"
+                    (click)="
+                      transferForm.patchValue({ transferType: type.value })
+                    "
+                  >
+                    <input
+                      type="radio"
+                      [id]="'type-' + type.value"
+                      [value]="type.value"
+                      formControlName="transferType"
+                      class="type-radio"
+                    />
 
-                      <button
-                        nbButton
-                        status="primary"
-                        type="button"
-                        (click)="onSubmit()"
-                        [disabled]="transferForm.invalid || isSubmitting"
-                        [class.btn-pulse]="isSubmitting"
-                      >
-                        <span *ngIf="!isSubmitting">
-                          <nb-icon
-                            icon="checkmark-outline"
-                            class="me-2"
-                          ></nb-icon>
-                          Confirmer et exécuter
-                        </span>
+                    <div class="type-icon">
+                      <nb-icon [icon]="type.icon"></nb-icon>
+                    </div>
 
-                        <span *ngIf="isSubmitting">
-                          <nb-icon
-                            icon="sync-outline"
-                            class="spin me-2"
-                          ></nb-icon>
-                          Exécution en cours...
-                        </span>
-                      </button>
+                    <div class="type-info">
+                      <h6>{{ type.label }}</h6>
+                      <p>{{ type.description }}</p>
+                      <div class="type-meta">
+                        <small>
+                          <nb-icon icon="clock-outline"></nb-icon>
+                          {{ type.delay }}
+                        </small>
+                        <small>
+                          <nb-icon icon="pricetags-outline"></nb-icon>
+                          Frais: {{ formatCurrency(type.fee) }}
+                        </small>
+                      </div>
+                    </div>
+
+                    <div
+                      class="type-check"
+                      *ngIf="f.transferType.value === type.value"
+                    >
+                      <nb-icon icon="checkmark-circle-2-outline"></nb-icon>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Date programmée -->
+                <div
+                  *ngIf="f.transferType.value === 'SCHEDULED'"
+                  class="scheduled-date-section"
+                >
+                  <label for="scheduledDate" class="form-label required"
+                    >Date d'exécution</label
+                  >
+                  <input
+                    type="date"
+                    id="scheduledDate"
+                    nbInput
+                    fullWidth
+                    formControlName="scheduledDate"
+                    [min]="getMinScheduledDate()"
+                  />
+                  <small class="field-hint"
+                    >Le virement sera exécuté automatiquement à cette
+                    date</small
+                  >
+                </div>
+              </div>
+
+              <!-- Description -->
+              <div class="form-section">
+                <label for="description" class="form-label"
+                  >Description / Motif</label
+                >
+                <textarea
+                  id="description"
+                  nbInput
+                  fullWidth
+                  rows="3"
+                  formControlName="description"
+                  placeholder="Ex: Remboursement, Loyer, Cadeau..."
+                  maxlength="200"
+                ></textarea>
+                <small class="field-hint"
+                  >Optionnel - Visible dans l'historique des deux comptes</small
+                >
+              </div>
+
+              <!-- Aperçu du transfert -->
+              <div
+                *ngIf="
+                  selectedSourceAccount && selectedDestAccount && f.amount.value
+                "
+                class="transfer-preview"
+              >
+                <div class="preview-header">
+                  <nb-icon icon="eye-outline"></nb-icon>
+                  <h6>Aperçu du virement</h6>
+                </div>
+
+                <div class="preview-flow">
+                  <div class="flow-item source">
+                    <div class="flow-icon">
+                      <nb-icon icon="arrow-downward-outline"></nb-icon>
+                    </div>
+                    <div class="flow-amount">
+                      - {{ formatCurrency(f.amount.value) }}
+                    </div>
+                    <div class="flow-account">
+                      {{
+                        formatAccountNumber(selectedSourceAccount.accountNumber)
+                      }}
+                    </div>
+                    <div class="flow-balance">
+                      Nouveau solde:
+                      {{
+                        formatCurrency(
+                          selectedSourceAccount.balance - f.amount.value
+                        )
+                      }}
+                    </div>
+                  </div>
+
+                  <div class="flow-arrow">
+                    <nb-icon icon="swap-horizontal-outline"></nb-icon>
+                  </div>
+
+                  <div class="flow-item destination">
+                    <div class="flow-icon">
+                      <nb-icon icon="arrow-upward-outline"></nb-icon>
+                    </div>
+                    <div class="flow-amount">
+                      + {{ formatCurrency(f.amount.value) }}
+                    </div>
+                    <div class="flow-account">
+                      {{
+                        formatAccountNumber(selectedDestAccount.accountNumber)
+                      }}
+                    </div>
+                    <div class="flow-balance">
+                      Nouveau solde:
+                      {{
+                        formatCurrency(
+                          selectedDestAccount.balance + f.amount.value
+                        )
+                      }}
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </nb-step>
-        </nb-stepper>
+            </nb-card-body>
+
+            <nb-card-footer>
+              <div class="step-actions">
+                <button
+                  nbButton
+                  status="basic"
+                  type="button"
+                  (click)="previousStep()"
+                >
+                  <nb-icon icon="arrow-back-outline"></nb-icon>
+                  Retour
+                </button>
+                <button
+                  nbButton
+                  status="primary"
+                  type="button"
+                  (click)="nextStep()"
+                  [disabled]="f.amount.invalid"
+                >
+                  Suivant
+                  <nb-icon icon="arrow-forward-outline"></nb-icon>
+                </button>
+              </div>
+            </nb-card-footer>
+          </nb-card>
+
+          <!-- ÉTAPE 3: Confirmation -->
+          <nb-card
+            *ngIf="currentStep === 3"
+            class="step-card step-3"
+            [@slideIn]
+          >
+            <nb-card-header>
+              <div class="step-header">
+                <div class="step-badge">Étape 3/3</div>
+                <h3>Confirmation du Virement</h3>
+                <p>Vérifiez toutes les informations avant de confirmer</p>
+              </div>
+            </nb-card-header>
+
+            <nb-card-body>
+              <div class="confirmation-summary">
+                <!-- Montant principal -->
+                <div class="summary-amount primary">
+                  <div class="amount-icon">
+                    <nb-icon icon="swap-horizontal-outline"></nb-icon>
+                  </div>
+                  <div class="amount-value">
+                    {{ formatCurrency(f.amount.value) }}
+                  </div>
+                  <div class="amount-label">Montant du virement</div>
+                  <div class="amount-type">
+                    <nb-icon
+                      [icon]="
+                        getSelectedTransferType()?.icon || 'flash-outline'
+                      "
+                    ></nb-icon>
+                    {{ getSelectedTransferType()?.label }}
+                  </div>
+                </div>
+
+                <!-- Flux du virement -->
+                <div class="transfer-flow">
+                  <div class="flow-card source">
+                    <div class="flow-header">
+                      <nb-icon icon="trending-down-outline"></nb-icon>
+                      <span>Compte Source</span>
+                    </div>
+                    <div class="flow-body">
+                      <div class="flow-account-number">
+                        {{
+                          formatAccountNumber(
+                            selectedSourceAccount!.accountNumber
+                          )
+                        }}
+                      </div>
+                      <div class="flow-owner">
+                        {{ selectedSourceAccount!.customerFullName }}
+                      </div>
+                      <div class="flow-balance-info">
+                        <div class="balance-row">
+                          <small>Solde actuel</small>
+                          <strong>{{
+                            formatCurrency(selectedSourceAccount!.balance)
+                          }}</strong>
+                        </div>
+                        <div class="balance-row highlight">
+                          <small>Nouveau solde</small>
+                          <strong class="text-danger">{{
+                            formatCurrency(
+                              selectedSourceAccount!.balance - f.amount.value
+                            )
+                          }}</strong>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="flow-separator">
+                    <div class="separator-line"></div>
+                    <div class="separator-icon">
+                      <nb-icon icon="arrow-forward-outline"></nb-icon>
+                    </div>
+                    <div class="separator-line"></div>
+                  </div>
+
+                  <div class="flow-card destination">
+                    <div class="flow-header">
+                      <nb-icon icon="trending-up-outline"></nb-icon>
+                      <span>Compte Destination</span>
+                    </div>
+                    <div class="flow-body">
+                      <div class="flow-account-number">
+                        {{
+                          formatAccountNumber(
+                            selectedDestAccount!.accountNumber
+                          )
+                        }}
+                      </div>
+                      <div class="flow-owner">
+                        {{ selectedDestAccount!.customerFullName }}
+                      </div>
+                      <div class="flow-balance-info">
+                        <div class="balance-row">
+                          <small>Solde actuel</small>
+                          <strong>{{
+                            formatCurrency(selectedDestAccount!.balance)
+                          }}</strong>
+                        </div>
+                        <div class="balance-row highlight">
+                          <small>Nouveau solde</small>
+                          <strong class="text-success">{{
+                            formatCurrency(
+                              selectedDestAccount!.balance + f.amount.value
+                            )
+                          }}</strong>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Détails -->
+                <div class="summary-details">
+                  <div class="detail-row" *ngIf="f.description.value">
+                    <span class="detail-label">
+                      <nb-icon icon="file-text-outline"></nb-icon>
+                      Description
+                    </span>
+                    <span class="detail-value">{{ f.description.value }}</span>
+                  </div>
+
+                  <div class="detail-row">
+                    <span class="detail-label">
+                      <nb-icon icon="hash-outline"></nb-icon>
+                      Référence
+                    </span>
+                    <span class="detail-value reference">{{
+                      transactionReference
+                    }}</span>
+                  </div>
+
+                  <div class="detail-row">
+                    <span class="detail-label">
+                      <nb-icon icon="flash-outline"></nb-icon>
+                      Type de virement
+                    </span>
+                    <span class="detail-value">{{
+                      getSelectedTransferType()?.label
+                    }}</span>
+                  </div>
+
+                  <div
+                    class="detail-row"
+                    *ngIf="
+                      f.transferType.value === 'SCHEDULED' &&
+                      f.scheduledDate.value
+                    "
+                  >
+                    <span class="detail-label">
+                      <nb-icon icon="calendar-outline"></nb-icon>
+                      Date d'exécution
+                    </span>
+                    <span class="detail-value">{{
+                      formatDate(f.scheduledDate.value)
+                    }}</span>
+                  </div>
+
+                  <div class="detail-row divider">
+                    <span class="detail-label">
+                      <nb-icon icon="pricetags-outline"></nb-icon>
+                      Frais
+                    </span>
+                    <span class="detail-value">{{
+                      formatCurrency(calculateFees())
+                    }}</span>
+                  </div>
+
+                  <div class="detail-row highlight">
+                    <span class="detail-label">
+                      <nb-icon icon="calculator-outline"></nb-icon>
+                      Total prélevé
+                    </span>
+                    <span class="detail-value total">{{
+                      formatCurrency(calculateTotal())
+                    }}</span>
+                  </div>
+                </div>
+
+                <!-- Avertissement -->
+                <nb-alert status="warning" class="mt-3">
+                  <nb-icon icon="alert-triangle-outline"></nb-icon>
+                  <div>
+                    <strong>Virement définitif</strong>
+                    <p class="mb-0 mt-1">
+                      Une fois confirmé, ce virement sera exécuté et ne pourra
+                      pas être annulé. Vérifiez attentivement les comptes et le
+                      montant.
+                    </p>
+                  </div>
+                </nb-alert>
+              </div>
+            </nb-card-body>
+
+            <nb-card-footer>
+              <div class="step-actions">
+                <button
+                  nbButton
+                  status="basic"
+                  type="button"
+                  (click)="previousStep()"
+                  [disabled]="isSubmitting"
+                >
+                  <nb-icon icon="arrow-back-outline"></nb-icon>
+                  Retour
+                </button>
+                <button
+                  nbButton
+                  status="primary"
+                  size="large"
+                  type="submit"
+                  [disabled]="transferForm.invalid || isSubmitting"
+                  [class.btn-loading]="isSubmitting"
+                >
+                  <nb-icon
+                    [icon]="
+                      isSubmitting
+                        ? 'loader-outline'
+                        : 'checkmark-circle-outline'
+                    "
+                    [class.spin]="isSubmitting"
+                  ></nb-icon>
+                  {{
+                    isSubmitting ? "Traitement.. ." : "Confirmer le virement"
+                  }}
+                </button>
+              </div>
+            </nb-card-footer>
+          </nb-card>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="form-sidebar">
+          <!-- Récapitulatif -->
+          <nb-card class="summary-card sticky">
+            <nb-card-header>
+              <h6>
+                <nb-icon icon="eye-outline"></nb-icon>
+                Récapitulatif
+              </h6>
+            </nb-card-header>
+            <nb-card-body>
+              <div class="summary-item" *ngIf="selectedSourceAccount">
+                <small>De</small>
+                <strong>{{
+                  formatAccountNumber(selectedSourceAccount.accountNumber)
+                }}</strong>
+              </div>
+
+              <div
+                class="summary-arrow"
+                *ngIf="selectedSourceAccount && selectedDestAccount"
+              >
+                <nb-icon icon="arrow-downward-outline"></nb-icon>
+              </div>
+
+              <div class="summary-item" *ngIf="selectedDestAccount">
+                <small>Vers</small>
+                <strong>{{
+                  formatAccountNumber(selectedDestAccount.accountNumber)
+                }}</strong>
+              </div>
+
+              <div class="summary-divider"></div>
+
+              <div class="summary-item" *ngIf="f.amount.value">
+                <small>Montant</small>
+                <strong class="text-primary">{{
+                  formatCurrency(f.amount.value)
+                }}</strong>
+              </div>
+
+              <div class="summary-item">
+                <small>Frais</small>
+                <strong>{{ formatCurrency(calculateFees()) }}</strong>
+              </div>
+
+              <div class="summary-item total">
+                <small>Total</small>
+                <strong>{{ formatCurrency(calculateTotal()) }}</strong>
+              </div>
+
+              <div class="summary-progress">
+                <small>Progression</small>
+                <nb-progress-bar
+                  [value]="(currentStep / totalSteps) * 100"
+                  status="primary"
+                ></nb-progress-bar>
+              </div>
+            </nb-card-body>
+          </nb-card>
+
+          <!-- Informations -->
+          <nb-card class="info-card">
+            <nb-card-header>
+              <h6>
+                <nb-icon icon="info-outline"></nb-icon>
+                Informations
+              </h6>
+            </nb-card-header>
+            <nb-card-body>
+              <div class="info-item">
+                <nb-icon icon="flash-outline" status="success"></nb-icon>
+                <div>
+                  <strong>Instantané</strong>
+                  <p>Virement exécuté en temps réel</p>
+                </div>
+              </div>
+
+              <div class="info-item">
+                <nb-icon icon="shield-outline" status="success"></nb-icon>
+                <div>
+                  <strong>Sécurisé</strong>
+                  <p>Transaction cryptée et protégée</p>
+                </div>
+              </div>
+
+              <div class="info-item">
+                <nb-icon icon="checkmark-outline" status="info"></nb-icon>
+                <div>
+                  <strong>Sans frais</strong>
+                  <p>Virement gratuit entre comptes</p>
+                </div>
+              </div>
+
+              <div class="info-item">
+                <nb-icon icon="activity-outline" status="info"></nb-icon>
+                <div>
+                  <strong>Traçable</strong>
+                  <p>Historique complet disponible</p>
+                </div>
+              </div>
+            </nb-card-body>
+          </nb-card>
+
+          <!-- Assistance -->
+          <nb-card class="help-card">
+            <nb-card-body>
+              <div class="help-icon">
+                <nb-icon icon="question-mark-circle-outline"></nb-icon>
+              </div>
+              <h6>Besoin d'aide ?</h6>
+              <p>Support disponible 24/7</p>
+              <button nbButton status="primary" size="small" ghost fullWidth>
+                <nb-icon icon="phone-outline"></nb-icon>
+                01 23 45 67 89
+              </button>
+            </nb-card-body>
+          </nb-card>
+        </div>
       </div>
-
-      <!-- Informations -->
-      <div class="col-lg-4">
-        <nb-card class="mb-4">
-          <nb-card-header>
-            <h5 class="mb-0">
-              <nb-icon icon="info-circle-outline" class="me-2"></nb-icon>
-              Frais et Délais
-            </h5>
-          </nb-card-header>
-          <nb-card-body>
-            <div class="mb-3">
-              <h6>Virement Immédiat</h6>
-              <ul class="text-muted small">
-                <li>Exécuté instantanément</li>
-                <li>Frais : 0 € pour les clients</li>
-                <li>Disponible 24h/24, 7j/7</li>
-                <li>Irrévocable</li>
-              </ul>
-            </div>
-
-            <div class="mb-3">
-              <h6>Virement Programmé</h6>
-              <ul class="text-muted small">
-                <li>Exécuté à la date choisie</li>
-                <li>Frais : 0 €</li>
-                <li>Annulable jusqu'à J-1</li>
-                <li>Maximum 90 jours</li>
-              </ul>
-            </div>
-
-            <div>
-              <h6>Virement Récurrent</h6>
-              <ul class="text-muted small">
-                <li>Exécuté automatiquement</li>
-                <li>Frais : 0 €</li>
-                <li>Paramétrable (mensuel, trimestriel)</li>
-                <li>Résiliable à tout moment</li>
-              </ul>
-            </div>
-          </nb-card-body>
-        </nb-card>
-
-        <!-- Assistance -->
-        <nb-card>
-          <nb-card-header>
-            <h5 class="mb-0">
-              <nb-icon icon="shield-outline" class="me-2"></nb-icon>
-              Sécurité
-            </h5>
-          </nb-card-header>
-          <nb-card-body>
-            <div class="security-info">
-              <div class="security-item d-flex align-items-start mb-3">
-                <nb-icon
-                  icon="lock-outline"
-                  class="text-success me-2 mt-1"
-                ></nb-icon>
-                <div>
-                  <small class="fw-bold">Chiffrement SSL</small>
-                  <p class="text-muted small mb-0">
-                    Toutes les données sont chiffrées
-                  </p>
-                </div>
-              </div>
-
-              <div class="security-item d-flex align-items-start mb-3">
-                <nb-icon
-                  icon="eye-off-outline"
-                  class="text-success me-2 mt-1"
-                ></nb-icon>
-                <div>
-                  <small class="fw-bold">Confidentialité</small>
-                  <p class="text-muted small mb-0">
-                    Vos informations sont protégées
-                  </p>
-                </div>
-              </div>
-
-              <div class="security-item d-flex align-items-start">
-                <nb-icon
-                  icon="activity-outline"
-                  class="text-success me-2 mt-1"
-                ></nb-icon>
-                <div>
-                  <small class="fw-bold">Surveillance</small>
-                  <p class="text-muted small mb-0">
-                    Détection automatique des fraudes
-                  </p>
-                </div>
-              </div>
-            </div>
-          </nb-card-body>
-        </nb-card>
-      </div>
-    </div>
+    </form>
   </div>
 </div>

@@ -7,6 +7,7 @@ import {
   NbCardModule,
   NbIconModule,
   NbButtonModule,
+  NbButtonGroupModule, // ← VÉRIFIER ICI
   NbInputModule,
   NbSelectModule,
   NbDatepickerModule,
@@ -19,7 +20,6 @@ import {
   NbListModule,
   NbActionsModule,
   NbProgressBarModule,
-  NbButtonGroupModule,
 } from "@nebular/theme";
 
 // Tableau intelligent
@@ -49,19 +49,19 @@ import { CustomerDetailComponent } from "./customer-detail/customer-detail.compo
     NbCardModule,
     NbIconModule,
     NbButtonModule,
+    NbButtonGroupModule, // ← VÉRIFIER ICI
     NbInputModule,
     NbSelectModule,
     NbDatepickerModule,
     NbSpinnerModule,
     NbAlertModule,
-    NbDialogModule.forChild(),
+    NbDialogModule. forChild(),
     NbTooltipModule,
     NbBadgeModule,
     NbTabsetModule,
     NbListModule,
     NbActionsModule,
     NbProgressBarModule,
-    NbButtonGroupModule,
 
     // Tableau intelligent
     Ng2SmartTableModule,

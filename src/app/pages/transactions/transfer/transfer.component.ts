@@ -1,17 +1,17 @@
-import { Component, OnInit } from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { Router } from "@angular/router";
-import { NbToastrService } from "@nebular/theme";
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { NbToastrService } from '@nebular/theme';
 import {
   TransactionApiService,
   AccountApiService,
-} from "../../../@core/data/api/index";
-import { Account, TransferRequest } from "../../../@core/data/models/index";
+} from '../../../@core/data/api/index';
+import { Account, TransferRequest } from '../../../@core/data/models/index';
 
 @Component({
-  selector: "ngx-transfer",
-  templateUrl: "./transfer.component.html",
-  styleUrls: ["./transfer.component.scss"],
+  selector: 'ngx-transfer',
+  templateUrl: './transfer.component.html',
+  styleUrls: ['./transfer.component.scss'],
 })
 export class TransferComponent implements OnInit {
   transferForm: FormGroup;
@@ -24,17 +24,43 @@ export class TransferComponent implements OnInit {
   selectedSourceAccount: Account | null = null;
   selectedDestAccount: Account | null = null;
 
-  // Labels pour le stepper
-  step1Label = "Comptes";
-  step2Label = "Montant";
-  step3Label = "Confirmation";
+  // Étapes du formulaire
+  currentStep = 1;
+  totalSteps = 3;
+
+  // Référence de transaction
+  transactionReference: string = '';
 
   // Options
   transferTypes = [
-    { value: "IMMEDIATE", label: "Immédiat", icon: "flash-outline" },
-    { value: "SCHEDULED", label: "Programmé", icon: "calendar-outline" },
-    { value: "RECURRING", label: "Récurrent", icon: "repeat-outline" },
+    {
+      value: 'IMMEDIATE',
+      label: 'Immédiat',
+      icon: 'flash-outline',
+      description: 'Exécuté instantanément',
+      delay: 'Immédiat',
+      fee: 0,
+    },
+    {
+      value: 'SCHEDULED',
+      label: 'Programmé',
+      icon: 'calendar-outline',
+      description: 'À une date ultérieure',
+      delay: 'Différé',
+      fee: 0,
+    },
+    {
+      value: 'RECURRING',
+      label: 'Récurrent',
+      icon: 'repeat-outline',
+      description:  'Automatique et répété',
+      delay: 'Périodique',
+      fee: 0,
+    },
   ];
+
+  // Montants suggérés
+  quickAmounts = [50, 100, 200, 500, 1000, 2000];
 
   constructor(
     private fb: FormBuilder,
@@ -44,65 +70,90 @@ export class TransferComponent implements OnInit {
     private toastr: NbToastrService
   ) {
     this.transferForm = this.createForm();
+    this.generateTransactionReference();
   }
 
   ngOnInit(): void {
     this.loadAccounts();
   }
 
+  /**
+   * Crée le formulaire
+   */
   private createForm(): FormGroup {
     return this.fb.group({
-      sourceAccountId: ["", [Validators.required]],
-      destinationAccountId: ["", [Validators.required]],
-      amount: ["", [Validators.required, Validators.min(0.01)]],
-      transferType: ["IMMEDIATE", [Validators.required]],
-      scheduledDate: [""],
-      description: ["", [Validators.maxLength(200)]],
-      reference: [this.generateReference()],
+      sourceAccountId: ['', [Validators.required]],
+      destinationAccountId: ['', [Validators.required]],
+      amount: ['', [Validators. required, Validators.min(0.01), Validators.max(100000)]],
+      transferType: ['IMMEDIATE', [Validators.required]],
+      scheduledDate: [''],
+      description: ['', [Validators.maxLength(200)]],
     });
-  }
-
-  private loadAccounts(): void {
-    this.isLoading = true;
-
-    this.accountApi
-      .getAccounts({ page: 0, size: 200, sort: "accountNumber,asc" })
-      .subscribe({
-        next: (response) => {
-          this.accounts = response.content;
-          this.sourceAccounts = [...this.accounts];
-          this.destinationAccounts = [...this.accounts];
-          this.isLoading = false;
-        },
-        error: (error) => {
-          this.isLoading = false;
-          this.toastr.danger("Erreur lors du chargement des comptes", "Erreur");
-        },
-      });
   }
 
   /**
    * Génère une référence unique
    */
-  private generateReference(): string {
-    return "VIR-" + Date.now().toString().slice(-8);
+  private generateTransactionReference(): void {
+    const timestamp = Date.now();
+    const random = Math.floor(Math.random() * 10000);
+    this.transactionReference = `TRF-${timestamp}-${random}`.toUpperCase();
+  }
+
+  /**
+   * Charge la liste des comptes
+   */
+  private loadAccounts(): void {
+    this.isLoading = true;
+
+    this.accountApi
+      .getAccounts({ page: 0, size: 200, sort: 'accountNumber,asc' })
+      .subscribe({
+        next: (response) => {
+          this.accounts = response.content. filter(
+            (acc) => acc.status === 'ACTIVE'
+          );
+          this.sourceAccounts = [... this.accounts];
+          this. destinationAccounts = [...this. accounts];
+          this.isLoading = false;
+        },
+        error: (error) => {
+          this.isLoading = false;
+          this.toastr.danger('Erreur lors du chargement des comptes', 'Erreur');
+        },
+      });
   }
 
   /**
    * Lorsque le compte source change
    */
   onSourceAccountSelect(): void {
-    const accountId = this.transferForm.get("sourceAccountId")?.value;
+    const accountId = this.transferForm.get('sourceAccountId')?.value;
     this.selectedSourceAccount =
       this.accounts.find((acc) => acc.id === accountId) || null;
 
+    // Filtrer les comptes de destination (exclure le compte source)
     this.destinationAccounts = this.accounts.filter(
       (acc) => acc.id !== accountId
     );
 
-    if (this.transferForm.get("destinationAccountId")?.value === accountId) {
-      this.transferForm.patchValue({ destinationAccountId: "" });
+    // Réinitialiser le compte destination si c'est le même que la source
+    if (this.transferForm.get('destinationAccountId')?.value === accountId) {
+      this.transferForm.patchValue({ destinationAccountId: '' });
       this.selectedDestAccount = null;
+    }
+
+    // Mettre à jour les validateurs du montant
+    if (this.selectedSourceAccount) {
+      const maxAmount = this.selectedSourceAccount. balance;
+      this.transferForm
+        .get('amount')
+        ?.setValidators([
+          Validators.required,
+          Validators.min(0.01),
+          Validators.max(maxAmount),
+        ]);
+      this.transferForm.get('amount')?.updateValueAndValidity();
     }
   }
 
@@ -110,7 +161,7 @@ export class TransferComponent implements OnInit {
    * Lorsque le compte destination change
    */
   onDestAccountSelect(): void {
-    const accountId = this.transferForm.get("destinationAccountId")?.value;
+    const accountId = this.transferForm.get('destinationAccountId')?.value;
     this.selectedDestAccount =
       this.accounts.find((acc) => acc.id === accountId) || null;
   }
@@ -118,27 +169,57 @@ export class TransferComponent implements OnInit {
   /**
    * Vérifie que les comptes sont différents
    */
-  validateDifferentAccounts(): boolean {
-    const sourceId = this.transferForm.get("sourceAccountId")?.value;
-    const destId = this.transferForm.get("destinationAccountId")?.value;
-
-    if (sourceId && destId && sourceId === destId) {
-      this.toastr.warning(
-        "Les comptes source et destination doivent être différents",
-        "Attention"
-      );
-      return false;
-    }
-    return true;
+  areAccountsDifferent(): boolean {
+    const sourceId = this.transferForm.get('sourceAccountId')?.value;
+    const destId = this.transferForm.get('destinationAccountId')?.value;
+    return sourceId && destId && sourceId !== destId;
   }
 
   /**
-   * Retourne la date de demain pour la validation
+   * Applique un montant rapide
    */
-  getTomorrowDate(): string {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    return tomorrow.toISOString().split("T")[0];
+  applyQuickAmount(amount: number): void {
+    if (this.selectedSourceAccount && amount <= this.selectedSourceAccount.balance) {
+      this.transferForm. patchValue({ amount });
+    } else {
+      this.toastr.warning('Solde insuffisant pour ce montant', 'Attention');
+    }
+  }
+
+  /**
+   * Navigation entre les étapes
+   */
+  nextStep(): void {
+    if (this.currentStep < this.totalSteps) {
+      // Valider l'étape actuelle
+      if (this.currentStep === 1) {
+        if (this.f.sourceAccountId.invalid || this.f.destinationAccountId.invalid) {
+          this.f.sourceAccountId.markAsTouched();
+          this.f.destinationAccountId.markAsTouched();
+          this.toastr.warning('Veuillez sélectionner les deux comptes', 'Attention');
+          return;
+        }
+
+        if (! this.areAccountsDifferent()) {
+          this.toastr.warning('Les comptes source et destination doivent être différents', 'Attention');
+          return;
+        }
+      }
+
+      if (this.currentStep === 2 && this.f.amount.invalid) {
+        this.f.amount.markAsTouched();
+        this.toastr.warning('Veuillez saisir un montant valide', 'Attention');
+        return;
+      }
+
+      this.currentStep++;
+    }
+  }
+
+  previousStep(): void {
+    if (this.currentStep > 1) {
+      this.currentStep--;
+    }
   }
 
   /**
@@ -147,10 +228,12 @@ export class TransferComponent implements OnInit {
   onSubmit(): void {
     if (this.transferForm.invalid) {
       this.markFormGroupTouched(this.transferForm);
+      this.toastr.warning('Veuillez remplir tous les champs correctement', 'Attention');
       return;
     }
 
-    if (!this.validateDifferentAccounts()) {
+    if (! this.areAccountsDifferent()) {
+      this.toastr.warning('Les comptes source et destination doivent être différents', 'Attention');
       return;
     }
 
@@ -160,82 +243,114 @@ export class TransferComponent implements OnInit {
       sourceAccountId: this.transferForm.value.sourceAccountId,
       destinationAccountId: this.transferForm.value.destinationAccountId,
       amount: this.transferForm.value.amount,
-      description: this.transferForm.value.description || undefined,
+      description: this.transferForm.value. description || undefined,
     };
 
-    this.transactionApi.transfer(transferData).subscribe({
+    this.transactionApi. transfer(transferData).subscribe({
       next: (transaction) => {
         this.isSubmitting = false;
 
         this.toastr.success(
-          `Virement de ${this.formatCurrency(
-            transaction.amount
-          )} effectué avec succès`,
-          "Succès"
+          `Virement de ${this.formatCurrency(transaction.amount)} effectué avec succès`,
+          'Succès',
+          { duration: 5000 }
         );
 
-        this.showConfirmation(transaction);
+        setTimeout(() => {
+          this.router.navigate(['/pages/transactions/history']);
+        }, 1500);
       },
       error: (error) => {
         this.isSubmitting = false;
 
         if (error.status === 400) {
-          this.toastr.warning(
-            "Solde insuffisant ou données invalides",
-            "Erreur"
-          );
+          this.toastr.warning('Solde insuffisant ou données invalides', 'Erreur');
         } else if (error.status === 403) {
-          this.toastr.warning("Compte source bloqué ou limité", "Accès refusé");
+          this.toastr.warning('Compte source bloqué ou limité', 'Accès refusé');
         } else if (error.status === 404) {
-          this.toastr.warning("Compte destination introuvable", "Erreur");
+          this.toastr.warning('Compte destination introuvable', 'Erreur');
         } else {
-          this.toastr.danger("Erreur lors du virement", "Erreur");
+          this.toastr.danger('Erreur lors du virement', 'Erreur');
         }
       },
     });
   }
 
-  private showConfirmation(transaction: any): void {
-    setTimeout(() => {
-      this.router.navigate(["/pages/transactions/history"]);
-    }, 1500);
-  }
-
+  /**
+   * Annule et retourne
+   */
   onCancel(): void {
-    this.router.navigate(["/pages/transactions"]);
+    this.router. navigate(['/pages/transactions']);
   }
 
+  /**
+   * Raccourci pour les contrôles
+   */
   get f() {
     return this.transferForm.controls;
   }
 
+  /**
+   * Récupère le type de virement sélectionné
+   */
+  getSelectedTransferType() {
+    return this.transferTypes.find((t) => t.value === this. f.transferType.value);
+  }
+
+  /**
+   * Retourne la date minimale pour le virement programmé (demain)
+   */
+  getMinScheduledDate(): string {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow.toISOString().split('T')[0];
+  }
+
+  /**
+   * Calcule les frais de transaction
+   */
+  calculateFees(): number {
+    const transferType = this.getSelectedTransferType();
+    return transferType?.fee || 0;
+  }
+
+  /**
+   * Calcule le total
+   */
+  calculateTotal(): number {
+    const amount = this.f.amount.value || 0;
+    return amount + this.calculateFees();
+  }
+
+  /**
+   * Helpers
+   */
   formatCurrency(amount: number): string {
-    return new Intl.NumberFormat("fr-FR", {
-      style: "currency",
-      currency: "EUR",
+    return new Intl.NumberFormat('fr-FR', {
+      style: 'currency',
+      currency: 'EUR',
     }).format(amount);
   }
 
   formatAccountNumber(iban: string): string {
-    return iban.replace(/(.{4})/g, "$1 ").trim();
+    return iban ?  iban.match(/.{1,4}/g)?.join(' ') || iban : '';
+  }
+
+  formatDate(dateString: string): string {
+    if (!dateString) return '';
+    return new Date(dateString).toLocaleDateString('fr-FR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
   }
 
   private markFormGroupTouched(formGroup: FormGroup): void {
     Object.values(formGroup.controls).forEach((control) => {
-      control.markAsTouched();
+      control. markAsTouched();
       if (control instanceof FormGroup) {
         this.markFormGroupTouched(control);
       }
     });
-  }
-
-  /**
-   * Retourne le label du type de virement sélectionné
-   */
-  getSelectedTransferTypeLabel(): string {
-    const type = this.transferTypes.find(
-      (t) => t.value === this.f.transferType.value
-    );
-    return type ? type.label : "";
   }
 }

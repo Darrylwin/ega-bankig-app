@@ -1,432 +1,534 @@
 <div class="deposit-container">
-  <!-- En-tête -->
-  <div class="deposit-header mb-4">
-    <div class="row align-items-center">
-      <div class="col-md-8">
-        <h2>Dépôt Bancaire</h2>
-        <p class="text-muted mb-0">Ajouter des fonds sur un compte</p>
-      </div>
-      <div class="col-md-4 text-end">
-        <button nbButton ghost size="small" (click)="onCancel()">
-          <nb-icon icon="arrow-back-outline" class="me-2"></nb-icon>
-          Retour aux opérations
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-left">
+        <button nbButton ghost size="small" (click)="onCancel()" class="back-btn">
+          <nb-icon icon="arrow-back-outline"></nb-icon>
         </button>
+        <div>
+          <h1 class="page-title">
+            <nb-icon icon="trending-up-outline"></nb-icon>
+            Dépôt Bancaire
+          </h1>
+          <p class="page-subtitle">Ajouter des fonds sur un compte en toute sécurité</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <br/>
+
+  <!-- Progress Steps -->
+  <div class="steps-progress">
+    <div class="steps-container">
+      <div class="step-item" [class.active]="currentStep >= 1" [class.completed]="currentStep > 1">
+        <div class="step-circle">
+          <nb-icon [icon]="currentStep > 1 ? 'checkmark-outline' : 'credit-card-outline'"></nb-icon>
+          <span>1</span>
+        </div>
+        <div class="step-label">Compte</div>
+      </div>
+
+      <div class="step-line" [class.active]="currentStep >= 2"></div>
+
+      <div class="step-item" [class.active]="currentStep >= 2" [class.completed]="currentStep > 2">
+        <div class="step-circle">
+          <nb-icon [icon]="currentStep > 2 ? 'checkmark-outline' : 'cash-outline'"></nb-icon>
+          <span>2</span>
+        </div>
+        <div class="step-label">Montant</div>
+      </div>
+
+      <div class="step-line" [class. active]="currentStep >= 3"></div>
+
+      <div class="step-item" [class. active]="currentStep >= 3">
+        <div class="step-circle">
+          <nb-icon icon="checkmark-circle-outline"></nb-icon>
+          <span>3</span>
+        </div>
+        <div class="step-label">Confirmation</div>
       </div>
     </div>
   </div>
 
   <!-- Chargement -->
-  <div *ngIf="isLoading" class="text-center py-5">
+  <div *ngIf="isLoading" class="loading-container">
     <nb-spinner size="giant" status="primary"></nb-spinner>
-    <p class="mt-3">Chargement des comptes...</p>
+    <p class="loading-text">Chargement des comptes...</p>
   </div>
 
   <!-- Formulaire -->
-  <div *ngIf="!isLoading">
-    <div class="row">
-      <div class="col-lg-8">
-        <nb-card>
-          <nb-card-body>
-            <form [formGroup]="depositForm" (ngSubmit)="onSubmit()" novalidate>
-              <!-- Étape 1 : Sélection du compte -->
-              <div class="row mb-4">
-                <div class="col-12">
-                  <h4 class="section-title mb-3">
-                    <nb-icon icon="credit-card-outline" class="me-2"></nb-icon>
-                    1. Sélection du Compte
-                  </h4>
+  <div *ngIf="!isLoading" class="form-content">
+    <form [formGroup]="depositForm" (ngSubmit)="onSubmit()">
+      <div class="form-grid">
+        <!-- Colonne principale -->
+        <div class="form-main">
+          <!-- ÉTAPE 1: Sélection du compte -->
+          <nb-card *ngIf="currentStep === 1" class="step-card step-1" [@slideIn]>
+            <nb-card-header>
+              <div class="step-header">
+                <div class="step-badge">Étape 1/3</div>
+                <h3>Sélection du Compte</h3>
+                <p>Choisissez le compte à créditer</p>
+              </div>
+            </nb-card-header>
+
+            <nb-card-body>
+              <div class="form-section">
+                <label for="accountId" class="form-label required">Compte bénéficiaire</label>
+                <nb-select
+                  id="accountId"
+                  fullWidth
+                  size="large"
+                  formControlName="accountId"
+                  placeholder="Sélectionnez un compte..."
+                  [status]="f.accountId.invalid && f.accountId.touched ?  'danger' : 'basic'"
+                  (selectedChange)="onAccountSelect()">
+                  
+                  <nb-option *ngFor="let account of accounts" [value]="account.id">
+                    <div class="account-option">
+                      <div class="account-icon">
+                        <nb-icon [icon]="account.accountType === 'SAVINGS' ? 'trending-up-outline' : 'credit-card-outline'"></nb-icon>
+                      </div>
+                      <div class="account-details">
+                        <div class="account-number">{{ formatAccountNumber(account. accountNumber) }}</div>
+                        <small>{{ account.customerFullName }}</small>
+                      </div>
+                      <div class="account-balance">
+                        {{ formatCurrency(account.balance) }}
+                      </div>
+                    </div>
+                  </nb-option>
+
+                  <nb-option *ngIf="accounts.length === 0" disabled>
+                    Aucun compte actif disponible
+                  </nb-option>
+                </nb-select>
+
+                <div *ngIf="f.accountId.invalid && f.accountId.touched" class="field-error">
+                  <nb-icon icon="alert-circle-outline"></nb-icon>
+                  <span>La sélection d'un compte est obligatoire</span>
                 </div>
 
-                <div class="col-12 mb-4">
-                  <label for="accountId" class="form-label required"
-                    >Compte à créditer</label
-                  >
-                  <nb-select
-                    id="accountId"
-                    fullWidth
-                    formControlName="accountId"
-                    placeholder="Sélectionnez un compte..."
-                    [status]="
-                      f.accountId.invalid && f.accountId.touched
-                        ? 'danger'
-                        : 'basic'
-                    "
-                    (selectedChange)="onAccountSelect()"
-                  >
-                    <nb-option
-                      *ngFor="let account of accounts"
-                      [value]="account.id"
-                    >
-                      {{ formatAccountNumber(account.accountNumber) }} -
-                      {{ account.customerFullName }} ({{
-                        formatCurrency(account.balance)
-                      }})
-                    </nb-option>
-
-                    <nb-option *ngIf="accounts.length === 0" disabled>
-                      Aucun compte disponible
-                    </nb-option>
-                  </nb-select>
-
-                  <div
-                    *ngIf="f.accountId.invalid && f.accountId.touched"
-                    class="text-danger mt-1 small"
-                  >
-                    <span *ngIf="f.accountId.errors?.['required']">
-                      La sélection d'un compte est obligatoire
-                    </span>
+                <!-- Carte du compte sélectionné -->
+                <div *ngIf="selectedAccount" class="selected-account-card">
+                  <div class="account-card-header">
+                    <nb-icon [icon]="selectedAccount.accountType === 'SAVINGS' ?  'trending-up-outline' : 'credit-card-outline'"></nb-icon>
+                    <nb-badge
+                      [text]="selectedAccount.accountType === 'SAVINGS' ? 'Épargne' : 'Courant'"
+                      [status]="selectedAccount.accountType === 'SAVINGS' ? 'success' : 'primary'">
+                    </nb-badge>
                   </div>
 
-                  <!-- Info compte sélectionné -->
-                  <div *ngIf="selectedAccount" class="mt-3">
-                    <nb-alert status="info" size="small">
-                      <div
-                        class="d-flex justify-content-between align-items-center"
-                      >
-                        <div>
-                          <strong>Compte sélectionné :</strong>
-                          {{
-                            formatAccountNumber(selectedAccount.accountNumber)
-                          }}
-                          <br />
-                          <small class="text-muted">
-                            Client : {{ selectedAccount.customerFullName }} |
-                            Solde actuel :
-                            {{ formatCurrency(selectedAccount.balance) }}
-                          </small>
-                        </div>
-                        <nb-badge
-                          [text]="
-                            selectedAccount.accountType === 'SAVINGS'
-                              ? 'Épargne'
-                              : 'Courant'
-                          "
-                          [status]="
-                            selectedAccount.accountType === 'SAVINGS'
-                              ? 'success'
-                              : 'primary'
-                          "
-                        >
-                        </nb-badge>
-                      </div>
-                    </nb-alert>
+                  <div class="account-card-body">
+                    <div class="account-info-item">
+                      <small>Numéro de compte</small>
+                      <strong>{{ formatAccountNumber(selectedAccount.accountNumber) }}</strong>
+                    </div>
+                    <div class="account-info-item">
+                      <small>Titulaire</small>
+                      <strong>{{ selectedAccount.customerFullName }}</strong>
+                    </div>
+                    <div class="account-info-item">
+                      <small>Solde actuel</small>
+                      <strong class="balance">{{ formatCurrency(selectedAccount.balance) }}</strong>
+                    </div>
+                    <div class="account-info-item">
+                      <small>Devise</small>
+                      <strong>{{ selectedAccount.currency }}</strong>
+                    </div>
                   </div>
                 </div>
               </div>
+            </nb-card-body>
 
-              <!-- Étape 2 : Montant et mode de paiement -->
-              <div class="row mb-4">
-                <div class="col-12">
-                  <h4 class="section-title mb-3">
-                    <nb-icon icon="cash-outline" class="me-2"></nb-icon>
-                    2. Montant et Mode de Paiement
-                  </h4>
-                </div>
+            <nb-card-footer>
+              <div class="step-actions">
+                <button nbButton status="basic" type="button" (click)="onCancel()">
+                  <nb-icon icon="close-outline"></nb-icon>
+                  Annuler
+                </button>
+                <button
+                  nbButton
+                  status="success"
+                  type="button"
+                  (click)="nextStep()"
+                  [disabled]="f.accountId.invalid">
+                  Suivant
+                  <nb-icon icon="arrow-forward-outline"></nb-icon>
+                </button>
+              </div>
+            </nb-card-footer>
+          </nb-card>
 
-                <!-- Montant -->
-                <div class="col-md-6 mb-4">
-                  <label for="amount" class="form-label required"
-                    >Montant du dépôt (€)</label
-                  >
+          <!-- ÉTAPE 2: Montant et mode de paiement -->
+          <nb-card *ngIf="currentStep === 2" class="step-card step-2" [@slideIn]>
+            <nb-card-header>
+              <div class="step-header">
+                <div class="step-badge">Étape 2/3</div>
+                <h3>Montant et Mode de Paiement</h3>
+                <p>Indiquez le montant à déposer</p>
+              </div>
+            </nb-card-header>
+
+            <nb-card-body>
+              <!-- Montant -->
+              <div class="form-section">
+                <label for="amount" class="form-label required">Montant du dépôt (€)</label>
+                <div class="amount-input-wrapper">
+                  <nb-icon icon="euro-outline" class="input-icon"></nb-icon>
                   <input
                     type="number"
                     id="amount"
                     nbInput
                     fullWidth
+                    size="giant"
                     formControlName="amount"
                     placeholder="0.00"
                     step="0.01"
                     min="0.01"
                     max="100000"
-                    [status]="
-                      f.amount.invalid && f.amount.touched ? 'danger' : 'basic'
-                    "
-                  />
-
-                  <div
-                    *ngIf="f.amount.invalid && f.amount.touched"
-                    class="text-danger mt-1 small"
-                  >
-                    <span *ngIf="f.amount.errors?.['required']">
-                      Le montant est obligatoire
-                    </span>
-                    <span *ngIf="f.amount.errors?.['min']">
-                      Le montant minimum est 0.01 €
-                    </span>
-                    <span *ngIf="f.amount.errors?.['max']">
-                      Le montant maximum est 100 000 €
-                    </span>
-                  </div>
-
-                  <!-- Montant en lettres -->
-                  <div *ngIf="f.amount.value && f.amount.valid" class="mt-2">
-                    <small class="text-muted">
-                      <nb-icon
-                        icon="checkmark-circle-outline"
-                        class="text-success me-1"
-                      ></nb-icon>
-                      {{ f.amount.value | number : "1.2-2" }} euros
-                    </small>
-                  </div>
+                    [status]="f.amount.invalid && f.amount.touched ? 'danger' : 'basic'">
                 </div>
 
-                <!-- Mode de paiement -->
-                <div class="col-md-6 mb-4">
-                  <label for="paymentMethod" class="form-label required"
-                    >Mode de paiement</label
-                  >
-                  <nb-select
-                    id="paymentMethod"
-                    fullWidth
-                    formControlName="paymentMethod"
-                    [status]="
-                      f.paymentMethod.invalid && f.paymentMethod.touched
-                        ? 'danger'
-                        : 'basic'
-                    "
-                  >
-                    <nb-option
-                      *ngFor="let method of paymentMethods"
-                      [value]="method.value"
-                    >
-                      <nb-icon [icon]="method.icon" class="me-2"></nb-icon>
-                      {{ method.label }}
-                    </nb-option>
-                  </nb-select>
-
-                  <div
-                    *ngIf="f.paymentMethod.invalid && f.paymentMethod.touched"
-                    class="text-danger mt-1 small"
-                  >
-                    <span *ngIf="f.paymentMethod.errors?.['required']">
-                      Le mode de paiement est obligatoire
-                    </span>
-                  </div>
+                <div *ngIf="f. amount.invalid && f.amount. touched" class="field-error">
+                  <nb-icon icon="alert-circle-outline"></nb-icon>
+                  <span *ngIf="f.amount. errors?.['required']">Le montant est obligatoire</span>
+                  <span *ngIf="f.amount.errors?.['min']">Montant minimum: 0.01 €</span>
+                  <span *ngIf="f. amount.errors?.['max']">Montant maximum: 100 000 €</span>
                 </div>
 
-                <!-- Référence -->
-                <div class="col-md-6 mb-4">
-                  <label for="reference" class="form-label">Référence</label>
-                  <input
-                    type="text"
-                    id="reference"
-                    nbInput
-                    fullWidth
-                    formControlName="reference"
-                    placeholder="Réf. chèque ou virement"
-                    maxlength="50"
-                  />
-                  <small class="text-muted"
-                    >Optionnel - pour votre référence</small
-                  >
-                </div>
-
-                <!-- Description -->
-                <div class="col-md-6 mb-4">
-                  <label for="description" class="form-label"
-                    >Description</label
-                  >
-                  <input
-                    type="text"
-                    id="description"
-                    nbInput
-                    fullWidth
-                    formControlName="description"
-                    placeholder="Motif du dépôt"
-                    maxlength="200"
-                  />
-                  <small class="text-muted"
-                    >Optionnel - visible dans l'historique</small
-                  >
-                </div>
-              </div>
-
-              <!-- Récapitulatif -->
-              <div
-                class="row mb-4"
-                *ngIf="selectedAccount && f.amount.value && f.amount.valid"
-              >
-                <div class="col-12">
-                  <nb-card status="success">
-                    <nb-card-header>
-                      <h5 class="mb-0">
-                        <nb-icon
-                          icon="checkmark-circle-outline"
-                          class="me-2"
-                        ></nb-icon>
-                        Récapitulatif du Dépôt
-                      </h5>
-                    </nb-card-header>
-                    <nb-card-body>
-                      <div class="row">
-                        <div class="col-md-6">
-                          <div class="mb-2">
-                            <small class="text-muted">Compte crédité</small>
-                            <div class="fw-bold">
-                              {{
-                                formatAccountNumber(
-                                  selectedAccount.accountNumber
-                                )
-                              }}
-                            </div>
-                          </div>
-                          <div class="mb-2">
-                            <small class="text-muted">Client</small>
-                            <div class="fw-bold">
-                              {{ selectedAccount.customerFullName }}
-                            </div>
-                          </div>
-                          <div class="mb-2">
-                            <small class="text-muted">Mode de paiement</small>
-                            <div class="fw-bold">
-                              {{ getSelectedPaymentMethodLabel() }}
-                            </div>
-                          </div>
-                        </div>
-                        <div class="col-md-6">
-                          <div class="mb-2">
-                            <small class="text-muted">Montant du dépôt</small>
-                            <div class="fw-bold h4 text-success">
-                              {{ formatCurrency(f.amount.value) }}
-                            </div>
-                          </div>
-                          <div class="mb-2">
-                            <small class="text-muted">Nouveau solde</small>
-                            <div class="fw-bold h5">
-                              {{
-                                formatCurrency(
-                                  selectedAccount.balance + f.amount.value
-                                )
-                              }}
-                            </div>
-                          </div>
-                          <div class="mb-2">
-                            <small class="text-muted">Gains</small>
-                            <div class="fw-bold text-success">
-                              + {{ formatCurrency(f.amount.value) }}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </nb-card-body>
-                  </nb-card>
-                </div>
-              </div>
-
-              <!-- Actions -->
-              <div class="row">
-                <div class="col-12">
-                  <div class="d-flex justify-content-end gap-2">
+                <!-- Montants rapides -->
+                <div class="quick-amounts">
+                  <label class="quick-label">Montants rapides</label>
+                  <div class="quick-buttons">
                     <button
+                      *ngFor="let quickAmount of quickAmounts"
                       nbButton
-                      status="basic"
+                      ghost
+                      size="small"
                       type="button"
-                      (click)="onCancel()"
-                      [disabled]="isSubmitting"
-                    >
-                      Annuler
-                    </button>
-
-                    <button
-                      nbButton
-                      status="success"
-                      type="submit"
-                      [disabled]="depositForm.invalid || isSubmitting"
-                      [class.btn-pulse]="isSubmitting"
-                    >
-                      <span *ngIf="!isSubmitting">
-                        <nb-icon
-                          icon="checkmark-outline"
-                          class="me-2"
-                        ></nb-icon>
-                        Confirmer le dépôt
-                      </span>
-
-                      <span *ngIf="isSubmitting">
-                        <nb-icon
-                          icon="sync-outline"
-                          class="spin me-2"
-                        ></nb-icon>
-                        Traitement en cours...
-                      </span>
+                      (click)="applyQuickAmount(quickAmount)">
+                      {{ formatCurrency(quickAmount) }}
                     </button>
                   </div>
                 </div>
+
+                <!-- Alerte si montant élevé -->
+                <nb-alert *ngIf="isAmountOverLimit()" status="warning" size="small">
+                  <nb-icon icon="alert-triangle-outline"></nb-icon>
+                  Le montant dépasse la limite journalière pour ce mode de paiement
+                </nb-alert>
               </div>
-            </form>
-          </nb-card-body>
-        </nb-card>
+
+              <!-- Modes de paiement -->
+              <div class="form-section">
+                <label class="form-label required">Mode de paiement</label>
+                <div class="payment-methods-grid">
+                  <div
+                    *ngFor="let method of paymentMethods"
+                    class="payment-method-card"
+                    [class.selected]="f.paymentMethod.value === method.value"
+                    (click)="depositForm.patchValue({ paymentMethod: method. value })">
+                    
+                    <input
+                      type="radio"
+                      [id]="'method-' + method.value"
+                      [value]="method. value"
+                      formControlName="paymentMethod"
+                      class="payment-radio">
+
+                    <div class="payment-icon">
+                      <nb-icon [icon]="method.icon"></nb-icon>
+                    </div>
+
+                    <div class="payment-info">
+                      <h6>{{ method.label }}</h6>
+                      <p>{{ method.description }}</p>
+                      <div class="payment-meta">
+                        <small>
+                          <nb-icon icon="clock-outline"></nb-icon>
+                          {{ method.delay }}
+                        </small>
+                        <small>
+                          <nb-icon icon="shield-outline"></nb-icon>
+                          Max: {{ formatCurrency(method.limit) }}
+                        </small>
+                      </div>
+                    </div>
+
+                    <div class="payment-check" *ngIf="f.paymentMethod.value === method.value">
+                      <nb-icon icon="checkmark-circle-2-outline"></nb-icon>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Informations complémentaires -->
+              <div class="form-section">
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="reference" class="form-label">Référence</label>
+                    <input
+                      type="text"
+                      id="reference"
+                      nbInput
+                      fullWidth
+                      formControlName="reference"
+                      placeholder="N° chèque, référence..."
+                      maxlength="50">
+                    <small class="field-hint">Optionnel</small>
+                  </div>
+
+                  <div class="col-md-6 mb-3">
+                    <label for="description" class="form-label">Description</label>
+                    <input
+                      type="text"
+                      id="description"
+                      nbInput
+                      fullWidth
+                      formControlName="description"
+                      placeholder="Motif du dépôt..."
+                      maxlength="200">
+                    <small class="field-hint">Optionnel</small>
+                  </div>
+                </div>
+              </div>
+            </nb-card-body>
+
+            <nb-card-footer>
+              <div class="step-actions">
+                <button nbButton status="basic" type="button" (click)="previousStep()">
+                  <nb-icon icon="arrow-back-outline"></nb-icon>
+                  Retour
+                </button>
+                <button
+                  nbButton
+                  status="success"
+                  type="button"
+                  (click)="nextStep()"
+                  [disabled]="f.amount.invalid || f.paymentMethod.invalid">
+                  Suivant
+                  <nb-icon icon="arrow-forward-outline"></nb-icon>
+                </button>
+              </div>
+            </nb-card-footer>
+          </nb-card>
+
+          <!-- ÉTAPE 3: Confirmation -->
+          <nb-card *ngIf="currentStep === 3" class="step-card step-3" [@slideIn]>
+            <nb-card-header>
+              <div class="step-header">
+                <div class="step-badge">Étape 3/3</div>
+                <h3>Confirmation du Dépôt</h3>
+                <p>Vérifiez les informations avant de confirmer</p>
+              </div>
+            </nb-card-header>
+
+            <nb-card-body>
+              <div class="confirmation-summary">
+                <!-- Montant principal -->
+                <div class="summary-amount">
+                  <div class="amount-icon">
+                    <nb-icon icon="trending-up-outline"></nb-icon>
+                  </div>
+                  <div class="amount-value">{{ formatCurrency(f.amount.value) }}</div>
+                  <div class="amount-label">Montant du dépôt</div>
+                </div>
+
+                <!-- Détails -->
+                <div class="summary-details">
+                  <div class="detail-row">
+                    <span class="detail-label">
+                      <nb-icon icon="credit-card-outline"></nb-icon>
+                      Compte
+                    </span>
+                    <span class="detail-value">
+                      {{ formatAccountNumber(selectedAccount! .accountNumber) }}
+                    </span>
+                  </div>
+
+                  <div class="detail-row">
+                    <span class="detail-label">
+                      <nb-icon icon="person-outline"></nb-icon>
+                      Bénéficiaire
+                    </span>
+                    <span class="detail-value">{{ selectedAccount!.customerFullName }}</span>
+                  </div>
+
+                  <div class="detail-row">
+                    <span class="detail-label">
+                      <nb-icon icon="cube-outline"></nb-icon>
+                      Mode de paiement
+                    </span>
+                    <span class="detail-value">{{ getSelectedPaymentMethod()?.label }}</span>
+                  </div>
+
+                  <div class="detail-row" *ngIf="f.reference.value">
+                    <span class="detail-label">
+                      <nb-icon icon="hash-outline"></nb-icon>
+                      Référence
+                    </span>
+                    <span class="detail-value">{{ f.reference.value }}</span>
+                  </div>
+
+                  <div class="detail-row" *ngIf="f.description.value">
+                    <span class="detail-label">
+                      <nb-icon icon="file-text-outline"></nb-icon>
+                      Description
+                    </span>
+                    <span class="detail-value">{{ f.description.value }}</span>
+                  </div>
+
+                  <div class="detail-row divider">
+                    <span class="detail-label">
+                      <nb-icon icon="wallet-outline"></nb-icon>
+                      Solde actuel
+                    </span>
+                    <span class="detail-value">{{ formatCurrency(selectedAccount!.balance) }}</span>
+                  </div>
+
+                  <div class="detail-row highlight">
+                    <span class="detail-label">
+                      <nb-icon icon="trending-up-outline"></nb-icon>
+                      Nouveau solde
+                    </span>
+                    <span class="detail-value success">
+                      {{ formatCurrency(selectedAccount!.balance + f.amount.value) }}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Informations importantes -->
+                <nb-alert status="info" size="small" class="mt-3">
+                  <nb-icon icon="info-outline"></nb-icon>
+                  <div>
+                    <strong>Délai de traitement</strong>
+                    <p class="mb-0 mt-1">{{ getSelectedPaymentMethod()?.delay }}</p>
+                  </div>
+                </nb-alert>
+              </div>
+            </nb-card-body>
+
+            <nb-card-footer>
+              <div class="step-actions">
+                <button nbButton status="basic" type="button" (click)="previousStep()" [disabled]="isSubmitting">
+                  <nb-icon icon="arrow-back-outline"></nb-icon>
+                  Retour
+                </button>
+                <button
+                  nbButton
+                  status="success"
+                  size="large"
+                  type="submit"
+                  [disabled]="depositForm.invalid || isSubmitting"
+                  [class.btn-loading]="isSubmitting">
+                  
+                  <nb-icon [icon]="isSubmitting ? 'loader-outline' : 'checkmark-circle-outline'" [class.spin]="isSubmitting"></nb-icon>
+                  {{ isSubmitting ? 'Traitement.. .' : 'Confirmer le dépôt' }}
+                </button>
+              </div>
+            </nb-card-footer>
+          </nb-card>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="form-sidebar">
+          <!-- Récapitulatif -->
+          <nb-card class="summary-card sticky">
+            <nb-card-header>
+              <h6>
+                <nb-icon icon="eye-outline"></nb-icon>
+                Récapitulatif
+              </h6>
+            </nb-card-header>
+            <nb-card-body>
+              <div class="summary-item" *ngIf="selectedAccount">
+                <small>Compte</small>
+                <strong>{{ formatAccountNumber(selectedAccount.accountNumber) }}</strong>
+              </div>
+
+              <div class="summary-item" *ngIf="f.amount.value">
+                <small>Montant</small>
+                <strong class="text-success">{{ formatCurrency(f.amount.value) }}</strong>
+              </div>
+
+              <div class="summary-item" *ngIf="getSelectedPaymentMethod()">
+                <small>Mode</small>
+                <strong>{{ getSelectedPaymentMethod()?.label }}</strong>
+              </div>
+
+              <div class="summary-divider"></div>
+
+              <div class="summary-item">
+                <small>Frais</small>
+                <strong>{{ formatCurrency(calculateFees()) }}</strong>
+              </div>
+
+              <div class="summary-item total">
+                <small>Total</small>
+                <strong>{{ formatCurrency(calculateTotal()) }}</strong>
+              </div>
+
+              <div class="summary-progress">
+                <small>Progression</small>
+                <nb-progress-bar [value]="(currentStep / totalSteps) * 100" status="success"></nb-progress-bar>
+              </div>
+            </nb-card-body>
+          </nb-card>
+
+          <!-- Informations -->
+          <nb-card class="info-card">
+            <nb-card-header>
+              <h6>
+                <nb-icon icon="info-outline"></nb-icon>
+                Informations
+              </h6>
+            </nb-card-header>
+            <nb-card-body>
+              <div class="info-item">
+                <nb-icon icon="shield-outline" status="success"></nb-icon>
+                <div>
+                  <strong>Sécurisé</strong>
+                  <p>Transaction cryptée et protégée</p>
+                </div>
+              </div>
+
+              <div class="info-item">
+                <nb-icon icon="flash-outline" status="warning"></nb-icon>
+                <div>
+                  <strong>Rapide</strong>
+                  <p>Traitement en temps réel</p>
+                </div>
+              </div>
+
+              <div class="info-item">
+                <nb-icon icon="checkmark-outline" status="info"></nb-icon>
+                <div>
+                  <strong>Sans frais</strong>
+                  <p>Aucun frais de dépôt</p>
+                </div>
+              </div>
+            </nb-card-body>
+          </nb-card>
+
+          <!-- Assistance -->
+          <nb-card class="help-card">
+            <nb-card-body>
+              <div class="help-icon">
+                <nb-icon icon="question-mark-circle-outline"></nb-icon>
+              </div>
+              <h6>Besoin d'aide ? </h6>
+              <p>Contactez notre service client</p>
+              <button nbButton status="primary" size="small" ghost fullWidth>
+                <nb-icon icon="phone-outline"></nb-icon>
+                01 23 45 67 89
+              </button>
+            </nb-card-body>
+          </nb-card>
+        </div>
       </div>
-
-      <!-- Informations -->
-      <div class="col-lg-4">
-        <nb-card class="mb-4">
-          <nb-card-header>
-            <h5 class="mb-0">
-              <nb-icon icon="info-circle-outline" class="me-2"></nb-icon>
-              Informations importantes
-            </h5>
-          </nb-card-header>
-          <nb-card-body>
-            <div class="mb-3">
-              <h6>Dépôt par Espèces</h6>
-              <ul class="text-muted small">
-                <li>Maximum : 5 000 € par jour</li>
-                <li>Pièce d'identité obligatoire</li>
-                <li>Reçu immédiatement</li>
-                <li>Disponible instantanément</li>
-              </ul>
-            </div>
-
-            <div class="mb-3">
-              <h6>Dépôt par Chèque</h6>
-              <ul class="text-muted small">
-                <li>Encaisse sous 2 jours ouvrés</li>
-                <li>Vérification des fonds</li>
-                <li>Endossement obligatoire</li>
-                <li>Reçu de dépôt fourni</li>
-              </ul>
-            </div>
-
-            <div>
-              <h6>Dépôt par Virement</h6>
-              <ul class="text-muted small">
-                <li>Crédité sous 24h</li>
-                <li>RIB disponible en agence</li>
-                <li>Gratuit pour les clients</li>
-                <li>Traçabilité complète</li>
-              </ul>
-            </div>
-          </nb-card-body>
-        </nb-card>
-
-        <!-- Assistance -->
-        <nb-card>
-          <nb-card-header>
-            <h5 class="mb-0">
-              <nb-icon icon="headphones-outline" class="me-2"></nb-icon>
-              Assistance
-            </h5>
-          </nb-card-header>
-          <nb-card-body>
-            <p class="text-muted small mb-3">
-              Pour toute question concernant les dépôts, contactez notre service
-              client.
-            </p>
-            <div class="text-center">
-              <nb-icon
-                icon="phone-call-outline"
-                class="text-primary"
-                size="giant"
-              ></nb-icon>
-              <p class="mt-2 mb-0">
-                <strong>01 23 45 67 89</strong><br />
-                <small>Lun-Ven 9h-18h</small>
-              </p>
-            </div>
-          </nb-card-body>
-        </nb-card>
-      </div>
-    </div>
+    </form>
   </div>
 </div>
