@@ -4,12 +4,12 @@
 
 // Header
 .detail-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: linear-gradient(135deg, var(--color-primary-400) 0%, var(--color-primary-600) 100%);
+  color: var(--text-control-color);
   padding: 2rem;
   margin: -1 5rem -1.5rem 2rem -1.5rem;
   border-radius: 0 0 1rem 1rem;
-  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 20px rgba(var(--color-primary-400-rgb), 0.3);
 
   .header-content {
     max-width: 1400px;
@@ -28,12 +28,12 @@
     flex: 1;
 
     .back-btn {
-      background: rgba(255, 255, 255, 0.2);
+      background: rgba(var(--text-control-color-rgb), 0.2);
       border: none;
-      color: white;
+      color: var(--text-control-color);
 
       &:hover {
-        background: rgba(255, 255, 255, 0.3);
+        background: rgba(var(--text-control-color-rgb), 0.3);
       }
     }
   }
@@ -64,7 +64,7 @@
     gap: 0.75rem;
 
     button {
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      box-shadow: var(--shadow);
     }
   }
 }
@@ -77,22 +77,22 @@
 
   .loading-text {
     margin-top: 1rem;
-    color: #8f9bb3;
+    color: var(--text-hint-color);
   }
 
   .error-icon {
     font-size: 4rem;
-    color: #ff3d71;
+    color: var(--color-danger-500);
     margin-bottom: 1.5rem;
   }
 
   h4 {
-    color: #222b45;
+    color: var(--text-basic-color);
     margin-bottom: 0.5rem;
   }
 
   p {
-    color: #8f9bb3;
+    color: var(--text-hint-color);
     margin-bottom: 2rem;
   }
 }
@@ -112,9 +112,9 @@
 .balance-card {
   border-radius: 1rem;
   border: none;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  box-shadow: var(--shadow-hover);
+  background: linear-gradient(135deg, var(--color-primary-400) 0%, var(--color-primary-600) 100%);
+  color: var(--text-control-color);
 
   nb-card-body {
     padding: 2rem;
@@ -145,7 +145,7 @@
     gap: 0.5rem;
     padding: 0.5rem 1rem;
     border-radius: 2rem;
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(var(--text-control-color-rgb), 0.2);
     font-weight: 600;
 
     nb-icon {
@@ -153,11 +153,11 @@
     }
 
     &.type-success {
-      background: rgba(0, 214, 143, 0.2);
+      background: rgba(var(--color-success-500-rgb), 0.2);
     }
 
     &.type-primary {
-      background: rgba(51, 102, 255, 0.2);
+      background: rgba(var(--color-primary-500-rgb), 0.2);
     }
   }
 
@@ -199,7 +199,7 @@
       margin-bottom: 0.25rem;
 
       &.positive {
-        color: #00ffa3;
+        color: var(--color-success-300);
       }
 
       &.zero {
@@ -207,7 +207,7 @@
       }
 
       &.negative {
-        color: #ff6b9d;
+        color: var(--color-danger-300);
       }
     }
 
@@ -233,12 +233,12 @@
     gap: 0.5rem;
     padding: 1 5rem 1rem;
     border-radius: 0.75rem;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--shadow);
     transition: all 0.3s;
 
     &:hover {
       transform: translateY(-4px);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      box-shadow: var(--shadow-hover);
     }
 
     nb-icon {
@@ -267,11 +267,11 @@
 .actions-card {
   border-radius: 1rem;
   border: none;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow);
   margin-bottom: 1.5rem;
 
   nb-card-header {
-    border-bottom: 1px solid;
+    border-bottom: 1px solid var(--border-basic-color-3);
 
     h6 {
       margin: 0;
@@ -309,7 +309,7 @@
   align-items: center;
   gap: 1rem;
   padding: 1rem;
-  background: #f7f9fc;
+  background: rgba(var(--color-primary-100-rgb), 0.5);
   border-radius: 0.75rem;
 
   .stat-icon {
@@ -326,23 +326,19 @@
     }
 
     &.stat-success {
-      background: #e8f9f0;
-      color: #00d68f;
+      color: var(--color-success-500);
     }
 
     &.stat-danger {
-      background: #ffe8ed;
-      color: #ff3d71;
+      color: var(--color-danger-500);
     }
 
     &.stat-primary {
-      background: #e7f1ff;
-      color: #3366ff;
+      color: var(--color-primary-500);
     }
 
     &.stat-info {
-      background: #e6f7ff;
-      color: #0095ff;
+      color: var(--color-info-500);
     }
   }
 
@@ -357,7 +353,7 @@
 
     .stat-label {
       font-size: 0.85rem;
-      color: #8f9bb3;
+      color: var(--text-hint-color);
       margin-bottom: 0.25rem;
     }
 
@@ -377,7 +373,7 @@
 .no-data {
   text-align: center;
   padding: 3rem 0;
-  color: #8f9bb3;
+  color: var(--text-hint-color);
 
   nb-icon {
     font-size: 3rem;
@@ -407,11 +403,11 @@
   gap: 1rem;
   padding: 1rem;
   border-radius: 0.75rem;
-  background: #f7f9fc;
+  background: var(--color-basic-100);
   transition: all 0.2s;
 
   &:hover {
-    background: #edf1f7;
+    background: var(--color-basic-200);
   }
 
   .transaction-icon {
@@ -428,18 +424,18 @@
     }
 
     &.icon-success {
-      background: #e8f9f0;
-      color: #00d68f;
+      background: var(--color-success-100);
+      color: var(--color-success-500);
     }
 
     &.icon-danger {
-      background: #ffe8ed;
-      color: #ff3d71;
+      background: var(--color-danger-100);
+      color: var(--color-danger-500);
     }
 
     &.icon-primary {
-      background: #e7f1ff;
-      color: #3366ff;
+      background: var(--color-primary-100);
+      color: var(--color-primary-500);
     }
   }
 
@@ -455,7 +451,7 @@
     .transaction-ref {
       display: block;
       font-size: 0.8rem;
-      color: #8f9bb3;
+      color: var(--text-hint-color);
     }
   }
 
@@ -469,17 +465,17 @@
     }
 
     &.amount-positive .amount-value {
-      color: #00d68f;
+      color: var(--color-success-500);
     }
 
     &.amount-negative .amount-value {
-      color: #ff3d71;
+      color: var(--color-danger-500);
     }
 
     .amount-balance {
       display: block;
       font-size: 0.75rem;
-      color: #8f9bb3;
+      color: var(--text-hint-color);
     }
   }
 }
@@ -490,12 +486,12 @@
 
   nb-icon {
     font-size: 3rem;
-    color: #c5cee0;
+    color: var(--color-basic-400);
     margin-bottom: 1rem;
   }
 
   p {
-    color: #8f9bb3;
+    color: var(--text-hint-color);
     margin-bottom: 1 5rem;
   }
 }
@@ -506,7 +502,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem 0;
-  border-bottom: 1px solid #edf1f7;
+  border-bottom: 1px solid var(--border-basic-color-3);
 
   &:last-child {
     border-bottom: none;
@@ -517,7 +513,7 @@
     align-items: center;
     gap: 0.5rem;
     font-size: 0.85rem;
-    color: #8f9bb3;
+    color: var(--text-hint-color);
 
     nb-icon {
       font-size: 1rem;
@@ -541,7 +537,7 @@
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--color-primary-400) 0%, var(--color-primary-600) 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -549,7 +545,7 @@
 
     nb-icon {
       font-size: 2.5rem;
-      color: white;
+      color: var(--text-control-color);
     }
   }
 
@@ -569,7 +565,7 @@
     align-items: center;
     gap: 0.75rem;
     padding: 0.75rem 0;
-    border-bottom: 1px solid #edf1f7;
+    border-bottom: 1px solid var(--border-basic-color-3);
     font-size: 0.9rem;
 
     &:last-child {
@@ -577,7 +573,7 @@
     }
 
     nb-icon {
-      color: #8f9bb3;
+      color: var(--text-hint-color);
       font-size: 1 1rem;
       flex-shrink: 0;
     }
