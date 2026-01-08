@@ -1,5 +1,5 @@
 <div class="account-form-container">
-  <!-- Header moderne -->
+  <!-- Header -->
   <div class="form-header">
     <div class="header-content">
       <div class="header-left">
@@ -17,17 +17,13 @@
             <nb-icon icon="plus-circle-outline"></nb-icon>
             Ouverture de Compte
           </h1>
-          <p class="form-subtitle">
-            Créez un nouveau compte bancaire en quelques étapes
-          </p>
+          <p class="form-subtitle">Créez un nouveau compte bancaire</p>
         </div>
       </div>
     </div>
   </div>
 
-  <br />
-
-  <!-- Chargement -->
+  <!-- Loading -->
   <div *ngIf="isLoading" class="loading-container">
     <nb-spinner size="giant" status="primary"></nb-spinner>
     <p class="loading-text">Chargement des clients...</p>
@@ -46,9 +42,7 @@
                 <div class="step-badge">1</div>
                 <div>
                   <h5>Sélection du Client</h5>
-                  <p class="text-muted mb-0">
-                    Choisissez le titulaire du compte
-                  </p>
+                  <p class="text-muted">Choisissez le titulaire du compte</p>
                 </div>
               </div>
             </nb-card-header>
@@ -70,15 +64,15 @@
                   "
                 >
                   <nb-select-label>
-                    <span *ngIf="f.customerId.value">
-                      {{ displayCustomerFn(f.customerId.value) }}
-                    </span>
+                    <span *ngIf="f.customerId.value">{{
+                      displayCustomerFn(f.customerId.value)
+                    }}</span>
                   </nb-select-label>
                   <input
                     type="text"
                     nbInput
-                    (input)="onCustomerSearch($event.target.value)"
-                    placeholder="Taper pour rechercher... "
+                    (input)="onCustomerSearch($any($event.target).value)"
+                    placeholder="Taper pour rechercher..."
                   />
                   <nb-option
                     *ngFor="let customer of filteredCustomers"
@@ -92,7 +86,7 @@
                         <div class="customer-name">
                           {{ customer.lastName }} {{ customer.firstName }}
                         </div>
-                        <small class="text-muted">{{ customer.email }}</small>
+                        <small>{{ customer.email }}</small>
                       </div>
                     </div>
                   </nb-option>
@@ -109,10 +103,7 @@
               <!-- Info client sélectionné -->
               <div *ngIf="selectedCustomer" class="customer-preview">
                 <div class="preview-header">
-                  <nb-icon
-                    icon="checkmark-circle-outline"
-                    status="success"
-                  ></nb-icon>
+                  <nb-icon icon="checkmark-circle-outline"></nb-icon>
                   <span>Client sélectionné</span>
                 </div>
                 <div class="preview-body">
@@ -136,12 +127,9 @@
                     }}</span>
                   </div>
                   <div class="preview-row">
-                    <span class="preview-label">Date de naissance:</span>
+                    <span class="preview-label">Âge:</span>
                     <span class="preview-value"
-                      >{{
-                        selectedCustomer.dateOfBirth | date : "dd/MM/yyyy"
-                      }}
-                      ({{ selectedCustomer.age }} ans)</span
+                      >{{ selectedCustomer.age }} ans</span
                     >
                   </div>
                 </div>
@@ -156,7 +144,7 @@
                 <div class="step-badge">2</div>
                 <div>
                   <h5>Type de Compte</h5>
-                  <p class="text-muted mb-0">
+                  <p class="text-muted">
                     Sélectionnez le type de compte à ouvrir
                   </p>
                 </div>
@@ -182,7 +170,7 @@
                     class="type-icon-wrapper"
                     [ngClass]="'type-' + type.color"
                   >
-                    <nb-icon [icon]="type.icon" class="type-icon"></nb-icon>
+                    <nb-icon [icon]="type.icon"></nb-icon>
                   </div>
 
                   <h6 class="type-title">{{ type.label }}</h6>
@@ -190,10 +178,7 @@
 
                   <ul class="type-features">
                     <li *ngFor="let feature of type.features">
-                      <nb-icon
-                        icon="checkmark-outline"
-                        status="success"
-                      ></nb-icon>
+                      <nb-icon icon="checkmark-outline"></nb-icon>
                       <span>{{ feature }}</span>
                     </li>
                   </ul>
@@ -216,7 +201,7 @@
                 <div class="step-badge">3</div>
                 <div>
                   <h5>Devise du Compte</h5>
-                  <p class="text-muted mb-0">Choisissez la devise de gestion</p>
+                  <p class="text-muted">Choisissez la devise de gestion</p>
                 </div>
               </div>
             </nb-card-header>
@@ -235,11 +220,9 @@
                     formControlName="currency"
                     class="currency-radio"
                   />
-
                   <div class="currency-flag">{{ currency.flag }}</div>
                   <div class="currency-code">{{ currency.value }}</div>
                   <div class="currency-name">{{ currency.label }}</div>
-
                   <div
                     class="currency-check"
                     *ngIf="f.currency.value === currency.value"
@@ -271,11 +254,11 @@
               status="primary"
               type="submit"
               [disabled]="accountForm.invalid || isSubmitting"
-              [class.btn-loading]="isSubmitting"
             >
               <nb-icon
                 [icon]="isSubmitting ? 'loader-outline' : 'checkmark-outline'"
-                [class.spin]="isSubmitting"
+                [class.
+                spin]="isSubmitting"
               ></nb-icon>
               {{ isSubmitting ? "Création en cours..." : "Créer le compte" }}
             </button>
@@ -284,7 +267,6 @@
 
         <!-- Sidebar récapitulatif -->
         <div class="form-sidebar">
-          <!-- Récapitulatif -->
           <nb-card class="summary-card">
             <nb-card-header>
               <h6>
@@ -370,10 +352,12 @@
 
               <!-- Validation -->
               <div class="summary-validation" *ngIf="accountForm.valid">
-                <nb-alert status="success" size="tiny">
+                <nb-badge
+                  text="Toutes les informations sont complètes"
+                  status="success"
+                >
                   <nb-icon icon="checkmark-circle-outline"></nb-icon>
-                  Toutes les informations sont complètes
-                </nb-alert>
+                </nb-badge>
               </div>
             </nb-card-body>
           </nb-card>

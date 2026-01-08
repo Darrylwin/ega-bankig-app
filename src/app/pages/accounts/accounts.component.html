@@ -1,17 +1,14 @@
 <div class="accounts-container">
-  <!-- En-tête moderne -->
+  <!-- Header -->
   <div class="page-header">
     <div class="header-content">
       <div class="header-left">
         <h1 class="page-title">
-          <nb-icon icon="credit-card-outline" class="title-icon"></nb-icon>
+          <nb-icon icon="credit-card-outline"></nb-icon>
           Gestion des Comptes
         </h1>
         <p class="page-subtitle">
-          <span class="badge badge-primary">{{ totalItems }}</span>
-          compte{{ totalItems > 1 ? "s" : "" }} bancaire{{
-            totalItems > 1 ? "s" : ""
-          }}
+          {{ formatNumber(totalItems) }} compte{{ totalItems > 1 ? "s" : "" }} bancaire{{ totalItems > 1 ?  "s" : "" }}
         </p>
       </div>
       <div class="header-actions">
@@ -35,15 +32,6 @@
           >
             <nb-icon icon="grid-outline"></nb-icon>
           </button>
-          <button
-            nbButton
-            size="small"
-            [status]="viewMode === 'stats' ? 'primary' : 'basic'"
-            (click)="setViewMode('stats')"
-            nbTooltip="Statistiques"
-          >
-            <nb-icon icon="bar-chart-outline"></nb-icon>
-          </button>
         </nb-button-group>
 
         <button nbButton status="primary" (click)="onCreate()">
@@ -51,149 +39,96 @@
           Nouveau Compte
         </button>
 
-        <button
-          nbButton
-          ghost
-          (click)="exportToCSV()"
-          nbTooltip="Exporter en CSV"
-        >
+        <button nbButton ghost (click)="exportToCSV()" nbTooltip="Exporter en CSV">
           <nb-icon icon="download-outline"></nb-icon>
         </button>
       </div>
     </div>
   </div>
 
-  <br />
-
-  <!-- Filtres compacts -->
-  <nb-card class="filters-card" *ngIf="viewMode === 'table'">
+  <!-- Filtres -->
+  <nb-card class="filters-card">
     <nb-card-body>
       <div class="filters-row">
         <div class="filter-item filter-search">
+          <nb-icon icon="search-outline" class="search-icon"></nb-icon>
           <input
             type="text"
             nbInput
             fullWidth
             placeholder="Rechercher par IBAN ou nom..."
             [(ngModel)]="searchTerm"
-            (keyup.enter)="applyFilters()"
+            (keyup)="applyFilters()"
           />
-          <button nbButton ghost size="tiny" (click)="applyFilters()">
-            <nb-icon icon="search-outline"></nb-icon>
+          <button nbButton ghost size="small" *ngIf="searchTerm" (click)="resetFilters()" class="clear-btn">
+            <nb-icon icon="close-outline"></nb-icon>
           </button>
         </div>
 
         <div class="filter-item">
-          <nb-select
-            fullWidth
-            size="small"
-            [(ngModel)]="accountTypeFilter"
-            (ngModelChange)="applyFilters()"
-            placeholder="Type"
-          >
-            <nb-option
-              *ngFor="let type of filterOptions.accountTypes"
-              [value]="type.value"
-            >
+          <nb-select fullWidth size="small" [(ngModel)]="accountTypeFilter" (ngModelChange)="applyFilters()" placeholder="Type">
+            <nb-option *ngFor="let type of filterOptions.accountTypes" [value]="type.value">
               {{ type.label }}
             </nb-option>
           </nb-select>
         </div>
 
         <div class="filter-item">
-          <nb-select
-            fullWidth
-            size="small"
-            [(ngModel)]="statusFilter"
-            (ngModelChange)="applyFilters()"
-            placeholder="Statut"
-          >
-            <nb-option
-              *ngFor="let status of filterOptions.statuses"
-              [value]="status.value"
-            >
+          <nb-select fullWidth size="small" [(ngModel)]="statusFilter" (ngModelChange)="applyFilters()" placeholder="Statut">
+            <nb-option *ngFor="let status of filterOptions.statuses" [value]="status.value">
               {{ status.label }}
             </nb-option>
           </nb-select>
         </div>
-
-        <button
-          nbButton
-          ghost
-          size="small"
-          (click)="resetFilters()"
-          nbTooltip="Réinitialiser"
-        >
-          <nb-icon icon="refresh-outline"></nb-icon>
-        </button>
       </div>
     </nb-card-body>
   </nb-card>
 
-  <!-- Chargement -->
+  <!-- Loading -->
   <div *ngIf="isLoading" class="loading-container">
     <nb-spinner size="giant" status="primary"></nb-spinner>
     <p class="loading-text">Chargement des comptes...</p>
   </div>
 
   <!-- Contenu -->
-  <div *ngIf="!isLoading">
+  <div *ngIf="! isLoading">
     <!-- VUE TABLEAU -->
     <div *ngIf="viewMode === 'table'">
-      <nb-card>
-        <nb-card-body class="table-card-body">
-          <ng2-smart-table
-            [settings]="settings"
-            [source]="source"
-            (edit)="onView($event)"
-            (delete)="onDelete($event)"
-          >
+      <nb-card class="table-card">
+        <nb-card-body>
+          <ng2-smart-table [settings]="settings" [source]="source" (edit)="onView($event)" (delete)="onDelete($event)">
           </ng2-smart-table>
 
-          <!-- Pagination personnalisée -->
-          <div class="custom-pagination">
+          <!-- Pagination -->
+          <div class="pagination-wrapper">
             <div class="pagination-info">
               Page {{ currentPageDisplay }} sur {{ totalPages }}
-              <span class="text-muted ms-2"
-                >({{ totalItems }} résultat{{
-                  totalItems > 1 ? "s" : ""
-                }})</span
-              >
+              <span class="text-hint">({{ formatNumber(totalItems) }} résultat{{ totalItems > 1 ? "s" : "" }})</span>
             </div>
             <div class="pagination-controls">
-              <button
-                nbButton
-                ghost
-                size="tiny"
-                [disabled]="currentPage === 0"
-                (click)="goToFirstPage()"
-              >
+              <button nbButton ghost size="small" [disabled]="currentPage === 0" (click)="goToFirstPage()" nbTooltip="Première page">
                 <nb-icon icon="arrowhead-left-outline"></nb-icon>
               </button>
-              <button
-                nbButton
-                ghost
-                size="tiny"
-                [disabled]="currentPage === 0"
-                (click)="goToPreviousPage()"
-              >
+              <button nbButton ghost size="small" [disabled]="currentPage === 0" (click)="goToPreviousPage()" nbTooltip="Page précédente">
                 <nb-icon icon="chevron-left-outline"></nb-icon>
               </button>
               <button
                 nbButton
                 ghost
-                size="tiny"
+                size="small"
                 [disabled]="currentPage >= totalPages - 1"
                 (click)="goToNextPage()"
+                nbTooltip="Page suivante"
               >
                 <nb-icon icon="chevron-right-outline"></nb-icon>
               </button>
               <button
                 nbButton
                 ghost
-                size="tiny"
+                size="small"
                 [disabled]="currentPage >= totalPages - 1"
                 (click)="goToLastPage()"
+                nbTooltip="Dernière page"
               >
                 <nb-icon icon="arrowhead-right-outline"></nb-icon>
               </button>
@@ -204,348 +139,99 @@
     </div>
 
     <!-- VUE CARTES -->
-    <div *ngIf="viewMode === 'cards'" class="cards-grid">
-      <nb-card
-        *ngFor="let account of accounts"
-        class="account-card"
-        [ngClass]="{
-          'status-active': account.status === 'ACTIVE',
-          'status-blocked': account.status === 'BLOCKED',
-          'status-closed': account.status === 'CLOSED'
-        }"
-      >
-        <nb-card-header>
-          <div class="card-header-content">
-            <div class="account-type">
-              <nb-icon
-                [icon]="
-                  account.accountType === 'SAVINGS'
-                    ? 'trending-up-outline'
-                    : 'credit-card-outline'
-                "
-                class="type-icon"
-              ></nb-icon>
-              <span>{{
-                account.accountType === "SAVINGS" ? "Épargne" : "Courant"
-              }}</span>
+    <div *ngIf="viewMode === 'cards'">
+      <div class="cards-grid">
+        <nb-card
+          *ngFor="let account of accounts"
+          class="account-card"
+          [ngClass]="{
+            'status-active': account.status === 'ACTIVE',
+            'status-blocked': account.status === 'BLOCKED',
+            'status-closed': account.status === 'CLOSED'
+          }"
+        >
+          <nb-card-header>
+            <div class="card-header-content">
+              <div class="account-type">
+                <nb-icon [icon]="account.accountType === 'SAVINGS' ? 'trending-up-outline' : 'credit-card-outline'"></nb-icon>
+                <span>{{ account.accountType === "SAVINGS" ? "Épargne" : "Courant" }}</span>
+              </div>
+              <nb-badge
+                [text]="account.status === 'ACTIVE' ? 'Actif' : account.status === 'BLOCKED' ? 'Bloqué' : 'Clos'"
+                [status]="account.status === 'ACTIVE' ? 'success' : account.status === 'BLOCKED' ? 'danger' : 'warning'"
+              ></nb-badge>
             </div>
-            <nb-badge
-              [text]="
-                account.status === 'ACTIVE'
-                  ? 'Actif'
-                  : account.status === 'BLOCKED'
-                  ? 'Bloqué'
-                  : 'Clos'
-              "
-              [status]="
-                account.status === 'ACTIVE'
-                  ? 'success'
-                  : account.status === 'BLOCKED'
-                  ? 'danger'
-                  : 'warning'
-              "
-            >
-            </nb-badge>
-          </div>
-        </nb-card-header>
+          </nb-card-header>
 
-        <nb-card-body (click)="onView({ data: account })" class="clickable">
-          <div class="account-number">
-            <small class="label">Numéro de compte</small>
-            <div class="value mono">
-              {{ formatAccountNumber(account.accountNumber) }}
+          <nb-card-body (click)="onView({ data: account })">
+            <div class="account-number">
+              <small class="label">Numéro de compte</small>
+              <div class="value mono">{{ formatAccountNumber(account. accountNumber) }}</div>
             </div>
-          </div>
 
-          <div class="account-balance">
-            <small class="label">Solde disponible</small>
-            <div
-              class="value balance"
-              [ngClass]="{
-                positive: account.balance > 0,
-                zero: account.balance === 0,
-                negative: account.balance < 0
-              }"
-            >
-              {{ formatCurrency(account.balance) }}
+            <div class="account-balance">
+              <small class="label">Solde disponible</small>
+              <div
+                class="value balance"
+                [ngClass]="{
+                  positive: account.balance > 0,
+                  zero: account.balance === 0,
+                  negative: account.balance < 0
+                }"
+              >
+                {{ formatCurrency(account.balance) }}
+              </div>
+              <small class="currency">{{ account.currency }}</small>
             </div>
-            <small class="currency">{{ account.currency }}</small>
-          </div>
 
-          <div class="account-owner">
-            <nb-icon icon="person-outline"></nb-icon>
-            <span>{{ account.customerFullName }}</span>
-          </div>
+            <div class="account-owner">
+              <nb-icon icon="person-outline"></nb-icon>
+              <span>{{ account.customerFullName }}</span>
+            </div>
 
-          <div class="account-date">
-            <nb-icon icon="calendar-outline"></nb-icon>
-            <span>Ouvert le {{ account.createdAt | date : "dd/MM/yyyy" }}</span>
-          </div>
-        </nb-card-body>
+            <div class="account-date">
+              <nb-icon icon="calendar-outline"></nb-icon>
+              <span>Ouvert le {{ account.createdAt | date :  "dd/MM/yyyy" }}</span>
+            </div>
+          </nb-card-body>
 
-        <nb-card-footer>
-          <button
-            nbButton
-            size="small"
-            status="primary"
-            fullWidth
-            (click)="onView({ data: account })"
-          >
-            <nb-icon icon="eye-outline"></nb-icon>
-            Détails
-          </button>
-        </nb-card-footer>
-      </nb-card>
+          <nb-card-footer>
+            <button nbButton size="small" status="primary" fullWidth (click)="onView({ data: account })">
+              <nb-icon icon="eye-outline"></nb-icon>
+              Détails
+            </button>
+          </nb-card-footer>
+        </nb-card>
+      </div>
 
-      <!-- Message si vide -->
-      <div *ngIf="accounts.length === 0" class="empty-state">
-        <nb-icon icon="credit-card-outline" class="empty-icon"></nb-icon>
-        <h4>Aucun compte trouvé</h4>
-        <p>Créez votre premier compte bancaire</p>
-        <button nbButton status="primary" (click)="onCreate()">
-          <nb-icon icon="plus-outline"></nb-icon>
-          Créer un compte
+      <!-- Pagination cartes -->
+      <div class="cards-pagination" *ngIf="accounts.length > 0">
+        <button nbButton ghost size="small" [disabled]="currentPage === 0" (click)="goToFirstPage()">
+          <nb-icon icon="arrowhead-left-outline"></nb-icon>
+        </button>
+        <button nbButton ghost size="small" [disabled]="currentPage === 0" (click)="goToPreviousPage()">
+          <nb-icon icon="chevron-left-outline"></nb-icon>
+        </button>
+        <span class="page-info">Page {{ currentPageDisplay }} / {{ totalPages }}</span>
+        <button nbButton ghost size="small" [disabled]="currentPage >= totalPages - 1" (click)="goToNextPage()">
+          <nb-icon icon="chevron-right-outline"></nb-icon>
+        </button>
+        <button nbButton ghost size="small" [disabled]="currentPage >= totalPages - 1" (click)="goToLastPage()">
+          <nb-icon icon="arrowhead-right-outline"></nb-icon>
         </button>
       </div>
     </div>
 
-    <!-- VUE STATISTIQUES -->
-    <div *ngIf="viewMode === 'stats'" class="stats-view">
-      <!-- KPIs principaux -->
-      <div class="kpi-grid">
-        <nb-card class="kpi-card kpi-primary">
-          <nb-card-body>
-            <div class="kpi-icon">
-              <nb-icon icon="credit-card-outline"></nb-icon>
-            </div>
-            <div class="kpi-content">
-              <div class="kpi-value">
-                {{ formatNumber(globalStats.totalAccounts) }}
-              </div>
-              <div class="kpi-label">Total Comptes</div>
-            </div>
-          </nb-card-body>
-        </nb-card>
-
-        <nb-card class="kpi-card kpi-success">
-          <nb-card-body>
-            <div class="kpi-icon">
-              <nb-icon icon="trending-up-outline"></nb-icon>
-            </div>
-            <div class="kpi-content">
-              <div class="kpi-value">
-                {{ formatCurrency(globalStats.totalBalance) }}
-              </div>
-              <div class="kpi-label">Solde Total</div>
-              <div class="kpi-detail">
-                Moyenne: {{ formatCurrency(globalStats.averageBalance) }}
-              </div>
-            </div>
-          </nb-card-body>
-        </nb-card>
-
-        <nb-card class="kpi-card kpi-info">
-          <nb-card-body>
-            <div class="kpi-icon">
-              <nb-icon icon="checkmark-circle-outline"></nb-icon>
-            </div>
-            <div class="kpi-content">
-              <div class="kpi-value">
-                {{ formatNumber(globalStats.activeAccounts) }}
-              </div>
-              <div class="kpi-label">Comptes Actifs</div>
-              <div class="kpi-detail">
-                {{
-                  calculatePercentage(
-                    globalStats.activeAccounts,
-                    globalStats.totalAccounts
-                  )
-                }}% du total
-              </div>
-            </div>
-          </nb-card-body>
-        </nb-card>
-
-        <nb-card class="kpi-card kpi-warning">
-          <nb-card-body>
-            <div class="kpi-icon">
-              <nb-icon icon="pie-chart-outline"></nb-icon>
-            </div>
-            <div class="kpi-content">
-              <div class="kpi-value">
-                {{ formatNumber(globalStats.savingsAccounts) }} /
-                {{ formatNumber(globalStats.currentAccounts) }}
-              </div>
-              <div class="kpi-label">Épargne / Courant</div>
-            </div>
-          </nb-card-body>
-        </nb-card>
-      </div>
-
-      <!-- Graphiques -->
-      <div class="charts-grid">
-        <!-- Types de comptes -->
-        <nb-card>
-          <nb-card-header>
-            <div class="chart-header">
-              <h6>Répartition par Type</h6>
-              <nb-icon icon="pie-chart-outline"></nb-icon>
-            </div>
-          </nb-card-header>
-          <nb-card-body>
-            <ngx-charts-pie-chart
-              [view]="[undefined, 300]"
-              [scheme]="colorScheme"
-              [results]="accountTypeChartData"
-              [legend]="true"
-              [labels]="true"
-              [doughnut]="true"
-            >
-            </ngx-charts-pie-chart>
-          </nb-card-body>
-        </nb-card>
-
-        <!-- Statuts -->
-        <nb-card>
-          <nb-card-header>
-            <div class="chart-header">
-              <h6>Répartition par Statut</h6>
-              <nb-icon icon="activity-outline"></nb-icon>
-            </div>
-          </nb-card-header>
-          <nb-card-body>
-            <ngx-charts-bar-vertical
-              [view]="[undefined, 300]"
-              [scheme]="colorScheme"
-              [results]="accountStatusChartData"
-              [xAxis]="true"
-              [yAxis]="true"
-              [legend]="false"
-              [showXAxisLabel]="false"
-              [showYAxisLabel]="true"
-              [yAxisLabel]="'Nombre'"
-            >
-            </ngx-charts-bar-vertical>
-          </nb-card-body>
-        </nb-card>
-
-        <!-- Distribution des soldes -->
-        <nb-card>
-          <nb-card-header>
-            <div class="chart-header">
-              <h6>Distribution des Soldes</h6>
-              <nb-icon icon="bar-chart-outline"></nb-icon>
-            </div>
-          </nb-card-header>
-          <nb-card-body>
-            <ngx-charts-bar-horizontal
-              [view]="[undefined, 300]"
-              [scheme]="colorScheme"
-              [results]="balanceDistributionChartData"
-              [xAxis]="true"
-              [yAxis]="true"
-              [legend]="false"
-              [showXAxisLabel]="false"
-              [showYAxisLabel]="true"
-            >
-            </ngx-charts-bar-horizontal>
-          </nb-card-body>
-        </nb-card>
-
-        <!-- Top comptes -->
-        <nb-card>
-          <nb-card-header>
-            <div class="chart-header">
-              <h6>Top 10 Comptes (Solde)</h6>
-              <nb-icon icon="award-outline"></nb-icon>
-            </div>
-          </nb-card-header>
-          <nb-card-body>
-            <ngx-charts-bar-horizontal
-              [view]="[undefined, 300]"
-              [scheme]="colorScheme"
-              [results]="topAccountsChartData"
-              [xAxis]="true"
-              [yAxis]="true"
-              [legend]="false"
-              [showXAxisLabel]="false"
-              [showYAxisLabel]="true"
-              [xAxisTickFormatting]="formatCurrency"
-            >
-            </ngx-charts-bar-horizontal>
-          </nb-card-body>
-        </nb-card>
-      </div>
-
-      <!-- Détails additionnels -->
-      <nb-card>
-        <nb-card-header>
-          <h6>
-            <nb-icon icon="info-outline" class="me-2"></nb-icon>
-            Informations Détaillées
-          </h6>
-        </nb-card-header>
-        <nb-card-body>
-          <div class="info-grid">
-            <div class="info-item">
-              <div class="info-label">Comptes avec solde positif</div>
-              <div class="info-value text-success">
-                {{ formatNumber(globalStats.accountsWithPositiveBalance) }}
-                <small
-                  >({{
-                    calculatePercentage(
-                      globalStats.accountsWithPositiveBalance,
-                      globalStats.totalAccounts
-                    )
-                  }}%)</small
-                >
-              </div>
-            </div>
-            <div class="info-item">
-              <div class="info-label">Comptes avec solde nul</div>
-              <div class="info-value text-warning">
-                {{ formatNumber(globalStats.accountsWithZeroBalance) }}
-                <small
-                  >({{
-                    calculatePercentage(
-                      globalStats.accountsWithZeroBalance,
-                      globalStats.totalAccounts
-                    )
-                  }}%)</small
-                >
-              </div>
-            </div>
-            <div class="info-item">
-              <div class="info-label">Comptes bloqués</div>
-              <div class="info-value text-danger">
-                {{ formatNumber(globalStats.blockedAccounts) }}
-                <small
-                  >({{
-                    calculatePercentage(
-                      globalStats.blockedAccounts,
-                      globalStats.totalAccounts
-                    )
-                  }}%)</small
-                >
-              </div>
-            </div>
-            <div class="info-item">
-              <div class="info-label">Comptes clos</div>
-              <div class="info-value text-basic">
-                {{ formatNumber(globalStats.closedAccounts) }}
-                <small
-                  >({{
-                    calculatePercentage(
-                      globalStats.closedAccounts,
-                      globalStats.totalAccounts
-                    )
-                  }}%)</small
-                >
-              </div>
-            </div>
-          </div>
-        </nb-card-body>
-      </nb-card>
+    <!-- Message si vide -->
+    <div *ngIf="accounts.length === 0 && !isLoading" class="empty-state">
+      <nb-icon icon="credit-card-outline"></nb-icon>
+      <h4>Aucun compte trouvé</h4>
+      <p *ngIf="searchTerm">Aucun résultat pour "{{ searchTerm }}"</p>
+      <p *ngIf="! searchTerm">Créez votre premier compte bancaire</p>
+      <button nbButton status="primary" size="large" (click)="onCreate()">
+        <nb-icon icon="plus-outline"></nb-icon>
+        Créer un compte
+      </button>
     </div>
   </div>
 </div>

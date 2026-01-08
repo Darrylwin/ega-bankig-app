@@ -1,7 +1,9 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, OnDestroy } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { Router } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { NbToastrService } from "@nebular/theme";
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 import {
   AccountApiService,
   CustomerApiService,
@@ -13,7 +15,9 @@ import { AccountRequest, Customer } from "../../../@core/data/models/index";
   templateUrl: "./account-form.component.html",
   styleUrls: ["./account-form.component.scss"],
 })
-export class AccountFormComponent implements OnInit {
+export class AccountFormComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+
   accountForm: FormGroup;
   isLoading = false;
   isSubmitting = false;
@@ -30,7 +34,7 @@ export class AccountFormComponent implements OnInit {
       icon: "trending-up-outline",
       description: "Idéal pour épargner avec un taux d'intérêt attractif",
       features: [
-        "Taux d'intérêt:  2.0% par an",
+        "Taux d'intérêt: 2.0% par an",
         "Pas de frais de tenue de compte",
         "Capital garanti",
         "Virements gratuits",
@@ -43,7 +47,7 @@ export class AccountFormComponent implements OnInit {
       icon: "credit-card-outline",
       description: "Pour vos opérations bancaires quotidiennes",
       features: [
-        "Découvert autorisé:  1 000 €",
+        "Découvert autorisé: 1 000 €",
         "Carte bancaire incluse",
         "Chéquier disponible",
         "Opérations illimitées",
@@ -53,13 +57,15 @@ export class AccountFormComponent implements OnInit {
   ];
 
   currencies = [
-    { value: "CFA", label: "Franc CFA (CFA)", symbol: "CFA", flag: "🇨🇫" },
-    { value: "EUR", label: "Euro (€)", symbol: "€", flag: "🇪🇺" },
-    { value: "USD", label: "Dollar ($)", symbol: "$", flag: "🇺🇸" },
+    { value: "EUR", label: "Euro", symbol: "€", flag: "🇪🇺" },
+    { value: "USD", label: "Dollar", symbol: "$", flag: "🇺🇸" },
+    { value: "GBP", label: "Livre Sterling", symbol: "£", flag: "🇬🇧" },
+    { value: "CHF", label: "Franc Suisse", symbol: "CHF", flag: "🇨🇭" },
   ];
 
   constructor(
     private fb: FormBuilder,
+    private route: ActivatedRoute,
     private router: Router,
     private accountApi: AccountApiService,
     private customerApi: CustomerApiService,
@@ -70,6 +76,17 @@ export class AccountFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadCustomers();
+
+    // Pré-remplir le customerId si passé en query params
+    const customerIdParam = this.route.snapshot.queryParams["customerId"];
+    if (customerIdParam) {
+      this.accountForm.patchValue({ customerId: +customerIdParam });
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private createForm(): FormGroup {
@@ -85,32 +102,41 @@ export class AccountFormComponent implements OnInit {
 
     this.customerApi
       .getCustomers({ page: 0, size: 1000, sort: "lastName,asc" })
+      .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
           this.customers = response.content;
           this.filteredCustomers = [...this.customers];
+
+          // Si customerId pré-rempli, sélectionner le client
+          const preselectedId = this.accountForm.value.customerId;
+          if (preselectedId) {
+            this.onCustomerChange(preselectedId);
+          }
+
           this.isLoading = false;
         },
         error: (error) => {
           this.isLoading = false;
           this.toastr.danger("Erreur lors du chargement des clients", "Erreur");
+          console.error(error);
         },
       });
   }
 
-  onCustomerSearch(event: any): void {
-    const searchTerm = event?.toLowerCase() || "";
+  onCustomerSearch(searchTerm: string): void {
+    const term = searchTerm?.toLowerCase() || "";
 
-    if (!searchTerm) {
+    if (!term) {
       this.filteredCustomers = [...this.customers];
       return;
     }
 
     this.filteredCustomers = this.customers.filter(
       (customer) =>
-        customer.lastName.toLowerCase().includes(searchTerm) ||
-        customer.firstName.toLowerCase().includes(searchTerm) ||
-        customer.email.toLowerCase().includes(searchTerm)
+        customer.lastName.toLowerCase().includes(term) ||
+        customer.firstName.toLowerCase().includes(term) ||
+        customer.email.toLowerCase().includes(term)
     );
   }
 
@@ -130,30 +156,36 @@ export class AccountFormComponent implements OnInit {
 
     const accountData: AccountRequest = this.accountForm.value;
 
-    this.accountApi.createAccount(accountData).subscribe({
-      next: (account) => {
-        this.isSubmitting = false;
-        this.toastr.success(
-          `Compte ${this.getSelectedAccountType()?.label} créé avec succès`,
-          "Succès"
-        );
-        this.router.navigate(["/pages/accounts/detail", account.id]);
-      },
-      error: (error) => {
-        this.isSubmitting = false;
-
-        if (error.status === 400) {
-          this.toastr.warning("Données invalides", "Erreur de validation");
-        } else if (error.status === 409) {
-          this.toastr.warning(
-            "Le client possède déjà un compte de ce type",
-            "Conflit"
+    this.accountApi
+      .createAccount(accountData)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (account) => {
+          this.isSubmitting = false;
+          this.toastr.success(
+            `Compte ${this.getSelectedAccountType()?.label} créé avec succès`,
+            "Succès"
           );
-        } else {
-          this.toastr.danger("Erreur lors de la création du compte", "Erreur");
-        }
-      },
-    });
+          this.router.navigate(["/pages/accounts/detail", account.id]);
+        },
+        error: (error) => {
+          this.isSubmitting = false;
+
+          if (error.status === 400) {
+            this.toastr.warning("Données invalides", "Erreur de validation");
+          } else if (error.status === 409) {
+            this.toastr.warning(
+              "Le client possède déjà un compte de ce type",
+              "Conflit"
+            );
+          } else {
+            this.toastr.danger(
+              "Erreur lors de la création du compte",
+              "Erreur"
+            );
+          }
+        },
+      });
   }
 
   onCancel(): void {
@@ -185,8 +217,6 @@ export class AccountFormComponent implements OnInit {
 
   displayCustomerFn(customerId: number): string {
     const customer = this.customers.find((c) => c.id === customerId);
-    return customer
-      ? `${customer.lastName} ${customer.firstName} - ${customer.email}`
-      : "";
+    return customer ? `${customer.lastName} ${customer.firstName}` : "";
   }
 }

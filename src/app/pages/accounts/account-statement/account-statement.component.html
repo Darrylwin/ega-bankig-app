@@ -19,9 +19,7 @@
     </div>
   </div>
 
-  <br/>
-
-  <!-- Chargement -->
+  <!-- Loading -->
   <div *ngIf="isLoading" class="loading-container">
     <nb-spinner size="giant" status="primary"></nb-spinner>
     <p class="loading-text">Chargement...</p>
@@ -39,9 +37,7 @@
               <div class="step-badge">1</div>
               <div>
                 <h5>Période du Relevé</h5>
-                <p class="text-muted mb-0">
-                  Sélectionnez la période à inclure dans le relevé
-                </p>
+                <p class="text-muted">Sélectionnez la période à inclure</p>
               </div>
             </div>
           </nb-card-header>
@@ -101,21 +97,18 @@
 
             <!-- Info période -->
             <div class="period-info" *ngIf="startDate && endDate">
-              <nb-alert status="info" size="small">
-                <div class="alert-content">
-                  <nb-icon icon="calendar-outline"></nb-icon>
-                  <div>
-                    <strong>Période sélectionnée</strong>
-                    <p class="mb-0">
-                      Du {{ formatDate(startDate) }} au
-                      {{ formatDate(endDate) }}
-                      <span class="badge badge-primary ms-2"
-                        >{{ getDaysBetween() }} jour(s)</span
-                      >
-                    </p>
-                  </div>
-                </div>
-              </nb-alert>
+              <nb-badge
+                [text]="
+                  'Du ' +
+                  formatDate(startDate) +
+                  ' au ' +
+                  formatDate(endDate) +
+                  ' (' +
+                  getDaysBetween() +
+                  ' jours)'
+                "
+                status="info"
+              ></nb-badge>
             </div>
           </nb-card-body>
         </nb-card>
@@ -127,9 +120,7 @@
               <div class="step-badge">2</div>
               <div>
                 <h5>Format du Relevé</h5>
-                <p class="text-muted mb-0">
-                  Choisissez le format de téléchargement
-                </p>
+                <p class="text-muted">Choisissez le format de téléchargement</p>
               </div>
             </div>
           </nb-card-header>
@@ -161,10 +152,7 @@
 
                 <ul class="format-features">
                   <li *ngFor="let feature of formatOption.features">
-                    <nb-icon
-                      icon="checkmark-outline"
-                      status="success"
-                    ></nb-icon>
+                    <nb-icon icon="checkmark-outline"></nb-icon>
                     <span>{{ feature }}</span>
                   </li>
                 </ul>
@@ -172,54 +160,6 @@
                 <div class="format-check" *ngIf="format === formatOption.value">
                   <nb-icon icon="checkmark-circle-2-outline"></nb-icon>
                 </div>
-              </div>
-            </div>
-          </nb-card-body>
-        </nb-card>
-
-        <!-- Options -->
-        <nb-card class="options-card">
-          <nb-card-header>
-            <div class="card-header-content">
-              <div class="step-badge">3</div>
-              <div>
-                <h5>Options d'Inclusion</h5>
-                <p class="text-muted mb-0">
-                  Personnalisez le contenu du relevé
-                </p>
-              </div>
-            </div>
-          </nb-card-header>
-          <nb-card-body>
-            <div class="options-grid">
-              <div class="option-item">
-                <nb-checkbox [(ngModel)]="includeHeader">
-                  <strong>En-tête</strong>
-                  <p class="option-desc">Logo et informations de la banque</p>
-                </nb-checkbox>
-              </div>
-
-              <div class="option-item">
-                <nb-checkbox [(ngModel)]="includeFooter">
-                  <strong>Pied de page</strong>
-                  <p class="option-desc">Coordonnées et mentions légales</p>
-                </nb-checkbox>
-              </div>
-
-              <div class="option-item">
-                <nb-checkbox [(ngModel)]="includeSummary">
-                  <strong>Résumé détaillé</strong>
-                  <p class="option-desc">
-                    Statistiques et totaux de la période
-                  </p>
-                </nb-checkbox>
-              </div>
-
-              <div class="option-item">
-                <nb-checkbox [(ngModel)]="includeChart">
-                  <strong>Graphiques</strong>
-                  <p class="option-desc">Visualisations des transactions</p>
-                </nb-checkbox>
               </div>
             </div>
           </nb-card-body>
@@ -239,8 +179,7 @@
                   ' transaction(s)'
                 "
                 status="primary"
-              >
-              </nb-badge>
+              ></nb-badge>
             </div>
           </nb-card-header>
           <nb-card-body>
@@ -316,7 +255,7 @@
 
               <!-- Transactions (5 premières) -->
               <div class="preview-transactions">
-                <small class="text-muted mb-2 d-block"
+                <small class="text-muted"
                   >Aperçu des 5 premières transactions</small
                 >
                 <div
@@ -358,7 +297,7 @@
                   *ngIf="previewTransactions.length > 5"
                   class="more-transactions"
                 >
-                  <small class="text-muted"
+                  <small
                     >+ {{ previewTransactions.length - 5 }} autre(s)
                     transaction(s)</small
                   >
@@ -395,11 +334,11 @@
             status="primary"
             (click)="generateStatement()"
             [disabled]="!startDate || !endDate || isGenerating"
-            [class.btn-loading]="isGenerating"
           >
             <nb-icon
               [icon]="isGenerating ? 'loader-outline' : 'download-outline'"
-              [class.spin]="isGenerating"
+              [class.
+              spin]="isGenerating"
             ></nb-icon>
             {{ isGenerating ? "Génération en cours..." : "Générer le relevé" }}
           </button>
@@ -413,7 +352,7 @@
           <nb-card-header>
             <h6>
               <nb-icon icon="credit-card-outline"></nb-icon>
-              Compte
+              Informations du Compte
             </h6>
           </nb-card-header>
           <nb-card-body>
@@ -438,7 +377,9 @@
                 <div class="detail-item">
                   <nb-icon icon="pricetags-outline"></nb-icon>
                   <span>{{
-                    account.accountType === "SAVINGS" ? "Épargne" : "Courant"
+                    account.accountType === "SAVINGS"
+                      ? "Compte Épargne"
+                      : "Compte Courant"
                   }}</span>
                 </div>
                 <div class="detail-item">

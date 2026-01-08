@@ -1,6 +1,8 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, OnDestroy } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { NbToastrService } from "@nebular/theme";
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 import {
   AccountApiService,
   TransactionApiService,
@@ -12,7 +14,9 @@ import { Account, Transaction } from "../../../@core/data/models/index";
   templateUrl: "./account-statement.component.html",
   styleUrls: ["./account-statement.component.scss"],
 })
-export class AccountStatementComponent implements OnInit {
+export class AccountStatementComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+
   accountId: number = 0;
   account: Account | null = null;
 
@@ -20,13 +24,11 @@ export class AccountStatementComponent implements OnInit {
   startDate: string = "";
   endDate: string = "";
   format: string = "pdf";
+  today: string = "";
 
-    today: string = '';
-
-  // Options
+  // Options (simplifiées)
   includeHeader: boolean = true;
   includeFooter: boolean = true;
-  includeChart: boolean = true;
   includeSummary: boolean = true;
 
   // États
@@ -75,14 +77,6 @@ export class AccountStatementComponent implements OnInit {
         "Compatible tableurs",
       ],
     },
-    {
-      value: "html",
-      label: "HTML",
-      icon: "browser-outline",
-      description: "Consultation en ligne",
-      color: "info",
-      features: ["Affichage navigateur", "Partage facile", "Responsive design"],
-    },
   ];
 
   // Périodes prédéfinies
@@ -112,11 +106,6 @@ export class AccountStatementComponent implements OnInit {
       icon: "calendar-outline",
       action: () => this.setCurrentYear(),
     },
-    {
-      label: "Personnalisée",
-      icon: "options-2-outline",
-      action: () => this.clearDates(),
-    },
   ];
 
   constructor(
@@ -128,10 +117,18 @@ export class AccountStatementComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.accountId = +this.route.snapshot.params['id'];
+    this.accountId = +this.route.snapshot.params["id"];
     this.today = this.formatDateForInput(new Date());
     this.setCurrentMonth();
-    this.loadAccount();
+
+    if (this.accountId) {
+      this.loadAccount();
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   /**
@@ -140,18 +137,21 @@ export class AccountStatementComponent implements OnInit {
   loadAccount(): void {
     this.isLoading = true;
 
-    this.accountApi.getAccountById(this.accountId).subscribe({
-      next: (account) => {
-        this.account = account;
-        this.isLoading = false;
-        this.loadPreview();
-      },
-      error: (error) => {
-        this.isLoading = false;
-        this.toastr.danger("Erreur lors du chargement du compte", "Erreur");
-        this.router.navigate(["/pages/accounts"]);
-      },
-    });
+    this.accountApi
+      .getAccountById(this.accountId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (account) => {
+          this.account = account;
+          this.isLoading = false;
+          this.loadPreview();
+        },
+        error: (error) => {
+          this.isLoading = false;
+          this.toastr.danger("Erreur lors du chargement du compte", "Erreur");
+          this.router.navigate(["/pages/accounts"]);
+        },
+      });
   }
 
   /**
@@ -167,6 +167,7 @@ export class AccountStatementComponent implements OnInit {
 
     this.transactionApi
       .getTransactionsByPeriod(this.accountId, startISO, endISO)
+      .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (transactions) => {
           this.previewTransactions = transactions;
@@ -175,7 +176,7 @@ export class AccountStatementComponent implements OnInit {
         },
         error: (error) => {
           this.isLoadingPreview = false;
-          this.toastr.warning("Impossible de charger l'aperçu", "Attention");
+          console.error("Erreur chargement aperçu:", error);
         },
       });
   }
@@ -254,6 +255,7 @@ export class AccountStatementComponent implements OnInit {
 
     this.accountApi
       .generateStatement(this.accountId, startISO, endISO)
+      .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (blob) => {
           this.isGenerating = false;
@@ -294,7 +296,9 @@ export class AccountStatementComponent implements OnInit {
 
     this.startDate = this.formatDateForInput(firstDay);
     this.endDate = this.formatDateForInput(today);
-    this.loadPreview();
+    if (this.account) {
+      this.loadPreview();
+    }
   }
 
   setLastMonth(): void {
@@ -336,11 +340,6 @@ export class AccountStatementComponent implements OnInit {
     this.loadPreview();
   }
 
-  clearDates(): void {
-    this.startDate = "";
-    this.endDate = "";
-  }
-
   /**
    * Événements
    */
@@ -372,14 +371,20 @@ export class AccountStatementComponent implements OnInit {
 
   formatDateTime(dateString: string): string {
     if (!dateString) return "";
-    return new Date(dateString).toLocaleString("fr-FR");
+    return new Date(dateString).toLocaleString("fr-FR", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   }
 
   formatCurrency(amount: number): string {
     return new Intl.NumberFormat("fr-FR", {
       style: "currency",
       currency: "EUR",
-    }).format(amount);
+    }).format(amount || 0);
   }
 
   formatAccountNumber(iban: string): string {
@@ -387,7 +392,7 @@ export class AccountStatementComponent implements OnInit {
   }
 
   formatNumber(num: number): string {
-    return num.toLocaleString("fr-FR");
+    return num?.toLocaleString("fr-FR") || "0";
   }
 
   getSelectedFormat() {
@@ -399,7 +404,7 @@ export class AccountStatementComponent implements OnInit {
     const start = new Date(this.startDate);
     const end = new Date(this.endDate);
     const diffTime = Math.abs(end.getTime() - start.getTime());
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
   }
 
   getTransactionTypeLabel(type: string): string {

@@ -1,654 +1,631 @@
 .account-detail-container {
   min-height: 100vh;
-}
 
-// Header
-.detail-header {
-  background: linear-gradient(135deg, var(--color-primary-400) 0%, var(--color-primary-600) 100%);
-  color: var(--text-control-color);
-  padding: 2rem;
-  margin: -1 5rem -1.5rem 2rem -1.5rem;
-  border-radius: 0 0 1rem 1rem;
-  box-shadow: 0 4px 20px rgba(var(--color-primary-400-rgb), 0.3);
-
-  .header-content {
-    max-width: 1400px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 2rem;
-    flex-wrap: wrap;
-  }
-
-  .header-left {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    flex: 1;
-
-    .back-btn {
-      background: rgba(var(--text-control-color-rgb), 0.2);
-      border: none;
-      color: var(--text-control-color);
-
-      &:hover {
-        background: rgba(var(--text-control-color-rgb), 0.3);
-      }
-    }
-  }
-
-  .detail-title {
-    font-size: 1.75rem;
-    font-weight: 700;
-    margin: 0 0 0.5rem 0;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-
-    nb-icon {
-      font-size: 2rem;
-    }
-  }
-
-  .detail-subtitle {
-    font-size: 0.95rem;
-    opacity: 0.9;
-    margin: 0;
-    font-family: "Courier New", monospace;
-    letter-spacing: 1px;
-  }
-
-  .header-actions {
-    display: flex;
-    gap: 0.75rem;
-
-    button {
-      box-shadow: var(--shadow);
-    }
-  }
-}
-
-// Loading & Error
-.loading-container,
-.error-container {
-  text-align: center;
-  padding: 4rem 0;
-
-  .loading-text {
-    margin-top: 1rem;
-    color: var(--text-hint-color);
-  }
-
-  .error-icon {
-    font-size: 4rem;
-    color: var(--color-danger-500);
-    margin-bottom: 1.5rem;
-  }
-
-  h4 {
-    color: var(--text-basic-color);
-    margin-bottom: 0.5rem;
-  }
-
-  p {
-    color: var(--text-hint-color);
-    margin-bottom: 2rem;
-  }
-}
-
-// Content
-.detail-content {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 1rem;
-}
-
-// Carte principale du compte
-.account-main-card {
-  margin-bottom: 2rem;
-}
-
-.balance-card {
-  border-radius: 1rem;
-  border: none;
-  box-shadow: var(--shadow-hover);
-  background: linear-gradient(135deg, var(--color-primary-400) 0%, var(--color-primary-600) 100%);
-  color: var(--text-control-color);
-
-  nb-card-body {
+  // Header
+  .detail-header {
+    background: linear-gradient(
+      135deg,
+      var(--color-primary-500),
+      var(--color-primary-700)
+    );
+    color: white;
     padding: 2rem;
-  }
+    margin-bottom: 2rem;
+    border-radius: 0 0 1 5rem 1.5rem;
+    box-shadow: 0 4px 20px rgba(51, 102, 255, 0.3);
 
-  .balance-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 2rem;
-    flex-wrap: wrap;
-  }
-
-  .balance-left {
-    flex: 1;
-  }
-
-  .account-info {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .account-type-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    border-radius: 2rem;
-    background: rgba(var(--text-control-color-rgb), 0.2);
-    font-weight: 600;
-
-    nb-icon {
-      font-size: 1.25rem;
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 2rem;
     }
 
-    &.type-success {
-      background: rgba(var(--color-success-500-rgb), 0.2);
-    }
-
-    &.type-primary {
-      background: rgba(var(--color-primary-500-rgb), 0.2);
-    }
-  }
-
-  .status-badge {
-    font-weight: 600;
-  }
-
-  .account-number {
-    small {
-      display: block;
-      opacity: 0.8;
-      font-size: 0.85rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .number-value {
-      font-size: 1.1rem;
-      font-family: "Courier New", monospace;
-      letter-spacing: 1px;
-      font-weight: 600;
-    }
-  }
-
-  .balance-right {
-    text-align: right;
-  }
-
-  .balance-display {
-    small {
-      display: block;
-      opacity: 0.8;
-      font-size: 0.85rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .balance-value {
-      font-size: 2 5rem;
-      font-weight: 700;
-      margin-bottom: 0.25rem;
-
-      &.positive {
-        color: var(--color-success-300);
-      }
-
-      &.zero {
-        opacity: 0.7;
-      }
-
-      &.negative {
-        color: var(--color-danger-300);
-      }
-    }
-
-    .currency {
-      opacity: 0.8;
-    }
-  }
-}
-
-// Actions rapides
-.quick-actions {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
-
-  .action-btn {
-    flex: 1;
-    min-width: 150px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 1 5rem 1rem;
-    border-radius: 0.75rem;
-    box-shadow: var(--shadow);
-    transition: all 0.3s;
-
-    &:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-hover);
-    }
-
-    nb-icon {
-      font-size: 1.75rem;
-    }
-
-    span {
-      font-weight: 600;
-    }
-  }
-}
-
-// Grille de détails
-.detail-grid {
-  display: grid;
-  grid-template-columns: 1fr 380px;
-  gap: 2rem;
-}
-
-// Cards
-.stats-card,
-.chart-card,
-.transactions-card,
-.info-card,
-.customer-card,
-.actions-card {
-  border-radius: 1rem;
-  border: none;
-  box-shadow: var(--shadow);
-  margin-bottom: 1.5rem;
-
-  nb-card-header {
-    border-bottom: 1px solid var(--border-basic-color-3);
-
-    h6 {
-      margin: 0;
-      font-weight: 600;
+    .header-left {
       display: flex;
       align-items: center;
+      gap: 1.5rem;
+      flex: 1;
+
+      .back-btn {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.3);
+        }
+      }
+    }
+
+    .detail-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+
+      nb-icon {
+        font-size: 2rem;
+      }
+    }
+
+    .detail-subtitle {
+      font-size: 1rem;
+      opacity: 0.9;
+      margin: 0;
+      font-family: "Courier New", monospace;
+      letter-spacing: 1px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 0.75rem;
+    }
+  }
+
+  // Loading & Error
+  .loading-container,
+  .error-container {
+    text-align: center;
+    padding: 4rem 2rem;
+
+    .loading-text {
+      margin-top: 1 5rem;
+      color: var(--text-hint-color);
+    }
+
+    nb-icon {
+      font-size: 5rem;
+      color: var(--color-danger-500);
+      margin-bottom: 1.5rem;
+    }
+
+    h4 {
+      font-weight: 600;
+      color: var(--text-basic-color);
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      color: var(--text-hint-color);
+      margin-bottom: 2rem;
+    }
+  }
+
+  // Content
+  .detail-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem 3rem;
+  }
+
+  // Carte principale du compte
+  .balance-card {
+    margin-bottom: 2rem;
+    border-radius: 1rem;
+    border: none;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(
+      135deg,
+      var(--color-primary-500),
+      var(--color-primary-600)
+    );
+    color: white;
+
+    nb-card-body {
+      padding: 2rem;
+    }
+
+    .balance-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .account-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .account-type-badge {
+      display: inline-flex;
+      align-items: center;
       gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 2rem;
+      background: rgba(255, 255, 255, 0.2);
+      font-weight: 600;
 
       nb-icon {
         font-size: 1.25rem;
       }
     }
 
-    .card-header-flex {
+    .account-number {
+      small {
+        display: block;
+        opacity: 0.8;
+        font-size: 0.875rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .number-value {
+        font-size: 1.125rem;
+        font-family: "Courier New", monospace;
+        letter-spacing: 1px;
+        font-weight: 600;
+      }
+    }
+
+    .balance-right {
+      text-align: right;
+    }
+
+    .balance-display {
+      small {
+        display: block;
+        opacity: 0.8;
+        font-size: 0.875rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .balance-value {
+        font-size: 2 5rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+
+        &.positive {
+          color: rgba(0, 214, 143, 0.3);
+        }
+
+        &.zero {
+          opacity: 0.7;
+        }
+
+        &.negative {
+          color: rgba(255, 61, 113, 0.3);
+        }
+      }
+
+      .currency {
+        opacity: 0.8;
+      }
+    }
+  }
+
+  // Actions rapides
+  .quick-actions {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+
+    button {
+      flex: 1;
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
       align-items: center;
+      gap: 0.5rem;
+      padding: 1.5rem 1rem;
+      border-radius: 1rem;
+      transition: all 0.3s;
+
+      &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      }
+
+      nb-icon {
+        font-size: 1.75rem;
+      }
+
+      span {
+        font-weight: 600;
+      }
     }
   }
 
-  nb-card-body {
-    padding: 1.5rem;
+  // Grille
+  .detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 2rem;
   }
-}
 
-// Statistiques
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.5rem;
-}
+  // Cards
+  .stats-card,
+  .transactions-card,
+  .info-card,
+  .customer-card,
+  .actions-card {
+    border-radius: 1rem;
+    border: none;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    margin-bottom: 2rem;
 
-.stat-item {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-  background: rgba(var(--color-primary-100-rgb), 0.5);
-  border-radius: 0.75rem;
+    nb-card-header {
+      border-bottom: 1px solid var(--border-basic-color-3);
+      padding: 1.5rem;
 
-  .stat-icon {
-    width: 50px;
-    height: 50px;
+      h6 {
+        margin: 0;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        nb-icon {
+          font-size: 1.25rem;
+          color: var(--color-primary-500);
+        }
+      }
+
+      .card-header-flex {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+    }
+
+    nb-card-body {
+      padding: 1.5rem;
+    }
+  }
+
+  // Statistiques
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--background-basic-color-3);
     border-radius: 0.75rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
 
-    nb-icon {
-      font-size: 1.5rem;
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+
+      nb-icon {
+        font-size: 1.5rem;
+      }
+
+      &.stat-success {
+        background: rgba(0, 214, 143, 0.1);
+        color: var(--color-success-500);
+      }
+
+      &.stat-danger {
+        background: rgba(255, 61, 113, 0.1);
+        color: var(--color-danger-500);
+      }
+
+      &.stat-primary {
+        background: rgba(51, 102, 255, 0.1);
+        color: var(--color-primary-500);
+      }
+
+      &.stat-info {
+        background: rgba(0, 149, 255, 0.1);
+        color: var(--color-info-500);
+      }
     }
 
-    &.stat-success {
-      color: var(--color-success-500);
-    }
+    .stat-content {
+      flex: 1;
 
-    &.stat-danger {
-      color: var(--color-danger-500);
-    }
+      .stat-value {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        color: var(--text-basic-color);
+      }
 
-    &.stat-primary {
-      color: var(--color-primary-500);
-    }
+      .stat-label {
+        font-size: 0.8125rem;
+        color: var(--text-hint-color);
+        margin-bottom: 0.25rem;
+      }
 
-    &.stat-info {
-      color: var(--color-info-500);
-    }
-  }
-
-  .stat-content {
-    flex: 1;
-
-    .stat-value {
-      font-size: 1.25rem;
-      font-weight: 700;
-      margin-bottom: 0.25rem;
-    }
-
-    .stat-label {
-      font-size: 0.85rem;
-      color: var(--text-hint-color);
-      margin-bottom: 0.25rem;
-    }
-
-    small {
-      font-size: 0.75rem;
-    }
-  }
-}
-
-// Graphiques
-.charts-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 1.5rem;
-}
-
-.no-data {
-  text-align: center;
-  padding: 3rem 0;
-  color: var(--text-hint-color);
-
-  nb-icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-  }
-
-  p {
-    margin: 0;
-  }
-}
-
-// Transactions
-.loading-transactions {
-  text-align: center;
-  padding: 3rem 0;
-}
-
-.transactions-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.transaction-item {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-  border-radius: 0.75rem;
-  background: var(--color-basic-100);
-  transition: all 0.2s;
-
-  &:hover {
-    background: var(--color-basic-200);
-  }
-
-  .transaction-icon {
-    width: 45px;
-    height: 45px;
-    border-radius: 0.75rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-
-    nb-icon {
-      font-size: 1.5rem;
-    }
-
-    &.icon-success {
-      background: var(--color-success-100);
-      color: var(--color-success-500);
-    }
-
-    &.icon-danger {
-      background: var(--color-danger-100);
-      color: var(--color-danger-500);
-    }
-
-    &.icon-primary {
-      background: var(--color-primary-100);
-      color: var(--color-primary-500);
+      small {
+        font-size: 0.75rem;
+        color: var(--text-hint-color);
+      }
     }
   }
 
-  .transaction-info {
-    flex: 1;
-
-    .transaction-type {
-      font-weight: 600;
-      margin-bottom: 0.25rem;
-    }
-
-    .transaction-date,
-    .transaction-ref {
-      display: block;
-      font-size: 0.8rem;
-      color: var(--text-hint-color);
-    }
-  }
-
-  .transaction-amount {
-    text-align: right;
-
-    .amount-value {
-      font-size: 1.1rem;
-      font-weight: 700;
-      margin-bottom: 0.25rem;
-    }
-
-    &.amount-positive .amount-value {
-      color: var(--color-success-500);
-    }
-
-    &.amount-negative .amount-value {
-      color: var(--color-danger-500);
-    }
-
-    .amount-balance {
-      display: block;
-      font-size: 0.75rem;
-      color: var(--text-hint-color);
-    }
-  }
-}
-
-.no-transactions {
-  text-align: center;
-  padding: 3rem 0;
-
-  nb-icon {
-    font-size: 3rem;
-    color: var(--color-basic-400);
-    margin-bottom: 1rem;
-  }
-
-  p {
-    color: var(--text-hint-color);
-    margin-bottom: 1 5rem;
-  }
-}
-
-// Sidebar
-.info-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.75rem 0;
-  border-bottom: 1px solid var(--border-basic-color-3);
-
-  &:last-child {
-    border-bottom: none;
-  }
-
-  .info-label {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.85rem;
-    color: var(--text-hint-color);
-
-    nb-icon {
-      font-size: 1rem;
-    }
-  }
-
-  .info-value {
-    font-weight: 600;
-    font-size: 0.9rem;
-    text-align: right;
-  }
-}
-
-// Client
-.customer-card {
-  nb-card-body {
+  // Transactions
+  .loading-transactions {
     text-align: center;
+    padding: 3rem 0;
   }
 
-  .customer-avatar {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--color-primary-400) 0%, var(--color-primary-600) 100%);
+  .transactions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .transaction-item {
     display: flex;
     align-items: center;
-    justify-content: center;
-    margin: 0 auto 1rem;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    background: var(--background-basic-color-3);
+    transition: all 0.2s;
 
-    nb-icon {
-      font-size: 2.5rem;
-      color: var(--text-control-color);
+    &:hover {
+      background: var(--background-basic-color-4);
+    }
+
+    .transaction-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+
+      nb-icon {
+        font-size: 1.5rem;
+      }
+
+      &.icon-success {
+        background: rgba(0, 214, 143, 0.1);
+        color: var(--color-success-500);
+      }
+
+      &.icon-danger {
+        background: rgba(255, 61, 113, 0.1);
+        color: var(--color-danger-500);
+      }
+
+      &.icon-primary {
+        background: rgba(51, 102, 255, 0.1);
+        color: var(--color-primary-500);
+      }
+    }
+
+    .transaction-info {
+      flex: 1;
+
+      .transaction-type {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+        color: var(--text-basic-color);
+      }
+
+      .transaction-date,
+      .transaction-ref {
+        display: block;
+        font-size: 0.8125rem;
+        color: var(--text-hint-color);
+      }
+    }
+
+    .transaction-amount {
+      text-align: right;
+
+      .amount-value {
+        font-size: 1.0625rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+      }
+
+      &.amount-positive .amount-value {
+        color: var(--color-success-500);
+      }
+
+      &.amount-negative .amount-value {
+        color: var(--color-danger-500);
+      }
+
+      .amount-balance {
+        display: block;
+        font-size: 0.75rem;
+        color: var(--text-hint-color);
+      }
     }
   }
 
-  .customer-name {
-    font-size: 1.25rem;
-    font-weight: 700;
-    margin-bottom: 1 5rem;
+  .no-transactions {
+    text-align: center;
+    padding: 3rem 0;
+
+    nb-icon {
+      font-size: 3rem;
+      color: var(--text-hint-color);
+      opacity: 0.5;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      color: var(--text-hint-color);
+      margin-bottom: 1.5rem;
+    }
   }
 
-  .customer-details {
-    text-align: left;
-    margin-bottom: 1.5rem;
-  }
-
-  .detail-row {
+  // Sidebar
+  .info-item {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 0.75rem;
     padding: 0.75rem 0;
     border-bottom: 1px solid var(--border-basic-color-3);
-    font-size: 0.9rem;
 
     &:last-child {
       border-bottom: none;
     }
 
-    nb-icon {
+    .info-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8125rem;
       color: var(--text-hint-color);
-      font-size: 1 1rem;
-      flex-shrink: 0;
-    }
-  }
-}
 
-// Actions list
-.action-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-
-  button {
-    justify-content: flex-start;
-    text-align: left;
-
-    nb-icon {
-      margin-right: 0.75rem;
-    }
-  }
-}
-
-// Responsive
-@media (max-width: 1200px) {
-  .detail-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .charts-row {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 768px) {
-  .detail-header {
-    .header-content {
-      flex-direction: column;
-      align-items: flex-start;
+      nb-icon {
+        font-size: 1rem;
+      }
     }
 
-    .header-actions {
-      width: 100%;
-      justify-content: stretch;
+    .info-value {
+      font-weight: 600;
+      font-size: 0.9375rem;
+      text-align: right;
+      color: var(--text-basic-color);
+    }
+  }
 
-      button {
-        flex: 1;
+  // Client
+  .customer-card {
+    nb-card-body {
+      text-align: center;
+    }
+
+    .customer-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(
+        135deg,
+        var(--color-primary-500),
+        var(--color-primary-600)
+      );
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+
+      nb-icon {
+        font-size: 2.5rem;
+        color: white;
+      }
+    }
+
+    .customer-name {
+      font-size: 1.125rem;
+      font-weight: 700;
+      margin-bottom: 1 5rem;
+      color: var(--text-basic-color);
+    }
+
+    .customer-details {
+      text-align: left;
+      margin-bottom: 1.5rem;
+    }
+
+    .detail-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border-basic-color-3);
+      font-size: 0.9375rem;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      nb-icon {
+        color: var(--text-hint-color);
+        font-size: 1 125rem;
+        flex-shrink: 0;
       }
     }
   }
 
-  .balance-content {
+  // Actions list
+  .action-list {
+    display: flex;
     flex-direction: column;
-    text-align: center;
+    gap: 0.5rem;
 
-    .balance-left,
-    .balance-right {
-      width: 100%;
+    button {
+      justify-content: flex-start;
+      text-align: left;
+
+      nb-icon {
+        margin-right: 0.75rem;
+      }
+    }
+  }
+
+  // Responsive
+  @media (max-width: 1200px) {
+    .detail-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .detail-header {
+      padding: 1.5rem 1rem;
+
+      .header-content {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .header-actions {
+        width: 100%;
+
+        button {
+          flex: 1;
+        }
+      }
     }
 
-    .account-info {
-      justify-content: center;
+    .detail-content {
+      padding: 0 1rem 2rem;
     }
 
-    .balance-right {
+    .balance-content {
+      flex-direction: column;
       text-align: center;
-    }
-  }
 
-  .quick-actions {
-    .action-btn {
-      min-width: calc(50% - 0.5rem);
-    }
-  }
+      .balance-left,
+      .balance-right {
+        width: 100%;
+      }
 
-  .stats-grid {
-    grid-template-columns: 1fr;
+      .account-info {
+        justify-content: center;
+      }
+
+      .balance-right {
+        text-align: center;
+      }
+    }
+
+    .quick-actions {
+      flex-wrap: wrap;
+
+      button {
+        min-width: calc(50% - 0.5rem);
+      }
+    }
+
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
   }
 }
