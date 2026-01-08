@@ -65,7 +65,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       features: [
         "Recherche avancée",
         "Filtres par période",
-        "Export PDF/CSV",
+        "Export PDF",
         "Statistiques détaillées",
       ],
     },

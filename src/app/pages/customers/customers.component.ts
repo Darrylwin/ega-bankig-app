@@ -280,53 +280,6 @@ export class CustomersComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Export CSV
-   */
-  exportToCSV(): void {
-    const headers = [
-      "ID",
-      "Nom",
-      "Prénom",
-      "Email",
-      "Téléphone",
-      "Date Naissance",
-      "Âge",
-      "Genre",
-      "Nationalité",
-      "Adresse",
-      "Date Inscription",
-    ];
-    const rows = this.customers.map((c) => [
-      c.id.toString(),
-      c.lastName,
-      c.firstName,
-      c.email,
-      c.phoneNumber,
-      new Date(c.dateOfBirth).toLocaleDateString("fr-FR"),
-      c.age.toString(),
-      c.gender === "MALE" ? "Homme" : c.gender === "FEMALE" ? "Femme" : "Autre",
-      c.nationality,
-      c.address,
-      new Date(c.createdAt).toLocaleDateString("fr-FR"),
-    ]);
-
-    const csvContent = [
-      headers.join(","),
-      ...rows.map((row) => row.map((cell) => `"${cell}"`).join(",")),
-    ].join("\n");
-
-    const blob = new Blob(["\ufeff" + csvContent], {
-      type: "text/csv;charset=utf-8;",
-    });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = `clients_${new Date().toISOString().split("T")[0]}.csv`;
-    link.click();
-
-    this.toastr.success("Export CSV réussi", "Succès");
-  }
-
-  /**
    * Pagination
    */
   goToFirstPage(): void {

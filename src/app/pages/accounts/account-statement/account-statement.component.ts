@@ -65,18 +65,6 @@ export class AccountStatementComponent implements OnInit, OnDestroy {
         "Compatible tous systèmes",
       ],
     },
-    {
-      value: "csv",
-      label: "CSV",
-      icon: "file-outline",
-      description: "Fichier Excel pour analyse",
-      color: "success",
-      features: [
-        "Import dans Excel",
-        "Analyse de données",
-        "Compatible tableurs",
-      ],
-    },
   ];
 
   // Périodes prédéfinies

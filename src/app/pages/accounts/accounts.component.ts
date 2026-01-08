@@ -299,34 +299,6 @@ export class AccountsComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Export CSV
-   */
-  exportToCSV(): void {
-    const headers = ['N° Compte', 'Titulaire', 'Type', 'Solde', 'Devise', 'Statut', 'Date création'];
-    const rows = this.accounts.map((a) => [
-      a.accountNumber,
-      a. customerFullName,
-      a. accountType === 'SAVINGS' ? 'Épargne' : 'Courant',
-      a.balance. toString(),
-      a.currency,
-      a.status === 'ACTIVE' ? 'Actif' :  a.status === 'BLOCKED' ? 'Bloqué' : 'Clos',
-      new Date(a.createdAt).toLocaleDateString('fr-FR'),
-    ]);
-
-    const csvContent = [headers.join(','), ...rows.map((row) => row.map((cell) => `"${cell}"`).join(','))].join('\n');
-
-    const blob = new Blob(['\ufeff' + csvContent], {
-      type: 'text/csv;charset=utf-8;',
-    });
-    const link = document.createElement('a');
-    link.href = URL. createObjectURL(blob);
-    link.download = `comptes_${new Date().toISOString().split('T')[0]}.csv`;
-    link.click();
-
-    this.toastr. success('Export CSV réussi', 'Succès');
-  }
-
-  /**
    * Pagination
    */
   goToFirstPage(): void {

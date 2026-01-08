@@ -548,65 +548,6 @@ export class HistoryComponent implements OnInit {
   }
 
   /**
-   * Export CSV
-   */
-  exportToCSV(): void {
-    if (this.filteredTransactions.length === 0) {
-      this.toastr.warning("Aucune transaction à exporter", "Attention");
-      return;
-    }
-
-    const headers = [
-      "Date",
-      "Type",
-      "Compte Source",
-      "Compte Destination",
-      "Montant",
-      "Solde Après",
-      "Statut",
-      "Description",
-      "Référence",
-    ];
-
-    const rows = this.filteredTransactions.map((tx) => [
-      new Date(tx.transactionDate).toLocaleString("fr-FR"),
-      tx.transactionType === "DEPOSIT"
-        ? "Dépôt"
-        : tx.transactionType === "WITHDRAWAL"
-        ? "Retrait"
-        : "Virement",
-      tx.sourceAccountNumber || "—",
-      tx.destinationAccountNumber || "—",
-      tx.amount.toString(),
-      tx.balanceAfter.toString(),
-      tx.status === "SUCCESS"
-        ? "Succès"
-        : tx.status === "PENDING"
-        ? "En attente"
-        : "Échoué",
-      tx.description || "—",
-      tx.transactionReference,
-    ]);
-
-    const csvContent = [
-      headers.join(","),
-      ...rows.map((row) => row.map((cell) => `"${cell}"`).join(",")),
-    ].join("\n");
-
-    const blob = new Blob(["\ufeff" + csvContent], {
-      type: "text/csv;charset=utf-8;",
-    });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = `transactions_${
-      new Date().toISOString().split("T")[0]
-    }.csv`;
-    link.click();
-
-    this.toastr.success("Export CSV réussi", "Succès");
-  }
-
-  /**
    * Export PDF (simulation)
    */
   exportToPDF(): void {

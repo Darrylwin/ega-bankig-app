@@ -3,7 +3,13 @@
   <div class="page-header">
     <div class="header-content">
       <div class="header-left">
-        <button nbButton ghost size="small" [routerLink]="['/pages/transactions']" class="back-btn">
+        <button
+          nbButton
+          ghost
+          size="small"
+          [routerLink]="['/pages/transactions']"
+          class="back-btn"
+        >
           <nb-icon icon="arrow-back-outline"></nb-icon>
         </button>
         <div>
@@ -11,24 +17,27 @@
             <nb-icon icon="archive-outline"></nb-icon>
             Historique des Transactions
           </h1>
-          <p class="page-subtitle">Consultez et analysez toutes vos opérations bancaires</p>
+          <p class="page-subtitle">
+            Consultez et analysez toutes vos opérations bancaires
+          </p>
         </div>
       </div>
       <div class="header-right">
         <!-- Actions rapides -->
         <nb-button-group>
-          <button nbButton ghost size="small" (click)="exportToCSV()" nbTooltip="Exporter CSV">
-            <nb-icon icon="download-outline"></nb-icon>
-          </button>
-          <button nbButton ghost size="small" (click)="exportToPDF()" nbTooltip="Exporter PDF">
+          <button
+            nbButton
+            ghost
+            size="small"
+            (click)="exportToPDF()"
+            nbTooltip="Exporter PDF"
+          >
             <nb-icon icon="file-text-outline"></nb-icon>
           </button>
         </nb-button-group>
       </div>
     </div>
   </div>
-
-  <br/>
 
   <!-- View Mode Selector -->
   <div class="view-selector">
@@ -38,16 +47,18 @@
         size="small"
         [status]="viewMode === 'table' ? 'primary' : 'basic'"
         (click)="setViewMode('table')"
-        nbTooltip="Vue tableau">
+        nbTooltip="Vue tableau"
+      >
         <nb-icon icon="list-outline"></nb-icon>
         Tableau
       </button>
       <button
         nbButton
         size="small"
-        [status]="viewMode === 'cards' ? 'primary' :  'basic'"
+        [status]="viewMode === 'cards' ? 'primary' : 'basic'"
         (click)="setViewMode('cards')"
-        nbTooltip="Vue cartes">
+        nbTooltip="Vue cartes"
+      >
         <nb-icon icon="grid-outline"></nb-icon>
         Cartes
       </button>
@@ -56,7 +67,8 @@
         size="small"
         [status]="viewMode === 'timeline' ? 'primary' : 'basic'"
         (click)="setViewMode('timeline')"
-        nbTooltip="Chronologie">
+        nbTooltip="Chronologie"
+      >
         <nb-icon icon="clock-outline"></nb-icon>
         Timeline
       </button>
@@ -71,7 +83,13 @@
           <nb-icon icon="funnel-outline"></nb-icon>
           Filtres de recherche
         </h6>
-        <button nbButton ghost size="tiny" (click)="resetFilters()" nbTooltip="Réinitialiser">
+        <button
+          nbButton
+          ghost
+          size="tiny"
+          (click)="resetFilters()"
+          nbTooltip="Réinitialiser"
+        >
           <nb-icon icon="refresh-outline"></nb-icon>
           Réinitialiser
         </button>
@@ -90,10 +108,12 @@
             size="small"
             [(ngModel)]="selectedAccountId"
             (ngModelChange)="loadTransactions()"
-            placeholder="Sélectionnez un compte">
+            placeholder="Sélectionnez un compte"
+          >
             <nb-option value="ALL">Tous les comptes</nb-option>
             <nb-option *ngFor="let account of accounts" [value]="account.id">
-              {{ formatAccountNumber(account.accountNumber) }} - {{ account.customerFullName }}
+              {{ formatAccountNumber(account.accountNumber) }} -
+              {{ account.customerFullName }}
             </nb-option>
           </nb-select>
         </div>
@@ -108,11 +128,15 @@
             fullWidth
             size="small"
             [(ngModel)]="selectedType"
-            (ngModelChange)="applyFilters()">
-            <nb-option *ngFor="let type of filterOptions.types" [value]="type.value">
+            (ngModelChange)="applyFilters()"
+          >
+            <nb-option
+              *ngFor="let type of filterOptions.types"
+              [value]="type.value"
+            >
               <span class="option-with-icon">
                 <nb-icon [icon]="type.icon"></nb-icon>
-                {{ type. label }}
+                {{ type.label }}
               </span>
             </nb-option>
           </nb-select>
@@ -128,8 +152,12 @@
             fullWidth
             size="small"
             [(ngModel)]="selectedStatus"
-            (ngModelChange)="applyFilters()">
-            <nb-option *ngFor="let status of filterOptions.statuses" [value]="status.value">
+            (ngModelChange)="applyFilters()"
+          >
+            <nb-option
+              *ngFor="let status of filterOptions.statuses"
+              [value]="status.value"
+            >
               {{ status.label }}
             </nb-option>
           </nb-select>
@@ -147,7 +175,8 @@
             fullWidth
             size="small"
             [(ngModel)]="startDate"
-            (change)="loadTransactions()">
+            (change)="loadTransactions()"
+          />
         </div>
 
         <!-- Date fin -->
@@ -162,7 +191,8 @@
             fullWidth
             size="small"
             [(ngModel)]="endDate"
-            (change)="loadTransactions()">
+            (change)="loadTransactions()"
+          />
         </div>
 
         <!-- Recherche -->
@@ -179,8 +209,15 @@
               size="small"
               placeholder="Référence, description..."
               [(ngModel)]="searchTerm"
-              (keyup.enter)="applyFilters()">
-            <button nbButton ghost size="tiny" (click)="applyFilters()" *ngIf="searchTerm">
+              (keyup.enter)="applyFilters()"
+            />
+            <button
+              nbButton
+              ghost
+              size="tiny"
+              (click)="applyFilters()"
+              *ngIf="searchTerm"
+            >
               <nb-icon icon="search-outline"></nb-icon>
             </button>
           </div>
@@ -191,25 +228,67 @@
       <div class="quick-periods">
         <label class="quick-label">Périodes rapides :</label>
         <div class="period-buttons">
-          <button nbButton ghost size="tiny" [status]="currentPeriod === 'today' ? 'primary' : 'basic'" (click)="setToday()">
+          <button
+            nbButton
+            ghost
+            size="tiny"
+            [status]="currentPeriod === 'today' ? 'primary' : 'basic'"
+            (click)="setToday()"
+          >
             Aujourd'hui
           </button>
-          <button nbButton ghost size="tiny" [status]="currentPeriod === 'yesterday' ? 'primary' : 'basic'" (click)="setYesterday()">
+          <button
+            nbButton
+            ghost
+            size="tiny"
+            [status]="currentPeriod === 'yesterday' ? 'primary' : 'basic'"
+            (click)="setYesterday()"
+          >
             Hier
           </button>
-          <button nbButton ghost size="tiny" [status]="currentPeriod === 'week' ? 'primary' : 'basic'" (click)="setLast7Days()">
+          <button
+            nbButton
+            ghost
+            size="tiny"
+            [status]="currentPeriod === 'week' ? 'primary' : 'basic'"
+            (click)="setLast7Days()"
+          >
             7 jours
           </button>
-          <button nbButton ghost size="tiny" [status]="currentPeriod === '30days' ? 'primary' : 'basic'" (click)="setLast30Days()">
+          <button
+            nbButton
+            ghost
+            size="tiny"
+            [status]="currentPeriod === '30days' ? 'primary' : 'basic'"
+            (click)="setLast30Days()"
+          >
             30 jours
           </button>
-          <button nbButton ghost size="tiny" [status]="currentPeriod === 'month' ? 'primary' : 'basic'" (click)="setCurrentMonth()">
+          <button
+            nbButton
+            ghost
+            size="tiny"
+            [status]="currentPeriod === 'month' ? 'primary' : 'basic'"
+            (click)="setCurrentMonth()"
+          >
             Ce mois
           </button>
-          <button nbButton ghost size="tiny" [status]="currentPeriod === 'lastMonth' ? 'primary' :  'basic'" (click)="setLastMonth()">
+          <button
+            nbButton
+            ghost
+            size="tiny"
+            [status]="currentPeriod === 'lastMonth' ? 'primary' : 'basic'"
+            (click)="setLastMonth()"
+          >
             Mois dernier
           </button>
-          <button nbButton ghost size="tiny" [status]="currentPeriod === 'year' ? 'primary' : 'basic'" (click)="setCurrentYear()">
+          <button
+            nbButton
+            ghost
+            size="tiny"
+            [status]="currentPeriod === 'year' ? 'primary' : 'basic'"
+            (click)="setCurrentYear()"
+          >
             Cette année
           </button>
         </div>
@@ -225,7 +304,9 @@
           <nb-icon icon="repeat-outline"></nb-icon>
         </div>
         <div class="stat-content">
-          <div class="stat-value">{{ formatNumber(stats.totalTransactions) }}</div>
+          <div class="stat-value">
+            {{ formatNumber(stats.totalTransactions) }}
+          </div>
           <div class="stat-label">Transactions</div>
         </div>
       </nb-card-body>
@@ -237,7 +318,9 @@
           <nb-icon icon="trending-up-outline"></nb-icon>
         </div>
         <div class="stat-content">
-          <div class="stat-value">{{ formatCurrency(stats.totalDeposits) }}</div>
+          <div class="stat-value">
+            {{ formatCurrency(stats.totalDeposits) }}
+          </div>
           <div class="stat-label">Dépôts ({{ stats.depositsCount }})</div>
         </div>
       </nb-card-body>
@@ -249,7 +332,9 @@
           <nb-icon icon="trending-down-outline"></nb-icon>
         </div>
         <div class="stat-content">
-          <div class="stat-value">{{ formatCurrency(stats.totalWithdrawals) }}</div>
+          <div class="stat-value">
+            {{ formatCurrency(stats.totalWithdrawals) }}
+          </div>
           <div class="stat-label">Retraits ({{ stats.withdrawalsCount }})</div>
         </div>
       </nb-card-body>
@@ -261,7 +346,11 @@
           <nb-icon icon="bar-chart-outline"></nb-icon>
         </div>
         <div class="stat-content">
-          <div class="stat-value" [class.text-success]="getNetBalance() > 0" [class.text-danger]="getNetBalance() < 0">
+          <div
+            class="stat-value"
+            [class.text-success]="getNetBalance() > 0"
+            [class.text-danger]="getNetBalance() < 0"
+          >
             {{ formatCurrency(getNetBalance()) }}
           </div>
           <div class="stat-label">Solde net</div>
@@ -273,11 +362,11 @@
   <!-- Chargement -->
   <div *ngIf="isLoading" class="loading-container">
     <nb-spinner size="giant" status="primary"></nb-spinner>
-    <p class="loading-text">Chargement de l'historique... </p>
+    <p class="loading-text">Chargement de l'historique...</p>
   </div>
 
   <!-- Contenu principal -->
-  <div *ngIf="! isLoading">
+  <div *ngIf="!isLoading">
     <!-- VUE TABLEAU -->
     <div *ngIf="viewMode === 'table'">
       <nb-card class="table-card">
@@ -285,13 +374,12 @@
           <div class="table-header">
             <div>
               <h6>Liste des transactions</h6>
-              <small>{{ filteredTransactions.length }} transaction(s) trouvée(s)</small>
+              <small
+                >{{ filteredTransactions.length }} transaction(s)
+                trouvée(s)</small
+              >
             </div>
             <div class="table-actions">
-              <button nbButton size="small" ghost (click)="exportToCSV()">
-                <nb-icon icon="download-outline"></nb-icon>
-                CSV
-              </button>
               <button nbButton size="small" ghost (click)="exportToPDF()">
                 <nb-icon icon="file-text-outline"></nb-icon>
                 PDF
@@ -305,7 +393,8 @@
             <ng2-smart-table
               [settings]="settings"
               [source]="source"
-              (custom)="onCustomAction($event)">
+              (custom)="onCustomAction($event)"
+            >
             </ng2-smart-table>
           </div>
         </nb-card-body>
@@ -315,24 +404,40 @@
     <!-- VUE CARTES -->
     <div *ngIf="viewMode === 'cards'" class="cards-view">
       <div class="transactions-grid">
-        <nb-card *ngFor="let transaction of filteredTransactions" class="transaction-card" [ngClass]="'card-' + getTransactionColor(transaction. transactionType)">
+        <nb-card
+          *ngFor="let transaction of filteredTransactions"
+          class="transaction-card"
+          [ngClass]="'card-' + getTransactionColor(transaction.transactionType)"
+        >
           <nb-card-header>
             <div class="transaction-header">
               <div class="transaction-type">
-                <nb-icon [icon]="getTransactionIcon(transaction.transactionType)"></nb-icon>
-                <span>{{ getTransactionLabel(transaction.transactionType) }}</span>
+                <nb-icon
+                  [icon]="getTransactionIcon(transaction.transactionType)"
+                ></nb-icon>
+                <span>{{
+                  getTransactionLabel(transaction.transactionType)
+                }}</span>
               </div>
               <nb-badge
                 [text]="getStatusLabel(transaction.status)"
-                [status]="getStatusColor(transaction.status)">
+                [status]="getStatusColor(transaction.status)"
+              >
               </nb-badge>
             </div>
           </nb-card-header>
 
           <nb-card-body>
             <div class="transaction-amount">
-              <div class="amount-value" [class.text-success]="transaction.transactionType === 'DEPOSIT'" [class.text-danger]="transaction.transactionType === 'WITHDRAWAL'">
-                {{ transaction.transactionType === 'DEPOSIT' ? '+' : '-' }} {{ formatCurrency(Math.abs(transaction.amount)) }}
+              <div
+                class="amount-value"
+                [class.text-success]="transaction.transactionType === 'DEPOSIT'"
+                [class.text-danger]="
+                  transaction.transactionType === 'WITHDRAWAL'
+                "
+              >
+                {{ transaction.transactionType === "DEPOSIT" ? "+" : "-" }}
+                {{ formatCurrency(Math.abs(transaction.amount)) }}
               </div>
               <div class="amount-label">Montant</div>
             </div>
@@ -344,15 +449,24 @@
               </div>
               <div class="detail-row" *ngIf="transaction.sourceAccountNumber">
                 <small>Compte source</small>
-                <span class="account-number">{{ formatAccountNumber(transaction.sourceAccountNumber) }}</span>
+                <span class="account-number">{{
+                  formatAccountNumber(transaction.sourceAccountNumber)
+                }}</span>
               </div>
-              <div class="detail-row" *ngIf="transaction.destinationAccountNumber">
+              <div
+                class="detail-row"
+                *ngIf="transaction.destinationAccountNumber"
+              >
                 <small>Compte destination</small>
-                <span class="account-number">{{ formatAccountNumber(transaction.destinationAccountNumber) }}</span>
+                <span class="account-number">{{
+                  formatAccountNumber(transaction.destinationAccountNumber)
+                }}</span>
               </div>
               <div class="detail-row">
                 <small>Solde après</small>
-                <span class="fw-bold">{{ formatCurrency(transaction.balanceAfter) }}</span>
+                <span class="fw-bold">{{
+                  formatCurrency(transaction.balanceAfter)
+                }}</span>
               </div>
               <div class="detail-row" *ngIf="transaction.description">
                 <small>Description</small>
@@ -360,13 +474,21 @@
               </div>
               <div class="detail-row">
                 <small>Référence</small>
-                <span class="reference">{{ transaction.transactionReference }}</span>
+                <span class="reference">{{
+                  transaction.transactionReference
+                }}</span>
               </div>
             </div>
           </nb-card-body>
 
           <nb-card-footer>
-            <button nbButton ghost size="small" fullWidth (click)="showTransactionDetails(transaction)">
+            <button
+              nbButton
+              ghost
+              size="small"
+              fullWidth
+              (click)="showTransactionDetails(transaction)"
+            >
               <nb-icon icon="eye-outline"></nb-icon>
               Voir détails
             </button>
@@ -380,41 +502,69 @@
       <nb-card>
         <nb-card-body>
           <div class="timeline">
-            <div *ngFor="let transaction of filteredTransactions; let i = index" class="timeline-item">
-              <div class="timeline-marker" [ngClass]="getTransactionColor(transaction.transactionType)">
-                <nb-icon [icon]="getTransactionIcon(transaction.transactionType)"></nb-icon>
+            <div
+              *ngFor="let transaction of filteredTransactions; let i = index"
+              class="timeline-item"
+            >
+              <div
+                class="timeline-marker"
+                [ngClass]="getTransactionColor(transaction.transactionType)"
+              >
+                <nb-icon
+                  [icon]="getTransactionIcon(transaction.transactionType)"
+                ></nb-icon>
               </div>
 
               <div class="timeline-content">
                 <div class="timeline-header">
                   <div class="timeline-date">
-                    {{ formatDateTime(transaction. transactionDate) }}
+                    {{ formatDateTime(transaction.transactionDate) }}
                   </div>
                   <nb-badge
                     [text]="getStatusLabel(transaction.status)"
                     [status]="getStatusColor(transaction.status)"
-                    size="tiny">
+                    size="tiny"
+                  >
                   </nb-badge>
                 </div>
 
                 <div class="timeline-body">
                   <div class="timeline-type">
-                    <nb-icon [icon]="getTransactionIcon(transaction.transactionType)"></nb-icon>
-                    <strong>{{ getTransactionLabel(transaction.transactionType) }}</strong>
+                    <nb-icon
+                      [icon]="getTransactionIcon(transaction.transactionType)"
+                    ></nb-icon>
+                    <strong>{{
+                      getTransactionLabel(transaction.transactionType)
+                    }}</strong>
                   </div>
 
-                  <div class="timeline-amount" [class.text-success]="transaction.transactionType === 'DEPOSIT'" [class.text-danger]="transaction.transactionType === 'WITHDRAWAL'">
-                    {{ transaction.transactionType === 'DEPOSIT' ? '+' : '-' }} {{ formatCurrency(Math.abs(transaction. amount)) }}
+                  <div
+                    class="timeline-amount"
+                    [class.text-success]="
+                      transaction.transactionType === 'DEPOSIT'
+                    "
+                    [class.text-danger]="
+                      transaction.transactionType === 'WITHDRAWAL'
+                    "
+                  >
+                    {{ transaction.transactionType === "DEPOSIT" ? "+" : "-" }}
+                    {{ formatCurrency(Math.abs(transaction.amount)) }}
                   </div>
 
                   <div class="timeline-details">
                     <div *ngIf="transaction.sourceAccountNumber">
                       <small>De :</small>
-                      <span class="account-number">{{ formatAccountNumber(transaction.sourceAccountNumber) }}</span>
+                      <span class="account-number">{{
+                        formatAccountNumber(transaction.sourceAccountNumber)
+                      }}</span>
                     </div>
                     <div *ngIf="transaction.destinationAccountNumber">
                       <small>Vers :</small>
-                      <span class="account-number">{{ formatAccountNumber(transaction.destinationAccountNumber) }}</span>
+                      <span class="account-number">{{
+                        formatAccountNumber(
+                          transaction.destinationAccountNumber
+                        )
+                      }}</span>
                     </div>
                     <div *ngIf="transaction.description">
                       <small>Description :</small>
@@ -423,7 +573,10 @@
                   </div>
 
                   <div class="timeline-balance">
-                    Solde après : <strong>{{ formatCurrency(transaction.balanceAfter) }}</strong>
+                    Solde après :
+                    <strong>{{
+                      formatCurrency(transaction.balanceAfter)
+                    }}</strong>
                   </div>
                 </div>
               </div>
@@ -451,7 +604,8 @@
               [results]="transactionsByTypeData"
               [legend]="true"
               [labels]="true"
-              [doughnut]="true">
+              [doughnut]="true"
+            >
             </ngx-charts-pie-chart>
           </nb-card-body>
         </nb-card>
@@ -474,7 +628,8 @@
               [showXAxisLabel]="true"
               [showYAxisLabel]="true"
               [xAxisLabel]="'Date'"
-              [yAxisLabel]="'Nombre'">
+              [yAxisLabel]="'Nombre'"
+            >
             </ngx-charts-bar-vertical>
           </nb-card-body>
         </nb-card>
@@ -482,7 +637,10 @@
     </div>
 
     <!-- État vide -->
-    <div *ngIf="filteredTransactions.length === 0 && !isLoading" class="empty-state">
+    <div
+      *ngIf="filteredTransactions.length === 0 && !isLoading"
+      class="empty-state"
+    >
       <div class="empty-icon">
         <nb-icon icon="archive-outline"></nb-icon>
       </div>
