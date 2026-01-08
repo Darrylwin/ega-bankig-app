@@ -19,7 +19,7 @@ export const MENU_ITEMS: NbMenuItem[] = [
   },
   {
     title: "Opérations Bancaires",
-    icon: "swap-horizontal-outline",
+    icon: "sync-outline",
     expanded: false,
     children: [
       {
@@ -48,5 +48,11 @@ export const MENU_ITEMS: NbMenuItem[] = [
     title: "Historique",
     icon: "archive-outline",
     link: "/pages/transactions/history",
+  },
+  {
+    title: "Administration",
+    icon: "settings-2-outline",
+    link: "/pages/admin",
+    hidden: true,
   },
 ];
