@@ -25,8 +25,6 @@
     </div>
   </div>
 
-  <br/>
-
   <!-- Progress Steps -->
   <div class="steps-progress">
     <div class="steps-container">
@@ -37,9 +35,10 @@
       >
         <div class="step-circle">
           <nb-icon
-            [icon]="currentStep > 1 ? 'checkmark-outline' : 'people-outline'"
+            *ngIf="currentStep > 1"
+            icon="checkmark-outline"
           ></nb-icon>
-          <span>1</span>
+          <span *ngIf="currentStep <= 1">1</span>
         </div>
         <div class="step-label">Comptes</div>
       </div>
@@ -53,18 +52,18 @@
       >
         <div class="step-circle">
           <nb-icon
-            [icon]="currentStep > 2 ? 'checkmark-outline' : 'cash-outline'"
+            *ngIf="currentStep > 2"
+            icon="checkmark-outline"
           ></nb-icon>
-          <span>2</span>
+          <span *ngIf="currentStep <= 2">2</span>
         </div>
         <div class="step-label">Montant</div>
       </div>
 
       <div class="step-line" [class.active]="currentStep >= 3"></div>
 
-      <div class="step-item" [class. active]="currentStep >= 3">
+      <div class="step-item" [class.active]="currentStep >= 3">
         <div class="step-circle">
-          <nb-icon icon="checkmark-circle-outline"></nb-icon>
           <span>3</span>
         </div>
         <div class="step-label">Confirmation</div>
@@ -75,7 +74,7 @@
   <!-- Chargement -->
   <div *ngIf="isLoading" class="loading-container">
     <nb-spinner size="giant" status="primary"></nb-spinner>
-    <p class="loading-text">Chargement des comptes... </p>
+    <p class="loading-text">Chargement des comptes...</p>
   </div>
 
   <!-- Formulaire -->
@@ -111,7 +110,7 @@
                   formControlName="sourceAccountId"
                   placeholder="Compte à débiter..."
                   [status]="
-                    f.sourceAccountId. invalid && f.sourceAccountId.touched
+                    f.sourceAccountId.invalid && f.sourceAccountId.touched
                       ? 'danger'
                       : 'basic'
                   "
@@ -160,15 +159,14 @@
                       [text]="
                         selectedSourceAccount.accountType === 'SAVINGS'
                           ? 'Épargne'
-                          :  'Courant'
+                          : 'Courant'
                       "
                       [status]="
-                        selectedSourceAccount. accountType === 'SAVINGS'
+                        selectedSourceAccount.accountType === 'SAVINGS'
                           ? 'success'
                           : 'primary'
                       "
-                    >
-                    </nb-badge>
+                    ></nb-badge>
                   </div>
 
                   <div class="account-card-body">
@@ -252,8 +250,7 @@
                               : 'primary'
                           "
                           size="tiny"
-                        >
-                        </nb-badge>
+                        ></nb-badge>
                       </div>
                     </div>
                   </nb-option>
@@ -266,7 +263,7 @@
                 <div
                   *ngIf="
                     f.destinationAccountId.invalid &&
-                    f. destinationAccountId.touched
+                    f.destinationAccountId.touched
                   "
                   class="field-error"
                 >
@@ -295,8 +292,7 @@
                           ? 'success'
                           : 'primary'
                       "
-                    >
-                    </nb-badge>
+                    ></nb-badge>
                   </div>
 
                   <div class="account-card-body">
@@ -379,7 +375,7 @@
                   >Montant du virement (F CFA)</label
                 >
                 <div class="amount-input-wrapper">
-                    <nb-icon icon="money-outline" class="input-icon"></nb-icon>
+                  <nb-icon icon="money-outline" class="input-icon"></nb-icon>
                   <input
                     type="number"
                     id="amount"
@@ -387,12 +383,12 @@
                     fullWidth
                     size="giant"
                     formControlName="amount"
-                    placeholder="0. 00"
+                    placeholder="0.00"
                     step="0.01"
                     min="0.01"
-                    [attr.max]="selectedSourceAccount?. balance"
+                    [attr.max]="selectedSourceAccount?.balance"
                     [status]="
-                      f.amount.invalid && f.amount.touched ?  'danger' : 'basic'
+                      f.amount.invalid && f.amount.touched ? 'danger' : 'basic'
                     "
                   />
                 </div>
@@ -402,15 +398,15 @@
                   class="field-error"
                 >
                   <nb-icon icon="alert-circle-outline"></nb-icon>
-                  <span *ngIf="f.amount. errors?.['required']"
+                  <span *ngIf="f.amount.errors?.['required']"
                     >Le montant est obligatoire</span
                   >
                   <span *ngIf="f.amount.errors?.['min']"
                     >Montant minimum: 1 F CFA</span
                   >
                   <span *ngIf="f.amount.errors?.['max']">
-                    Solde insuffisant (Max: 
-                    {{ formatCurrency(selectedSourceAccount! .balance) }})
+                    Solde insuffisant (Max:
+                    {{ formatCurrency(selectedSourceAccount!.balance) }})
                   </span>
                 </div>
 
@@ -425,7 +421,7 @@
                       size="small"
                       type="button"
                       [disabled]="
-                        ! selectedSourceAccount ||
+                        !selectedSourceAccount ||
                         quickAmount > selectedSourceAccount.balance
                       "
                       (click)="applyQuickAmount(quickAmount)"
@@ -481,7 +477,7 @@
                       }}
                     </div>
                     <div class="flow-balance">
-                      Nouveau solde: 
+                      Nouveau solde:
                       {{
                         formatCurrency(
                           selectedSourceAccount.balance - f.amount.value
@@ -499,7 +495,7 @@
                       <nb-icon icon="arrow-upward-outline"></nb-icon>
                     </div>
                     <div class="flow-amount">
-                      + {{ formatCurrency(f.amount. value) }}
+                      + {{ formatCurrency(f.amount.value) }}
                     </div>
                     <div class="flow-account">
                       {{
@@ -578,7 +574,7 @@
                       <div class="flow-account-number">
                         {{
                           formatAccountNumber(
-                            selectedSourceAccount! .accountNumber
+                            selectedSourceAccount!.accountNumber
                           )
                         }}
                       </div>
@@ -596,7 +592,7 @@
                           <small>Nouveau solde</small>
                           <strong class="text-danger">{{
                             formatCurrency(
-                              selectedSourceAccount! .balance - f.amount.value
+                              selectedSourceAccount!.balance - f.amount.value
                             )
                           }}</strong>
                         </div>
@@ -621,7 +617,7 @@
                       <div class="flow-account-number">
                         {{
                           formatAccountNumber(
-                            selectedDestAccount!. accountNumber
+                            selectedDestAccount!.accountNumber
                           )
                         }}
                       </div>
@@ -639,7 +635,7 @@
                           <small>Nouveau solde</small>
                           <strong class="text-success">{{
                             formatCurrency(
-                              selectedDestAccount! .balance + f.amount.value
+                              selectedDestAccount!.balance + f.amount.value
                             )
                           }}</strong>
                         </div>
@@ -696,7 +692,7 @@
                     <strong>Virement définitif</strong>
                     <p class="mb-0 mt-1">
                       Une fois confirmé, ce virement sera exécuté et ne pourra
-                      pas être annulé.  Vérifiez attentivement les comptes et le
+                      pas être annulé. Vérifiez attentivement les comptes et le
                       montant.
                     </p>
                   </div>
@@ -730,10 +726,10 @@
                         ? 'loader-outline'
                         : 'checkmark-circle-outline'
                     "
-                    [class. spin]="isSubmitting"
+                    [class.spin]="isSubmitting"
                   ></nb-icon>
                   {{
-                    isSubmitting ?  "Traitement..." : "Confirmer le virement"
+                    isSubmitting ? "Traitement..." : "Confirmer le virement"
                   }}
                 </button>
               </div>
