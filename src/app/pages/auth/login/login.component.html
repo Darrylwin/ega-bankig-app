@@ -1,96 +1,82 @@
 <div class="login-container">
-  <div class="row justify-content-center align-items-center min-vh-100">
-    <div class="col-xl-4 col-lg-5 col-md-6 col-sm-8">
+  <div class="login-wrapper">
+    <div class="login-card-wrapper">
       <nb-card class="login-card">
-        <nb-card-header class="text-center">
-          <div class="logo-container mb-3">
+        <!-- Header -->
+        <nb-card-header>
+          <div class="logo-container">
             <nb-icon icon="shield-outline" class="logo-icon"></nb-icon>
-            <h3 class="logo-text">EGA Bank Admin</h3>
+            <h1 class="logo-title">EGA Bank</h1>
+            <p class="logo-subtitle">Système de gestion bancaire</p>
           </div>
-          <p class="subtitle">Portail d'administration bancaire</p>
         </nb-card-header>
 
+        <!-- Body -->
         <nb-card-body>
           <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
-            <!-- Email -->
+            <!-- Email Field -->
             <div class="form-group">
-              <label for="email" class="form-label">Adresse email</label>
+              <label for="email" class="form-label">
+                <nb-icon icon="email-outline"></nb-icon>
+                Adresse email
+              </label>
               <input
                 type="email"
                 id="email"
                 nbInput
                 fullWidth
                 formControlName="email"
-                placeholder="admin@ega-bank. com"
-                [status]="
-                  f.email.invalid && f.email.touched ? 'danger' : 'basic'
-                "
+                placeholder="admin@ega-bank.com"
+                [status]="f.email.invalid && f.email.touched ? 'danger' : 'basic'"
                 [attr.aria-invalid]="f.email.invalid && f.email.touched"
               />
-
-              <!-- Messages d'erreur email -->
-              <div
-                *ngIf="f.email.invalid && f.email.touched"
-                class="text-danger mt-1 small"
-              >
-                <span *ngIf="f.email.errors?.['required']">
-                  L'email est requis
-                </span>
-                <span *ngIf="f.email. errors?.['email']">
-                  Format d'email invalide
-                </span>
+              <div *ngIf="f.email. invalid && f.email.touched" class="error-message">
+                <nb-icon icon="alert-circle-outline"></nb-icon>
+                <span *ngIf="f.email. errors?.['required']">L'email est requis</span>
+                <span *ngIf="f.email.errors?.['email']">Format d'email invalide</span>
               </div>
             </div>
 
-            <!-- Password -->
+            <!-- Password Field -->
             <div class="form-group">
-              <label for="password" class="form-label">Mot de passe</label>
-              <div class="input-group">
+              <label for="password" class="form-label">
+                <nb-icon icon="lock-outline"></nb-icon>
+                Mot de passe
+              </label>
+              <div class="password-input-wrapper">
                 <input
                   [type]="showPassword ? 'text' : 'password'"
                   id="password"
                   nbInput
                   fullWidth
                   formControlName="password"
-                  placeholder="••••••••"
-                  [status]="
-                    f.password.invalid && f.password.touched
-                      ? 'danger'
-                      : 'basic'
-                  "
+                  placeholder="Entrez votre mot de passe"
+                  [status]="f.password.invalid && f.password.touched ? 'danger' :  'basic'"
                   [attr.aria-invalid]="f.password.invalid && f.password.touched"
                 />
-
                 <button
                   nbButton
                   ghost
                   type="button"
                   class="password-toggle"
                   (click)="togglePasswordVisibility()"
-                  [attr.aria-label]="
-                    showPassword
-                      ? 'Masquer le mot de passe'
-                      : 'Afficher le mot de passe'
-                  "
+                  [attr. aria-label]="showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
                 >
-                  <nb-icon
-                    [icon]="showPassword ? 'eye-off-outline' : 'eye-outline'"
-                  ></nb-icon>
+                  <nb-icon [icon]="showPassword ? 'eye-off-outline' : 'eye-outline'"></nb-icon>
                 </button>
               </div>
-
-              <!-- Messages d'erreur password -->
-              <div
-                *ngIf="f.password.invalid && f.password.touched"
-                class="text-danger mt-1 small"
-              >
-                <span *ngIf="f.password.errors?.['required']">
-                  Le mot de passe est requis
-                </span>
-                <span *ngIf="f.password. errors?.['minlength']">
-                  Minimum 6 caractères
-                </span>
+              <div *ngIf="f.password.invalid && f.password.touched" class="error-message">
+                <nb-icon icon="alert-circle-outline"></nb-icon>
+                <span *ngIf="f. password.errors?.['required']">Le mot de passe est requis</span>
+                <span *ngIf="f.password. errors?.['minlength']">Minimum 6 caractères</span>
               </div>
+            </div>
+
+            <!-- Remember Me -->
+            <div class="form-options">
+              <nb-checkbox formControlName="rememberMe">
+                Se souvenir de moi
+              </nb-checkbox>
             </div>
 
             <!-- Submit Button -->
@@ -98,22 +84,29 @@
               nbButton
               fullWidth
               status="primary"
+              size="large"
               type="submit"
               [disabled]="loginForm.invalid || isLoading"
-              [class.btn-pulse]="isLoading"
+              class="login-button"
             >
-              <span *ngIf="!isLoading">
-                <nb-icon icon="log-in-outline" class="me-2"></nb-icon>
+              <span *ngIf="! isLoading" class="button-content">
+                <nb-icon icon="log-in-outline"></nb-icon>
                 Se connecter
               </span>
-
-              <span *ngIf="isLoading">
-                <nb-icon icon="sync-outline" class="spin me-2"></nb-icon>
-                Connexion...
+              <span *ngIf="isLoading" class="button-content">
+                <nb-icon icon="loader-outline" class="spin"></nb-icon>
+                Connexion en cours...
               </span>
             </button>
           </form>
         </nb-card-body>
+
+        <!-- Footer -->
+        <nb-card-footer>
+          <p class="footer-text">
+            © 2026 EGA Bank - Tous droits réservés
+          </p>
+        </nb-card-footer>
       </nb-card>
     </div>
   </div>

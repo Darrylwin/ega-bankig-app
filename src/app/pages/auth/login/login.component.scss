@@ -1,126 +1,319 @@
+@import "~@nebular/theme/styles/theming";
+@import "~@nebular/theme/styles/themes/default";
+
 .login-container {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   min-height: 100vh;
-  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: nb-theme(background-basic-color-1);
+  position: relative;
+  overflow: hidden;
+
+  // Effet de fond animé
+  &::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(
+      circle at 30% 50%,
+      rgba(nb-theme(color-primary-500), 0.05) 0%,
+      transparent 50%
+    );
+    animation: pulse 15s ease-in-out infinite;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(
+      circle at 70% 50%,
+      rgba(nb-theme(color-success-500), 0.03) 0%,
+      transparent 50%
+    );
+    animation: pulse 20s ease-in-out infinite reverse;
+  }
+
+  .login-wrapper {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 480px;
+  }
+
+  .login-card-wrapper {
+    animation: slideUp 0.6s ease-out;
+  }
 
   .login-card {
-    border-radius: 12px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    border-radius: nb-theme(card-border-radius);
+    box-shadow: 0 0 5rem 1rem rgba(0, 0, 0, 0.05),
+      0 0 0 1px nb-theme(border-basic-color-4);
     border: none;
+    overflow: hidden;
+    background: nb-theme(card-background-color);
 
     nb-card-header {
       background: transparent;
-      border-bottom: 1px solid #f0f0f0;
-      padding: 2rem 2rem 1rem;
+      border-bottom: 1px solid nb-theme(border-basic-color-3);
+      padding: 2 5rem 2rem 2rem;
 
       .logo-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+        text-align: center;
 
         .logo-icon {
-          font-size: 3rem;
-          color: #36f;
+          font-size: 4rem;
+          color: nb-theme(color-primary-500);
           margin-bottom: 1rem;
+          display: block;
+          animation: fadeIn 0.8s ease-out;
         }
 
-        .logo-text {
-          font-weight: 600;
-          color: #333;
+        .logo-title {
+          font-size: 1.75rem;
+          font-weight: 700;
+          color: nb-theme(text-basic-color);
+          margin: 0 0 0.5rem 0;
+          letter-spacing: -0.5px;
+        }
+
+        .logo-subtitle {
+          font-size: 0.875rem;
+          color: nb-theme(text-hint-color);
           margin: 0;
+          font-weight: 400;
         }
-      }
-
-      .subtitle {
-        color: #666;
-        font-size: 0.9rem;
-        margin: 0;
       }
     }
 
     nb-card-body {
       padding: 2rem;
+
+      .form-group {
+        margin-bottom: 1.5rem;
+
+        .form-label {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-size: 0.875rem;
+          font-weight: 600;
+          color: nb-theme(text-basic-color);
+          margin-bottom: 0.5rem;
+
+          nb-icon {
+            font-size: 1.125rem;
+            color: nb-theme(color-primary-500);
+          }
+        }
+
+        input[nbInput] {
+          border-radius: nb-theme(input-border-radius);
+          font-size: 0.9375rem;
+          padding: 0.75rem 1rem;
+          transition: all 0.2s ease;
+
+          &:focus {
+            box-shadow: 0 0 0 3px rgba(nb-theme(color-primary-500), 0.1);
+          }
+
+          &::placeholder {
+            color: nb-theme(text-hint-color);
+            opacity: 0.7;
+          }
+        }
+
+        .password-input-wrapper {
+          position: relative;
+
+          .password-toggle {
+            position: absolute;
+            right: 0.25rem;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            background: transparent;
+            color: nb-theme(text-hint-color);
+            padding: 0.5rem;
+            z-index: 2;
+            transition: color 0.2s ease;
+
+            &:hover {
+              color: nb-theme(color-primary-500);
+              background: transparent;
+            }
+
+            nb-icon {
+              font-size: 1.25rem;
+            }
+          }
+        }
+
+        .error-message {
+          display: flex;
+          align-items: center;
+          gap: 0.375rem;
+          margin-top: 0.5rem;
+          font-size: 0.8125rem;
+          color: nb-theme(color-danger-500);
+
+          nb-icon {
+            font-size: 1rem;
+          }
+        }
+      }
+
+      .form-options {
+        margin-bottom: 1.5rem;
+
+        nb-checkbox {
+          font-size: 0.875rem;
+          color: nb-theme(text-hint-color);
+        }
+      }
+
+      .login-button {
+        border-radius: nb-theme(button-filled-border-radius);
+        font-weight: 600;
+        font-size: 0.9375rem;
+        padding: 0.875rem 1.5rem;
+        margin-top: 0.5rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(nb-theme(color-primary-500), 0.2);
+
+        &:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 16px rgba(nb-theme(color-primary-500), 0.3);
+        }
+
+        &:active:not(:disabled) {
+          transform: translateY(0);
+        }
+
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        .button-content {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+
+          nb-icon {
+            font-size: 1.25rem;
+          }
+        }
+      }
     }
 
     nb-card-footer {
-      background: #f8f9fa;
-      border-top: 1px solid #f0f0f0;
-      padding: 1rem 2rem;
-    }
-  }
+      background: nb-theme(background-basic-color-2);
+      border-top: 1px solid nb-theme(border-basic-color-3);
+      padding: 1.25rem 2rem;
+      text-align: center;
 
-  .input-group {
-    position: relative;
-
-    .password-toggle {
-      position: absolute;
-      right: 0;
-      top: 0;
-      height: 100%;
-      border: none;
-      background: transparent;
-      color: #666;
-
-      &:hover {
-        color: #36f;
-      }
-    }
-  }
-
-  .btn-pulse {
-    position: relative;
-    
-    &::after {
-      content: '';
-      position: absolute;
-      top: -4px;
-      left: -4px;
-      right: -4px;
-      bottom: -4px;
-      border-radius: 8px;
-      background: rgba(54, 102, 255, 0.2);
-      animation: pulse 1.5s infinite;
-    }
-  }
-
-  .demo-credentials {
-    nb-alert {
-      padding: 0.75rem;
-      
-      .text-small {
-        font-size: 0.85rem;
+      .footer-text {
+        font-size: 0.8125rem;
+        color: nb-theme(text-hint-color);
+        margin: 0;
       }
     }
   }
 }
 
-// Animation du spinner
-.spin {
-  animation: spin 1s linear infinite;
+// Animations
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @keyframes pulse {
-  0% { opacity: 1; }
-  50% { opacity: 0.5; }
-  100% { opacity: 1; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spin {
+  animation: spin 1s linear infinite;
 }
 
 // Responsive
 @media (max-width: 576px) {
   .login-container {
-    padding: 1rem;
-    
+    padding: 0.5rem;
+
     .login-card {
-      nb-card-header,
-      nb-card-body,
-      nb-card-footer {
+      nb-card-header {
+        padding: 2rem 1.5rem 1.5rem;
+
+        .logo-container {
+          .logo-icon {
+            font-size: 3rem;
+          }
+
+          .logo-title {
+            font-size: 1.5rem;
+          }
+        }
+      }
+
+      nb-card-body {
         padding: 1.5rem;
       }
+
+      nb-card-footer {
+        padding: 1rem 1.5rem;
+      }
+    }
+  }
+}
+
+// Dark theme adjustments
+@media (prefers-color-scheme: dark) {
+  .login-container {
+    .login-card {
+      box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.05);
     }
   }
 }

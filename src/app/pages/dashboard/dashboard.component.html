@@ -1,27 +1,25 @@
 <div class="dashboard-container">
-  <!-- Header Premium -->
+  <!-- Header -->
   <div class="page-header">
     <div class="header-content">
       <div class="header-left">
         <div class="header-title-group">
           <h1 class="page-title">
-            <nb-icon icon="activity-outline" class="title-icon"></nb-icon>
+            <nb-icon icon="activity-outline"></nb-icon>
             Tableau de Bord
           </h1>
           <p class="page-subtitle">
-            Vue d'ensemble en temps réel de votre activité bancaire
+            Vue d'ensemble de votre activité bancaire
           </p>
         </div>
       </div>
       <div class="header-right">
         <div class="header-actions">
-          <!-- Temps depuis dernière mise à jour -->
           <div class="last-update">
             <nb-icon icon="clock-outline"></nb-icon>
             <span>{{ getTimeSinceLastUpdate() }}</span>
           </div>
 
-          <!-- Auto-refresh toggle -->
           <button
             nbButton
             ghost
@@ -29,31 +27,24 @@
             [status]="autoRefreshEnabled ? 'success' : 'basic'"
             (click)="toggleAutoRefresh()"
             nbTooltip="Rafraîchissement automatique"
-            class="refresh-toggle"
           >
             <nb-icon
-              [icon]="
-                autoRefreshEnabled
-                  ? 'checkmark-circle-outline'
-                  : 'close-circle-outline'
-              "
+              [icon]="autoRefreshEnabled ?  'checkmark-circle-outline' : 'close-circle-outline'"
             ></nb-icon>
             Auto
           </button>
 
-          <!-- Bouton rafraîchir -->
           <button
             nbButton
             status="primary"
             size="small"
             (click)="loadDashboardData()"
             [disabled]="isLoading"
-            nbTooltip="Rafraîchir les données"
-            class="refresh-btn"
+            nbTooltip="Rafraîchir"
           >
             <nb-icon
               [icon]="isLoading ? 'sync-outline' : 'refresh-outline'"
-              [class.spin]="isLoading"
+              [class. spin]="isLoading"
             ></nb-icon>
             Rafraîchir
           </button>
@@ -62,429 +53,205 @@
     </div>
   </div>
 
-  <!-- Chargement global -->
+  <!-- Loading -->
   <div *ngIf="isLoading" class="loading-container">
     <div class="loading-content">
       <nb-spinner size="giant" status="primary"></nb-spinner>
       <p class="loading-text">Chargement des statistiques...</p>
-      <small class="loading-subtext"
-        >Veuillez patienter quelques instants</small
-      >
     </div>
   </div>
 
-  <!-- Message d'erreur -->
+  <!-- Error -->
   <div *ngIf="hasError && !isLoading" class="error-container">
     <nb-alert status="danger" closable (close)="hasError = false">
       <div class="alert-content">
-        <nb-icon icon="alert-triangle-outline" class="alert-icon"></nb-icon>
+        <nb-icon icon="alert-triangle-outline"></nb-icon>
         <div>
           <strong>Erreur de chargement</strong>
           <p>{{ errorMessage }}</p>
         </div>
       </div>
-      <button
-        nbButton
-        size="small"
-        status="danger"
-        (click)="loadDashboardData()"
-      >
+      <button nbButton size="small" status="danger" (click)="loadDashboardData()">
         <nb-icon icon="refresh-outline"></nb-icon>
         Réessayer
       </button>
     </nb-alert>
   </div>
 
-  <!-- Contenu principal -->
+  <!-- Main Content -->
   <div *ngIf="!isLoading && !hasError && stats" class="dashboard-content">
-    <!-- ROW 1: KPI Cards -->
+    
+    <!-- KPI Cards -->
     <div class="kpi-grid">
       <!-- Total Clients -->
-      <nb-card class="kpi-card primary">
+      <nb-card class="kpi-card">
         <nb-card-body>
-          <div class="kpi-header">
-            <div class="kpi-icon-wrapper">
-              <nb-icon icon="people-outline" class="kpi-icon"></nb-icon>
-            </div>
-            <div class="kpi-badge">
-              <nb-badge text="Actif" status="success" size="tiny"></nb-badge>
-            </div>
+          <div class="kpi-icon-wrapper primary">
+            <nb-icon icon="people-outline"></nb-icon>
           </div>
           <div class="kpi-content">
-            <div class="kpi-value">
-              {{ formatNumber(stats.totalCustomers) }}
-            </div>
+            <div class="kpi-value">{{ formatNumber(stats.totalCustomers) }}</div>
             <div class="kpi-label">Clients</div>
-            <div class="kpi-description">Total des clients enregistrés</div>
           </div>
-          <div class="kpi-footer">
-            <button nbButton ghost size="tiny" routerLink="/pages/customers">
-              Voir tous <nb-icon icon="arrow-forward-outline"></nb-icon>
-            </button>
-          </div>
+          <button nbButton ghost size="tiny" routerLink="/pages/customers" class="kpi-action">
+            Voir tous <nb-icon icon="arrow-forward-outline"></nb-icon>
+          </button>
         </nb-card-body>
       </nb-card>
 
       <!-- Total Comptes -->
-      <nb-card class="kpi-card success">
+      <nb-card class="kpi-card">
         <nb-card-body>
-          <div class="kpi-header">
-            <div class="kpi-icon-wrapper">
-              <nb-icon icon="credit-card-outline" class="kpi-icon"></nb-icon>
-            </div>
-            <div class="kpi-badge">
-              <nb-badge
-                [text]="formatDecimal(calculatedStats.accountsPerCustomer, 1)"
-                status="info"
-                size="tiny"
-              ></nb-badge>
-            </div>
+          <div class="kpi-icon-wrapper success">
+            <nb-icon icon="credit-card-outline"></nb-icon>
           </div>
           <div class="kpi-content">
             <div class="kpi-value">{{ formatNumber(stats.totalAccounts) }}</div>
             <div class="kpi-label">Comptes</div>
-            <div class="kpi-description">
-              {{ stats.savingsAccountsCount }} Épargne •
-              {{ stats.currentAccountsCount }} Courant
+            <div class="kpi-details">
+              {{ stats.savingsAccountsCount }} Épargne • {{ stats.currentAccountsCount }} Courant
             </div>
           </div>
-          <div class="kpi-footer">
-            <button nbButton ghost size="tiny" routerLink="/pages/accounts">
-              Gérer <nb-icon icon="arrow-forward-outline"></nb-icon>
-            </button>
-          </div>
+          <button nbButton ghost size="tiny" routerLink="/pages/accounts" class="kpi-action">
+            Gérer <nb-icon icon="arrow-forward-outline"></nb-icon>
+          </button>
         </nb-card-body>
       </nb-card>
 
       <!-- Total Transactions -->
-      <nb-card class="kpi-card info">
+      <nb-card class="kpi-card">
         <nb-card-body>
-          <div class="kpi-header">
-            <div class="kpi-icon-wrapper">
-              <nb-icon icon="repeat-outline" class="kpi-icon"></nb-icon>
-            </div>
-            <div class="kpi-badge">
-              <nb-badge text="100%" status="success" size="tiny"></nb-badge>
-            </div>
+          <div class="kpi-icon-wrapper info">
+            <nb-icon icon="repeat-outline"></nb-icon>
           </div>
           <div class="kpi-content">
-            <div class="kpi-value">
-              {{ formatNumber(stats.totalTransactions) }}
-            </div>
+            <div class="kpi-value">{{ formatNumber(stats. totalTransactions) }}</div>
             <div class="kpi-label">Transactions</div>
-            <div class="kpi-description">
-              {{ stats.transactionsToday }} aujourd'hui
-            </div>
+            <div class="kpi-details">{{ stats.transactionsToday }} aujourd'hui</div>
           </div>
-          <div class="kpi-footer">
-            <button
-              nbButton
-              ghost
-              size="tiny"
-              routerLink="/pages/transactions/history"
-            >
-              Historique <nb-icon icon="arrow-forward-outline"></nb-icon>
-            </button>
-          </div>
+          <button nbButton ghost size="tiny" routerLink="/pages/transactions" class="kpi-action">
+            Historique <nb-icon icon="arrow-forward-outline"></nb-icon>
+          </button>
         </nb-card-body>
       </nb-card>
 
       <!-- Solde Total -->
-      <nb-card class="kpi-card warning">
+      <nb-card class="kpi-card">
         <nb-card-body>
-          <div class="kpi-header">
-            <div class="kpi-icon-wrapper">
-              <nb-icon icon="trending-up-outline" class="kpi-icon"></nb-icon>
-            </div>
-            <div class="kpi-badge">
-              <nb-badge
-                [text]="
-                  (calculatedStats.balanceChangePercent > 0 ? '+' : '') +
-                  formatDecimal(calculatedStats.balanceChangePercent, 1) +
-                  '%'
-                "
-                [status]="getValueColor(calculatedStats.balanceChangePercent)"
-                size="tiny"
-              >
-              </nb-badge>
-            </div>
+          <div class="kpi-icon-wrapper warning">
+            <nb-icon icon="trending-up-outline"></nb-icon>
           </div>
           <div class="kpi-content">
-            <div class="kpi-value">
-              {{ formatCurrency(stats.totalBalance) }}
-            </div>
+            <div class="kpi-value">{{ formatCurrency(stats.totalBalance) }}</div>
             <div class="kpi-label">Solde Total</div>
-            <div class="kpi-description">Capital total déposé</div>
           </div>
-          <div class="kpi-footer">
-            <button nbButton ghost size="tiny" routerLink="/pages/accounts">
-              Détails <nb-icon icon="arrow-forward-outline"></nb-icon>
-            </button>
-          </div>
+          <button nbButton ghost size="tiny" routerLink="/pages/accounts" class="kpi-action">
+            Détails <nb-icon icon="arrow-forward-outline"></nb-icon>
+          </button>
         </nb-card-body>
       </nb-card>
     </div>
 
-    <!-- ROW 2: Activité du jour -->
-    <div class="activity-section">
-      <nb-card class="activity-card">
-        <nb-card-header>
-          <div class="section-header">
-            <div>
-              <h5>
-                <nb-icon icon="flash-outline"></nb-icon>
-                Activité Aujourd'hui
-              </h5>
-              <small>Opérations effectuées ce jour</small>
+    <!-- Activity Today -->
+    <nb-card class="activity-card">
+      <nb-card-header>
+        <div class="card-header-content">
+          <h5>
+            <nb-icon icon="flash-outline"></nb-icon>
+            Activité Aujourd'hui
+          </h5>
+        </div>
+      </nb-card-header>
+      <nb-card-body>
+        <div class="activity-grid">
+          <div class="activity-item">
+            <div class="activity-icon primary">
+              <nb-icon icon="activity-outline"></nb-icon>
             </div>
-            <button
-              nbButton
-              ghost
-              size="small"
-              routerLink="/pages/transactions"
-              class="view-all-btn"
-            >
-              <nb-icon icon="arrow-forward-outline"></nb-icon>
-            </button>
-          </div>
-        </nb-card-header>
-        <nb-card-body>
-          <div class="activity-grid">
-            <!-- Transactions -->
-            <div class="activity-item primary">
-              <div class="activity-icon">
-                <nb-icon icon="activity-outline"></nb-icon>
-              </div>
-              <div class="activity-content">
-                <div class="activity-value">
-                  {{ formatNumber(stats.transactionsToday) }}
-                </div>
-                <div class="activity-label">Transactions</div>
-                <div class="activity-meta">
-                  <nb-progress-bar
-                    [value]="
-                      calculatePercentage(
-                        stats.transactionsToday,
-                        stats.transactionsThisWeek
-                      )
-                    "
-                    status="primary"
-                    size="tiny"
-                  >
-                  </nb-progress-bar>
-                  <small
-                    >{{
-                      calculatePercentage(
-                        stats.transactionsToday,
-                        stats.transactionsThisWeek
-                      )
-                    }}% de la semaine</small
-                  >
-                </div>
-              </div>
-            </div>
-
-            <!-- Dépôts -->
-            <div class="activity-item success">
-              <div class="activity-icon">
-                <nb-icon icon="trending-up-outline"></nb-icon>
-              </div>
-              <div class="activity-content">
-                <div class="activity-value text-success">
-                  {{ formatCurrency(stats.depositsToday) }}
-                </div>
-                <div class="activity-label">Dépôts</div>
-                <div class="activity-meta">
-                  <nb-progress-bar
-                    [value]="
-                      calculatePercentage(
-                        stats.depositsToday,
-                        stats.depositsThisWeek
-                      )
-                    "
-                    status="success"
-                    size="tiny"
-                  >
-                  </nb-progress-bar>
-                  <small
-                    >{{
-                      calculatePercentage(
-                        stats.depositsToday,
-                        stats.depositsThisWeek
-                      )
-                    }}% de la semaine</small
-                  >
-                </div>
-              </div>
-            </div>
-
-            <!-- Retraits -->
-            <div class="activity-item danger">
-              <div class="activity-icon">
-                <nb-icon icon="trending-down-outline"></nb-icon>
-              </div>
-              <div class="activity-content">
-                <div class="activity-value text-danger">
-                  {{ formatCurrency(stats.withdrawalsToday) }}
-                </div>
-                <div class="activity-label">Retraits</div>
-                <div class="activity-meta">
-                  <nb-progress-bar
-                    [value]="
-                      calculatePercentage(
-                        stats.withdrawalsToday,
-                        stats.withdrawalsThisWeek
-                      )
-                    "
-                    status="danger"
-                    size="tiny"
-                  >
-                  </nb-progress-bar>
-                  <small
-                    >{{
-                      calculatePercentage(
-                        stats.withdrawalsToday,
-                        stats.withdrawalsThisWeek
-                      )
-                    }}% de la semaine</small
-                  >
-                </div>
-              </div>
+            <div class="activity-content">
+              <div class="activity-value">{{ formatNumber(stats.transactionsToday) }}</div>
+              <div class="activity-label">Transactions</div>
+              <nb-progress-bar
+                [value]="calculatePercentage(stats.transactionsToday, stats.transactionsThisWeek)"
+                status="primary"
+                size="tiny"
+              ></nb-progress-bar>
+              <small>{{ calculatePercentage(stats.transactionsToday, stats.transactionsThisWeek) }}% de la semaine</small>
             </div>
           </div>
-        </nb-card-body>
-      </nb-card>
-    </div>
 
-    <!-- ROW 3: Graphiques principaux -->
+          <div class="activity-item">
+            <div class="activity-icon success">
+              <nb-icon icon="trending-up-outline"></nb-icon>
+            </div>
+            <div class="activity-content">
+              <div class="activity-value text-success">{{ formatCurrency(stats.depositsToday) }}</div>
+              <div class="activity-label">Dépôts</div>
+              <nb-progress-bar
+                [value]="calculatePercentage(stats.depositsToday, stats.depositsThisWeek)"
+                status="success"
+                size="tiny"
+              ></nb-progress-bar>
+              <small>{{ calculatePercentage(stats.depositsToday, stats.depositsThisWeek) }}% de la semaine</small>
+            </div>
+          </div>
+
+          <div class="activity-item">
+            <div class="activity-icon danger">
+              <nb-icon icon="trending-down-outline"></nb-icon>
+            </div>
+            <div class="activity-content">
+              <div class="activity-value text-danger">{{ formatCurrency(stats.withdrawalsToday) }}</div>
+              <div class="activity-label">Retraits</div>
+              <nb-progress-bar
+                [value]="calculatePercentage(stats.withdrawalsToday, stats.withdrawalsThisWeek)"
+                status="danger"
+                size="tiny"
+              ></nb-progress-bar>
+              <small>{{ calculatePercentage(stats.withdrawalsToday, stats.withdrawalsThisWeek) }}% de la semaine</small>
+            </div>
+          </div>
+        </div>
+      </nb-card-body>
+    </nb-card>
+
+    <!-- Charts -->
     <div class="charts-grid">
       <!-- Répartition des comptes -->
       <nb-card class="chart-card">
         <nb-card-header>
-          <div class="chart-header">
-            <h6>
-              <nb-icon icon="pie-chart-outline"></nb-icon>
-              Répartition des Comptes
-            </h6>
-            <nb-badge
-              text="{{ stats.totalAccounts }} comptes"
-              status="info"
-              size="tiny"
-            ></nb-badge>
-          </div>
+          <h6>
+            <nb-icon icon="pie-chart-outline"></nb-icon>
+            Répartition des Comptes
+          </h6>
+          <nb-badge text="{{ stats.totalAccounts }} comptes" status="info"></nb-badge>
         </nb-card-header>
         <nb-card-body>
-          <div class="chart-container">
+          <div class="chart-wrapper">
             <ngx-charts-pie-chart
-              [view]="accountDistributionView"
+              [view]="[undefined, 300]"
               [scheme]="colorScheme"
               [results]="accountDistributionData"
               [legend]="true"
               [labels]="true"
               [doughnut]="true"
               [arcWidth]="0.4"
-              [tooltipDisabled]="false"
-              (select)="onChartSelect($event)"
-            >
-            </ngx-charts-pie-chart>
-          </div>
-
-          <div class="chart-summary">
-            <div class="summary-item">
-              <div class="summary-dot success"></div>
-              <div>
-                <strong>{{ stats.savingsAccountsCount }}</strong>
-                <small>Comptes Épargne</small>
-              </div>
-            </div>
-            <div class="summary-item">
-              <div class="summary-dot primary"></div>
-              <div>
-                <strong>{{ stats.currentAccountsCount }}</strong>
-                <small>Comptes Courant</small>
-              </div>
-            </div>
+              [animations]="animations"
+            ></ngx-charts-pie-chart>
           </div>
         </nb-card-body>
       </nb-card>
 
-      <!-- Évolution du solde -->
-      <nb-card class="chart-card">
-        <nb-card-header>
-          <div class="chart-header">
-            <h6>
-              <nb-icon icon="trending-up-outline"></nb-icon>
-              Évolution du Solde (7 jours)
-            </h6>
-            <nb-badge
-              [text]="
-                (calculatedStats.balanceChangePercent > 0 ? '+' : '') +
-                formatDecimal(calculatedStats.balanceChangePercent, 2) +
-                '%'
-              "
-              [status]="getValueColor(calculatedStats.balanceChangePercent)"
-              size="tiny"
-            >
-            </nb-badge>
-          </div>
-        </nb-card-header>
-        <nb-card-body>
-          <div class="chart-container">
-            <ngx-charts-line-chart
-              [view]="[undefined, 300]"
-              [scheme]="colorScheme"
-              [results]="balanceEvolutionData"
-              [xAxis]="showXAxis"
-              [yAxis]="showYAxis"
-              [legend]="false"
-              [showXAxisLabel]="false"
-              [showYAxisLabel]="false"
-              [gradient]="gradient"
-              [curve]="'basis'"
-              [tooltipDisabled]="false"
-              [yAxisTickFormatting]="formatCurrencyForChart"
-              (select)="onChartSelect($event)"
-            >
-            </ngx-charts-line-chart>
-          </div>
-
-          <div class="chart-summary">
-            <div class="summary-item">
-              <small>Solde actuel</small>
-              <strong>{{ formatCurrency(stats.totalBalance) }}</strong>
-            </div>
-            <div class="summary-item">
-              <small>Variation</small>
-              <strong
-                [ngClass]="
-                  'text-' + getValueColor(calculatedStats.balanceChangePercent)
-                "
-              >
-                {{
-                  (calculatedStats.balanceChangePercent > 0 ? "+" : "") +
-                    formatDecimal(calculatedStats.balanceChangePercent, 2)
-                }}%
-              </strong>
-            </div>
-          </div>
-        </nb-card-body>
-      </nb-card>
-    </div>
-
-    <!-- ROW 4: Graphiques secondaires -->
-    <div class="charts-grid-2">
       <!-- Transactions par période -->
       <nb-card class="chart-card">
         <nb-card-header>
-          <div class="chart-header">
-            <h6>
-              <nb-icon icon="bar-chart-outline"></nb-icon>
-              Transactions par Période
-            </h6>
-          </div>
+          <h6>
+            <nb-icon icon="bar-chart-outline"></nb-icon>
+            Transactions par Période
+          </h6>
         </nb-card-header>
         <nb-card-body>
-          <div class="chart-container">
+          <div class="chart-wrapper">
             <ngx-charts-bar-vertical
               [view]="[undefined, 300]"
               [scheme]="colorScheme"
@@ -492,343 +259,134 @@
               [xAxis]="showXAxis"
               [yAxis]="showYAxis"
               [legend]="false"
-              [showXAxisLabel]="false"
-              [showYAxisLabel]="false"
-              [gradient]="gradient"
-              [barPadding]="20"
-              (select)="onChartSelect($event)"
-            >
-            </ngx-charts-bar-vertical>
-          </div>
-        </nb-card-body>
-      </nb-card>
-
-      <!-- Dépôts vs Retraits -->
-      <nb-card class="chart-card">
-        <nb-card-header>
-          <div class="chart-header">
-            <h6>
-              <nb-icon icon="swap-outline"></nb-icon>
-              Dépôts vs Retraits
-            </h6>
-          </div>
-        </nb-card-header>
-        <nb-card-body>
-          <div class="chart-container">
-            <ngx-charts-bar-vertical-2d
-              [view]="[undefined, 300]"
-              [scheme]="colorScheme"
-              [results]="depositsVsWithdrawalsData"
-              [xAxis]="showXAxis"
-              [yAxis]="showYAxis"
-              [legend]="true"
-              [showXAxisLabel]="false"
-              [showYAxisLabel]="false"
-              [gradient]="gradient"
-              [barPadding]="8"
-              [groupPadding]="16"
-              [yAxisTickFormatting]="formatCurrencyForChart"
-              (select)="onChartSelect($event)"
-            >
-            </ngx-charts-bar-vertical-2d>
+              [animations]="animations"
+            ></ngx-charts-bar-vertical>
           </div>
         </nb-card-body>
       </nb-card>
     </div>
 
-    <!-- ROW 5: Statistiques périodiques -->
-    <div class="period-stats-grid">
-      <!-- Cette semaine -->
+    <!-- Dépôts vs Retraits -->
+    <nb-card class="chart-card-full">
+      <nb-card-header>
+        <h6>
+          <nb-icon icon="swap-outline"></nb-icon>
+          Dépôts vs Retraits
+        </h6>
+      </nb-card-header>
+      <nb-card-body>
+        <div class="chart-wrapper">
+          <ngx-charts-bar-vertical-2d
+            [view]="[undefined, 300]"
+            [scheme]="colorScheme"
+            [results]="depositsVsWithdrawalsData"
+            [xAxis]="showXAxis"
+            [yAxis]="showYAxis"
+            [legend]="true"
+            [animations]="animations"
+          ></ngx-charts-bar-vertical-2d>
+        </div>
+      </nb-card-body>
+    </nb-card>
+
+    <!-- Period Stats -->
+    <div class="period-grid">
+      <!-- Cette Semaine -->
       <nb-card class="period-card">
-        <nb-card-header>
-          <div class="period-header">
-            <nb-icon icon="calendar-outline"></nb-icon>
-            <h6>Cette Semaine</h6>
-          </div>
-        </nb-card-header>
-        <nb-card-body>
-          <div class="period-stats">
-            <div class="period-stat-item">
-              <div class="stat-row">
-                <span class="stat-name">
-                  <nb-icon icon="repeat-outline"></nb-icon>
-                  Transactions
-                </span>
-                <span class="stat-value">{{ formatNumber(stats.transactionsThisWeek) }}</span>
-              </div>
-              <nb-progress-bar
-                [value]="
-                  calculatePercentage(
-                    stats.transactionsThisWeek,
-                    stats.transactionsThisMonth
-                  )
-                "
-                status="primary"
-                size="tiny"
-              >
-              </nb-progress-bar>
-              <small class="stat-meta"
-                >{{
-                  calculatePercentage(
-                    stats.transactionsThisWeek,
-                    stats.transactionsThisMonth
-                  )
-                }}% du mois</small
-              >
-            </div>
-
-            <div class="period-stat-item">
-              <div class="stat-row">
-                <span class="stat-name">
-                  <nb-icon icon="trending-up-outline"></nb-icon>
-                  Dépôts
-                </span>
-                <span class="stat-value text-success">{{
-                  formatCurrency(stats.depositsThisWeek)
-                }}</span>
-              </div>
-              <nb-progress-bar
-                [value]="
-                  calculatePercentage(
-                    stats.depositsThisWeek,
-                    stats.depositsThisMonth
-                  )
-                "
-                status="success"
-                size="tiny"
-              >
-              </nb-progress-bar>
-              <small class="stat-meta"
-                >{{
-                  calculatePercentage(
-                    stats.depositsThisWeek,
-                    stats.depositsThisMonth
-                  )
-                }}% du mois</small
-              >
-            </div>
-
-            <div class="period-stat-item">
-              <div class="stat-row">
-                <span class="stat-name">
-                  <nb-icon icon="trending-down-outline"></nb-icon>
-                  Retraits
-                </span>
-                <span class="stat-value text-danger">{{
-                  formatCurrency(stats.withdrawalsThisWeek)
-                }}</span>
-              </div>
-              <nb-progress-bar
-                [value]="
-                  calculatePercentage(
-                    stats.withdrawalsThisWeek,
-                    stats.withdrawalsThisMonth
-                  )
-                "
-                status="danger"
-                size="tiny"
-              >
-              </nb-progress-bar>
-              <small class="stat-meta"
-                >{{
-                  calculatePercentage(
-                    stats.withdrawalsThisWeek,
-                    stats.withdrawalsThisMonth
-                  )
-                }}% du mois</small
-              >
-            </div>
-          </div>
-        </nb-card-body>
-      </nb-card>
-
-      <!-- Ce mois -->
-      <nb-card class="period-card">
-        <nb-card-header>
-          <div class="period-header">
-            <nb-icon icon="calendar-outline"></nb-icon>
-            <h6>Ce Mois</h6>
-          </div>
-        </nb-card-header>
-        <nb-card-body>
-          <div class="period-stats">
-            <div class="period-stat-item">
-              <div class="stat-row">
-                <span class="stat-name">
-                  <nb-icon icon="repeat-outline"></nb-icon>
-                  Transactions
-                </span>
-                <span class="stat-value">{{ formatNumber(stats.transactionsThisMonth) }}</span>
-              </div>
-              <nb-progress-bar
-                [value]="100"
-                status="primary"
-                size="tiny"
-              ></nb-progress-bar>
-              <small class="stat-meta">Total mensuel</small>
-            </div>
-
-            <div class="period-stat-item">
-              <div class="stat-row">
-                <span class="stat-name">
-                  <nb-icon icon="trending-up-outline"></nb-icon>
-                  Dépôts
-                </span>
-                <span class="stat-value text-success">{{
-                  formatCurrency(stats.depositsThisMonth)
-                }}</span>
-              </div>
-              <nb-progress-bar
-                [value]="100"
-                status="success"
-                size="tiny"
-              ></nb-progress-bar>
-              <small class="stat-meta">Total mensuel</small>
-            </div>
-
-            <div class="period-stat-item">
-              <div class="stat-row">
-                <span class="stat-name">
-                  <nb-icon icon="trending-down-outline"></nb-icon>
-                  Retraits
-                </span>
-                <span class="stat-value text-danger">{{
-                  formatCurrency(stats.withdrawalsThisMonth)
-                }}</span>
-              </div>
-              <nb-progress-bar
-                [value]="100"
-                status="danger"
-                size="tiny"
-              ></nb-progress-bar>
-              <small class="stat-meta">Total mensuel</small>
-            </div>
-          </div>
-        </nb-card-body>
-      </nb-card>
-
-      <!-- Actions rapides -->
-      <nb-card class="quick-actions-card">
-        <nb-card-header>
-          <div class="period-header">
-            <nb-icon icon="flash-outline"></nb-icon>
-            <h6>Actions Rapides</h6>
-          </div>
-        </nb-card-header>
-        <nb-card-body>
-          <div class="quick-actions">
-            <button
-              nbButton
-              fullWidth
-              status="primary"
-              routerLink="/pages/customers/new"
-              class="action-btn"
-            >
-              <nb-icon icon="person-add-outline"></nb-icon>
-              <span>Nouveau Client</span>
-            </button>
-
-            <button
-              nbButton
-              fullWidth
-              status="success"
-              routerLink="/pages/accounts/new"
-              class="action-btn"
-            >
-              <nb-icon icon="plus-circle-outline"></nb-icon>
-              <span>Ouvrir un Compte</span>
-            </button>
-
-            <button
-              nbButton
-              fullWidth
-              status="info"
-              routerLink="/pages/transactions/deposit"
-              class="action-btn"
-            >
-              <nb-icon icon="trending-up-outline"></nb-icon>
-              <span>Effectuer un Dépôt</span>
-            </button>
-
-            <button
-              nbButton
-              fullWidth
-              status="warning"
-              routerLink="/pages/transactions/history"
-              class="action-btn"
-            >
-              <nb-icon icon="archive-outline"></nb-icon>
-              <span>Voir l'Historique</span>
-            </button>
-          </div>
-        </nb-card-body>
-      </nb-card>
-    </div>
-
-    <!-- ROW 6: Statistiques calculées -->
-    <div class="insights-section">
-      <nb-card class="insights-card">
         <nb-card-header>
           <h6>
-            <nb-icon icon="bulb-outline"></nb-icon>
-            Insights & Statistiques
+            <nb-icon icon="calendar-outline"></nb-icon>
+            Cette Semaine
           </h6>
         </nb-card-header>
         <nb-card-body>
-          <div class="insights-grid">
-            <div class="insight-item">
-              <div class="insight-icon">
-                <nb-icon icon="bar-chart-outline"></nb-icon>
-              </div>
-              <div class="insight-content">
-                <div class="insight-label">Valeur moyenne transaction</div>
-                <div class="insight-value">
-                  {{ formatCurrency(calculatedStats.averageTransactionValue) }}
-                </div>
-              </div>
+          <div class="stat-item">
+            <div class="stat-row">
+              <span class="stat-label">
+                <nb-icon icon="repeat-outline"></nb-icon>
+                Transactions
+              </span>
+              <span class="stat-value">{{ formatNumber(stats. transactionsThisWeek) }}</span>
             </div>
+            <nb-progress-bar
+              [value]="calculatePercentage(stats.transactionsThisWeek, stats.transactionsThisMonth)"
+              status="primary"
+              size="tiny"
+            ></nb-progress-bar>
+          </div>
 
-            <div class="insight-item">
-              <div class="insight-icon">
-                <nb-icon icon="people-outline"></nb-icon>
-              </div>
-              <div class="insight-content">
-                <div class="insight-label">Comptes par client</div>
-                <div class="insight-value">
-                  {{ formatDecimal(calculatedStats.accountsPerCustomer, 2) }}
-                </div>
-              </div>
-            </div>
-
-            <div class="insight-item">
-              <div class="insight-icon">
+          <div class="stat-item">
+            <div class="stat-row">
+              <span class="stat-label">
                 <nb-icon icon="trending-up-outline"></nb-icon>
-              </div>
-              <div class="insight-content">
-                <div class="insight-label">Taux de croissance</div>
-                <div
-                  class="insight-value"
-                  [ngClass]="'text-' + getGrowthStatus()"
-                >
-                  {{
-                    (calculatedStats.growthRate > 0 ? "+" : "") +
-                      formatDecimal(calculatedStats.growthRate, 2)
-                  }}%
-                </div>
-              </div>
+                Dépôts
+              </span>
+              <span class="stat-value text-success">{{ formatCurrency(stats.depositsThisWeek) }}</span>
             </div>
+            <nb-progress-bar
+              [value]="calculatePercentage(stats.depositsThisWeek, stats.depositsThisMonth)"
+              status="success"
+              size="tiny"
+            ></nb-progress-bar>
+          </div>
 
-            <div class="insight-item">
-              <div class="insight-icon">
-                <nb-icon icon="star-outline"></nb-icon>
-              </div>
-              <div class="insight-content">
-                <div class="insight-label">Type le plus fréquent</div>
-                <div class="insight-value">
-                  {{ calculatedStats.topTransactionType }}
-                </div>
-              </div>
+          <div class="stat-item">
+            <div class="stat-row">
+              <span class="stat-label">
+                <nb-icon icon="trending-down-outline"></nb-icon>
+                Retraits
+              </span>
+              <span class="stat-value text-danger">{{ formatCurrency(stats.withdrawalsThisWeek) }}</span>
             </div>
+            <nb-progress-bar
+              [value]="calculatePercentage(stats.withdrawalsThisWeek, stats.withdrawalsThisMonth)"
+              status="danger"
+              size="tiny"
+            ></nb-progress-bar>
+          </div>
+        </nb-card-body>
+      </nb-card>
+
+      <!-- Ce Mois -->
+      <nb-card class="period-card">
+        <nb-card-header>
+          <h6>
+            <nb-icon icon="calendar-outline"></nb-icon>
+            Ce Mois
+          </h6>
+        </nb-card-header>
+        <nb-card-body>
+          <div class="stat-item">
+            <div class="stat-row">
+              <span class="stat-label">
+                <nb-icon icon="repeat-outline"></nb-icon>
+                Transactions
+              </span>
+              <span class="stat-value">{{ formatNumber(stats.transactionsThisMonth) }}</span>
+            </div>
+            <nb-progress-bar [value]="100" status="primary" size="tiny"></nb-progress-bar>
+          </div>
+
+          <div class="stat-item">
+            <div class="stat-row">
+              <span class="stat-label">
+                <nb-icon icon="trending-up-outline"></nb-icon>
+                Dépôts
+              </span>
+              <span class="stat-value text-success">{{ formatCurrency(stats. depositsThisMonth) }}</span>
+            </div>
+            <nb-progress-bar [value]="100" status="success" size="tiny"></nb-progress-bar>
+          </div>
+
+          <div class="stat-item">
+            <div class="stat-row">
+              <span class="stat-label">
+                <nb-icon icon="trending-down-outline"></nb-icon>
+                Retraits
+              </span>
+              <span class="stat-value text-danger">{{ formatCurrency(stats.withdrawalsThisMonth) }}</span>
+            </div>
+            <nb-progress-bar [value]="100" status="danger" size="tiny"></nb-progress-bar>
           </div>
         </nb-card-body>
       </nb-card>
