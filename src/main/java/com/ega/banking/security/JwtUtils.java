@@ -1,10 +1,10 @@
-package com. ega.banking.security;
+package com.ega.banking.security;
 
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.security. Keys;
-import org.springframework. beans.factory.annotation.Value;
-import org.springframework.security. core.Authentication;
-import org. springframework.stereotype.Component;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
@@ -30,29 +30,25 @@ public class JwtUtils {
 
     /**
      * Génère un token JWT à partir de l'authentification
-     * @param authentication L'objet d'authentification Spring Security
-     * @return Le token JWT
+     * Le token contient l'EMAIL de l'utilisateur (pas le username)
      */
     public String generateJwtToken(Authentication authentication) {
         UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
 
         // Utiliser l'email
         return Jwts.builder()
-                .setSubject(userPrincipal.getEmail())
+                .setSubject(userPrincipal.getEmail())  // EMAIL stocké dans le token
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
-                .signWith(getSigningKey(), SignatureAlgorithm. HS512)
+                .signWith(getSigningKey(), SignatureAlgorithm.HS512)
                 .compact();
     }
 
     /**
      * Extrait l'EMAIL du token JWT
-     * @param token Le token JWT
-     * @return L'email de l'utilisateur
      */
-    public String getUsernameFromJwtToken(String token) {
-        // ⚠️ Le nom de la méthode est trompeur, mais elle retourne l'email maintenant
-        return Jwts. parserBuilder()
+    public String getEmailFromJwtToken(String token) {
+        return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(token)
@@ -62,15 +58,13 @@ public class JwtUtils {
 
     /**
      * Valide le token JWT
-     * @param authToken Le token à valider
-     * @return true si valide, false sinon
      */
     public boolean validateJwtToken(String authToken) {
         try {
             Jwts.parserBuilder()
                     .setSigningKey(getSigningKey())
                     .build()
-                    . parseClaimsJws(authToken);
+                    .parseClaimsJws(authToken);
             return true;
         } catch (MalformedJwtException e) {
             System.err.println("Invalid JWT token: " + e.getMessage());

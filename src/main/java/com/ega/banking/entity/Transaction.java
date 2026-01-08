@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 
 /**
  * Entité représentant une transaction bancaire
- * Sera transformée en table "transactions"
  */
 @Entity
 @Table(name = "transactions")
@@ -48,15 +47,15 @@ public class Transaction {
     private String description;
 
     /**
-     * Compte source de la transaction
-     * Pour DEPOSIT : compte qui reçoit l'argent
-     * Pour WITHDRAWAL : compte qui perd l'argent
-     * Pour TRANSFER : compte qui envoie l'argent
+     * Compte principal concerné par la transaction
+     * - Pour DEPOSIT : compte qui reçoit l'argent
+     * - Pour WITHDRAWAL : compte qui perd l'argent
+     * - Pour TRANSFER : compte qui envoie l'argent (débité)
      */
-    @NotNull(message = "Source account is required")
+    @NotNull(message = "Account is required")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "source_account_id", nullable = false)
-    private Account sourceAccount;
+    @JoinColumn(name = "account_id", nullable = false)
+    private Account account;
 
     /**
      * Compte destination (uniquement pour les virements)
@@ -79,18 +78,28 @@ public class Transaction {
     private TransactionStatus status = TransactionStatus.PENDING;
 
     /**
-     * Solde du compte AVANT la transaction
-     * Utile pour l'audit et les relevés
+     * Solde du compte principal AVANT la transaction
      */
     @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal balanceBefore;
 
     /**
-     * Solde du compte APRÈS la transaction
-     * Utile pour l'audit et les relevés
+     * Solde du compte principal APRÈS la transaction
      */
     @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal balanceAfter;
+
+    /**
+     * Pour les virements : solde du compte destination AVANT
+     */
+    @Column(precision = 19, scale = 2)
+    private BigDecimal destinationBalanceBefore;
+
+    /**
+     * Pour les virements : solde du compte destination APRÈS
+     */
+    @Column(precision = 19, scale = 2)
+    private BigDecimal destinationBalanceAfter;
 
     /**
      * Méthode appelée automatiquement AVANT l'insertion en base

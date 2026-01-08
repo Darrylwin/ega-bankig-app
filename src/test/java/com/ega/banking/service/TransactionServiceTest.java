@@ -208,7 +208,7 @@ class TransactionServiceTest {
         t2.setAmount(new BigDecimal("200.00"));
 
         when(accountService.getAccountById(1L)).thenReturn(activeAccount);
-        when(transactionRepository.findBySourceAccountIdOrderByTransactionDateDesc(1L))
+        when(transactionRepository.findByAccountIdOrderByTransactionDateDesc(1L))
                 .thenReturn(Arrays.asList(t1, t2));
 
         // When

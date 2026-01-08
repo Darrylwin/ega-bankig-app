@@ -13,46 +13,37 @@ import java.util.Optional;
 
 /**
  * Repository pour l'entité Transaction
- * Fournit les méthodes pour accéder aux transactions bancaires
+ * inclue les virements reçus
  */
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
-    /**
-     * Recherche une transaction par sa référence unique
-     * Spring génère : SELECT * FROM transactions WHERE transaction_reference = ?
-     * @param transactionReference La référence de la transaction
-     * @return Optional contenant la transaction si trouvée, vide sinon
-     */
     Optional<Transaction> findByTransactionReference(String transactionReference);
 
     /**
-     * Récupère toutes les transactions d'un compte
-     * Ordonnées par date décroissante (les plus récentes en premier)
-     * Spring génère : SELECT * FROM transactions
-     *                 WHERE source_account_id = ?
-     *                 ORDER BY transaction_date DESC
-     * @param sourceAccount Le compte source
-     * @return Liste des transactions du compte
+     * Récupère toutes les transactions où le compte est l'account principal
+     * Cela inclut les dépôts, retraits et virements ENVOYÉS
      */
-    List<Transaction> findBySourceAccountOrderByTransactionDateDesc(Account sourceAccount);
+    List<Transaction> findByAccountOrderByTransactionDateDesc(Account account);
+
+    List<Transaction> findByAccountIdOrderByTransactionDateDesc(Long accountId);
 
     /**
-     * Récupère toutes les transactions d'un compte par son ID
-     * @param accountId L'ID du compte
-     * @return Liste des transactions
+     * Récupère TOUTES les transactions d'un compte
+     * - Transactions où le compte est l'account principal (dépôts, retraits, virements envoyés)
+     * - Transactions où le compte est la destination (virements reçus)
      */
-    List<Transaction> findBySourceAccountIdOrderByTransactionDateDesc(Long accountId);
+    @Query("SELECT t FROM Transaction t WHERE t.account.id = :accountId " +
+            "OR t.destinationAccount.id = :accountId " +
+            "ORDER BY t.transactionDate DESC")
+    List<Transaction> findAllByAccountId(@Param("accountId") Long accountId);
 
     /**
-     * Récupère les transactions d'un compte sur une période donnée
-     * Utilise une requête JPQL personnalisée
-     * @param accountId L'ID du compte
-     * @param startDate Date de début de la période
-     * @param endDate Date de fin de la période
-     * @return Liste des transactions dans la période
+     * Récupère TOUTES les transactions d'un compte sur une période
+     * Inclut les virements reçus
      */
-    @Query("SELECT t FROM Transaction t WHERE t.sourceAccount.id = :accountId " +
+    @Query("SELECT t FROM Transaction t WHERE " +
+            "(t.account.id = :accountId OR t.destinationAccount.id = :accountId) " +
             "AND t.transactionDate BETWEEN :startDate AND :endDate " +
             "ORDER BY t.transactionDate DESC")
     List<Transaction> findByAccountAndDateBetween(
@@ -61,20 +52,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             @Param("endDate") LocalDateTime endDate
     );
 
-    /**
-     * Récupère toutes les transactions où un compte est source OU destination
-     * Utile pour voir l'historique complet d'un compte (virements reçus inclus)
-     * @param sourceAccountId ID du compte source
-     * @param destinationAccountId ID du compte destination
-     * @return Liste complète des transactions
-     */
-    @Query("SELECT t FROM Transaction t WHERE t.sourceAccount.id = :accountId " +
-            "OR t.destinationAccount.id = :accountId " +
-            "ORDER BY t.transactionDate DESC")
-    List<Transaction> findAllByAccountId(@Param("accountId") Long accountId);
-    /**
-     * Compte le nombre de transactions depuis une certaine date
-     */
     @Query("SELECT COUNT(t) FROM Transaction t WHERE t.transactionDate >= :startDate")
     Long countSinceDate(@Param("startDate") LocalDateTime startDate);
 

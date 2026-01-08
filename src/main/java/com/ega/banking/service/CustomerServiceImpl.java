@@ -10,15 +10,14 @@ import java.util.List;
 
 /**
  * Implémentation du service Customer
- * Contient toute la logique métier pour gérer les clients
+ * CORRECTION : Suppression de la validation d'âge minimum
+ * Un client peut être créé quel que soit son âge (pour permettre comptes épargne mineurs)
  */
-@Service  // Indique à Spring que c'est un service
-@RequiredArgsConstructor  // Lombok génère un constructeur avec les champs final (injection de dépendances)
-@Transactional  // Toutes les méthodes sont transactionnelles (rollback automatique en cas d'erreur)
+@Service
+@RequiredArgsConstructor
+@Transactional
 public class CustomerServiceImpl implements CustomerService {
 
-    // Injection de dépendances par constructeur (meilleure pratique)
-    // Le repository est injecté automatiquement par Spring
     private final CustomerRepository customerRepository;
 
     /**
@@ -36,11 +35,6 @@ public class CustomerServiceImpl implements CustomerService {
             throw new com.ega.banking.exception.DuplicateResourceException("Phone number", customer.getPhoneNumber());
         }
 
-        // Vérification : le client doit avoir au moins 18 ans
-        if (customer.getAge() < 18) {
-            throw new com.ega.banking.exception.InvalidOperationException("Customer must be at least 18 years old");
-        }
-
         // Sauvegarde en base de données
         return customerRepository.save(customer);
     }
@@ -49,7 +43,7 @@ public class CustomerServiceImpl implements CustomerService {
      * Récupère tous les clients
      */
     @Override
-    @Transactional(readOnly = true)  // Optimisation pour les lectures seules
+    @Transactional(readOnly = true)
     public List<Customer> getAllCustomers() {
         return customerRepository.findAll();
     }
@@ -94,10 +88,8 @@ public class CustomerServiceImpl implements CustomerService {
             throw new com.ega.banking.exception.DuplicateResourceException("Phone number", customer.getPhoneNumber());
         }
 
-        // Vérification : l'âge doit rester >= 18 ans
-        if (customer.getAge() < 18) {
-            throw new com.ega.banking.exception.InvalidOperationException("Customer must be at least 18 years old");
-        }
+        // Suppression de la vérification d'âge
+        // Permet de mettre à jour un client sans restriction d'âge
 
         // Mise à jour des champs (on garde l'ID et la date de création)
         existingCustomer.setLastName(customer.getLastName());

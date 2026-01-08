@@ -16,16 +16,17 @@ import java.util.List;
 
 /**
  * Implémentation du service Account
- * Gère la logique métier des comptes bancaires
+ * validation d'âge selon le type de compte
+ * - CURRENT : nécessite 18 ans minimum
+ * - SAVINGS : aucune restriction d'âge
  */
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class AccountServiceImpl implements AccountService {
 
-    // Injection de dépendances
     private final AccountRepository accountRepository;
-    private final CustomerService customerService;  // Pour récupérer le client
+    private final CustomerService customerService;
 
     /**
      * Crée un nouveau compte bancaire avec un IBAN généré
@@ -35,14 +36,22 @@ public class AccountServiceImpl implements AccountService {
         // Récupère le client (lance une exception si non trouvé)
         Customer customer = customerService.getCustomerById(customerId);
 
-        // Génère un IBAN unique
+        // Validation d'âge selon le type de compte
+        if (accountType == AccountType.CURRENT && customer.getAge() < 18) {
+            throw new com.ega.banking.exception.InvalidOperationException(
+                    "A current account requires the customer to be at least 18 years old. " +
+                            "Customers under 18 can only open savings accounts.");
+        }
+
+        // Aucune restriction pour SAVINGS → OK pour tous les âges
+
         String iban = generateUniqueIban();
 
         // Crée le compte
         Account account = new Account();
         account.setAccountNumber(iban);
         account.setAccountType(accountType);
-        account.setBalance(BigDecimal.ZERO);  // Solde initial = 0
+        account.setBalance(BigDecimal.ZERO);
         account.setCurrency(currency);
         account.setStatus(AccountStatus.ACTIVE);
         account.setCustomer(customer);
@@ -124,13 +133,12 @@ public class AccountServiceImpl implements AccountService {
 
         do {
             // Génère un IBAN français aléatoire
-            // Format : FR + 2 chiffres de contrôle + 23 chiffres
             iban = new Iban.Builder()
-                    .countryCode(CountryCode.FR)  // Code pays : France
-                    .bankCode("12345")  // Code banque (5 chiffres)
-                    .branchCode("67890")  // Code guichet (5 chiffres)
-                    .accountNumber(String.format("%011d", (long) (Math.random() * 100000000000L)))  // 11 chiffres
-                    .nationalCheckDigit(String.format("%02d", (int) (Math.random() * 100)))  // 2 chiffres
+                    .countryCode(CountryCode.FR)
+                    .bankCode("12345")
+                    .branchCode("67890")
+                    .accountNumber(String.format("%011d", (long) (Math.random() * 100000000000L)))
+                    .nationalCheckDigit(String.format("%02d", (int) (Math.random() * 100)))
                     .build()
                     .toString();
 
@@ -142,7 +150,7 @@ public class AccountServiceImpl implements AccountService {
                         "Unable to generate unique IBAN after " + maxAttempts + " attempts");
             }
 
-        } while (accountRepository.existsByAccountNumber(iban));  // Vérifie l'unicité
+        } while (accountRepository.existsByAccountNumber(iban));
 
         return iban;
     }

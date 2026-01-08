@@ -20,7 +20,8 @@ import java.util.List;
 
 /**
  * Implémentation du service de génération de relevés bancaires
- * Utilise iText pour générer des PDF
+ * Utilise la requête qui inclut TOUS les types de transactions
+ * (y compris les virements reçus)
  */
 @Service
 @RequiredArgsConstructor
@@ -38,7 +39,7 @@ public class StatementServiceImpl implements StatementService {
         // Récupère le compte
         Account account = accountService.getAccountById(accountId);
 
-        // Récupère les transactions de la période
+        // Cette méthode utilise la requête qui inclu TOUTES les transactions (virements reçus compris)
         List<Transaction> transactions = transactionService.getTransactionsByAccountIdAndPeriod(
                 accountId, startDate, endDate);
 
@@ -77,16 +78,27 @@ public class StatementServiceImpl implements StatementService {
             // Calcul des totaux
             BigDecimal totalDeposits = BigDecimal.ZERO;
             BigDecimal totalWithdrawals = BigDecimal.ZERO;
+            BigDecimal totalTransfersIn = BigDecimal.ZERO;
+            BigDecimal totalTransfersOut = BigDecimal.ZERO;
 
+            // CORRECTION : Calcul des totaux en tenant compte des virements reçus
             for (Transaction t : transactions) {
-                switch (t.getTransactionType()) {
-                    case DEPOSIT:
-                        totalDeposits = totalDeposits.add(t.getAmount());
-                        break;
-                    case WITHDRAWAL:
-                    case TRANSFER:
-                        totalWithdrawals = totalWithdrawals.add(t.getAmount());
-                        break;
+                // Si c'est une transaction où notre compte est l'account principal
+                if (t.getAccount().getId().equals(accountId)) {
+                    switch (t.getTransactionType()) {
+                        case DEPOSIT:
+                            totalDeposits = totalDeposits.add(t.getAmount());
+                            break;
+                        case WITHDRAWAL:
+                            totalWithdrawals = totalWithdrawals.add(t.getAmount());
+                            break;
+                        case TRANSFER:
+                            totalTransfersOut = totalTransfersOut.add(t.getAmount());
+                            break;
+                    }
+                } else {
+                    // C'est un virement reçu (notre compte est destinationAccount)
+                    totalTransfersIn = totalTransfersIn.add(t.getAmount());
                 }
             }
 
@@ -107,11 +119,22 @@ public class StatementServiceImpl implements StatementService {
             for (Transaction t : transactions) {
                 table.addCell(t.getTransactionDate().format(formatter));
                 table.addCell(t.getDescription() != null ? t.getDescription() : "-");
-                table.addCell(t.getTransactionType().toString());
 
-                String sign = t.getTransactionType() == com.ega.banking.entity.TransactionType.DEPOSIT ? "+" : "-";
+                // Affichage adapté selon si c'est un virement reçu ou envoyé
+                boolean isIncoming = !t.getAccount().getId().equals(accountId);
+                String typeDisplay = t.getTransactionType().toString();
+                if (isIncoming) {
+                    typeDisplay = "TRANSFER (Reçu)";
+                }
+                table.addCell(typeDisplay);
+
+                String sign = (t.getTransactionType() == com.ega.banking.entity.TransactionType.DEPOSIT || isIncoming)
+                        ? "+" : "-";
                 table.addCell(sign + t.getAmount() + " " + account.getCurrency());
-                table.addCell(t.getBalanceAfter() + " " + account.getCurrency());
+
+                // Affiche le bon solde selon si c'est account ou destinationAccount
+                BigDecimal displayBalance = isIncoming ? t.getDestinationBalanceAfter() : t.getBalanceAfter();
+                table.addCell(displayBalance + " " + account.getCurrency());
             }
 
             document.add(table);
@@ -120,7 +143,9 @@ public class StatementServiceImpl implements StatementService {
             document.add(new Paragraph("\nRésumé de la période").setBold().setFontSize(12).setMarginTop(20));
             document.add(new Paragraph("Nombre de transactions : " + transactions.size()));
             document.add(new Paragraph("Total des dépôts : +" + totalDeposits + " " + account.getCurrency()));
+            document.add(new Paragraph("Total des virements reçus : +" + totalTransfersIn + " " + account.getCurrency()));
             document.add(new Paragraph("Total des retraits : -" + totalWithdrawals + " " + account.getCurrency()));
+            document.add(new Paragraph("Total des virements envoyés : -" + totalTransfersOut + " " + account.getCurrency()));
 
             // Pied de page
             document.add(new Paragraph("\n\nGénéré le " + LocalDateTime.now().format(formatter))

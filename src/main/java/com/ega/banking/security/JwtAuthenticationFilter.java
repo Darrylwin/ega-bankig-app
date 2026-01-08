@@ -16,7 +16,6 @@ import java.io.IOException;
 
 /**
  * Filtre qui intercepte chaque requête pour valider le token JWT
- * S'exécute une fois par requête (OncePerRequestFilter)
  */
 @Component
 @RequiredArgsConstructor
@@ -41,11 +40,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             // Si un token existe et qu'il est valide
             if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
-                // Extrait le nom d'utilisateur du token
-                String username = jwtUtils.getUsernameFromJwtToken(jwt);
+                // CORRECTION : Utilisation de la méthode renommée
+                String email = jwtUtils.getEmailFromJwtToken(jwt);
 
-                // Charge les détails de l'utilisateur
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
                 // Crée l'objet d'authentification
                 UsernamePasswordAuthenticationToken authentication =
@@ -76,7 +74,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String headerAuth = request.getHeader("Authorization");
 
         if (headerAuth != null && headerAuth.startsWith("Bearer ")) {
-            return headerAuth.substring(7);  // Enlève "Bearer "
+            return headerAuth.substring(7);
         }
 
         return null;

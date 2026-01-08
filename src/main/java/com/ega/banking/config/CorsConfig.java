@@ -17,11 +17,11 @@ public class CorsConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/api/**")  // Applique CORS à toutes les URLs /api/**
-                .allowedOrigins(allowedOrigins.split(","))  // Origines autorisées (séparées par virgule)
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")  // Méthodes HTTP autorisées
-                .allowedHeaders("*")  // Tous les headers autorisés
-                .allowCredentials(true)  // Autorise l'envoi de cookies
-                .maxAge(3600);  // Cache la config CORS pendant 1 heure
+        registry.addMapping("/api/**")
+                .allowedOrigins("*")
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowedHeaders("*")
+                .allowCredentials(false)  // les credentials ne sont pas compatibles avec '*'
+                .maxAge(3600);
     }
 }

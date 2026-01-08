@@ -13,7 +13,7 @@ import java.util.List;
 
 /**
  * Entité représentant un compte bancaire
- * Sera transformée en table "accounts"
+ * CORRECTION : Relation avec Transaction mise à jour
  */
 @Entity
 @Table(name = "accounts")
@@ -75,9 +75,10 @@ public class Account {
     private Customer customer;
 
     /**
-     * Relation One-to-Many : Un compte peut avoir plusieurs transactions
+     * Relation avec Transaction
+     * mappedBy correspond au nouveau nom "account" dans Transaction
      */
-    @OneToMany(mappedBy = "sourceAccount", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Transaction> transactions = new ArrayList<>();
 
     /**
@@ -98,6 +99,7 @@ public class Account {
 
     /**
      * Vérifie si le compte est actif
+     *
      * @return true si le compte est actif, false sinon
      */
     public boolean isActive() {
@@ -115,6 +117,7 @@ public class Account {
 
     /**
      * Ajoute un montant au solde (pour les dépôts)
+     *
      * @param amount Montant à ajouter
      */
     public void deposit(BigDecimal amount) {
@@ -123,6 +126,7 @@ public class Account {
 
     /**
      * Retire un montant du solde (pour les retraits)
+     *
      * @param amount Montant à retirer
      */
     public void withdraw(BigDecimal amount) {

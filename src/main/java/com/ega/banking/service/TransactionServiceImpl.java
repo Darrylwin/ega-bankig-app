@@ -12,11 +12,12 @@ import java.util.List;
 
 /**
  * Implémentation du service Transaction
- * Gère toute la logique métier des opérations bancaires
+ * Logique de virement corrigée pour créer deux transactions
+ * et requêtes mises à jour pour inclure virements reçus
  */
 @Service
 @RequiredArgsConstructor
-@Transactional  // Très important : assure l'atomicité des transactions (rollback automatique en cas d'erreur)
+@Transactional
 public class TransactionServiceImpl implements TransactionService {
 
     // Injection de dépendances
@@ -46,8 +47,8 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setTransactionType(TransactionType.DEPOSIT);
         transaction.setAmount(amount);
         transaction.setDescription(description);
-        transaction.setSourceAccount(account);
-        transaction.setDestinationAccount(null);  // Pas de destination pour un dépôt
+        transaction.setAccount(account);
+        transaction.setDestinationAccount(null);
         transaction.setBalanceBefore(balanceBefore);
         transaction.setBalanceAfter(account.getBalance());
         transaction.setStatus(TransactionStatus.SUCCESS);
@@ -85,7 +86,7 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setTransactionType(TransactionType.WITHDRAWAL);
         transaction.setAmount(amount);
         transaction.setDescription(description);
-        transaction.setSourceAccount(account);
+        transaction.setAccount(account);
         transaction.setDestinationAccount(null);
         transaction.setBalanceBefore(balanceBefore);
         transaction.setBalanceAfter(account.getBalance());
@@ -95,8 +96,10 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     /**
-     * Effectue un virement d'un compte vers un autre
-     * Opération atomique grâce à @Transactional
+     * Création de DEUX transactions pour un virement
+     * - Transaction 1 : Débit du compte source
+     * - Transaction 2 : Crédit du compte destination
+     * Cela permet aux deux comptes de voir le virement dans leur historique
      */
     @Override
     public Transaction transfer(Long sourceAccountId, Long destinationAccountId,
@@ -132,21 +135,45 @@ public class TransactionServiceImpl implements TransactionService {
         sourceAccount.withdraw(amount);
         destinationAccount.deposit(amount);
 
-        // Crée la transaction principale (du point de vue du compte source)
-        Transaction transaction = new Transaction();
-        transaction.setTransactionType(TransactionType.TRANSFER);
-        transaction.setAmount(amount);
-        transaction.setDescription(description);
-        transaction.setSourceAccount(sourceAccount);
-        transaction.setDestinationAccount(destinationAccount);
-        transaction.setBalanceBefore(sourceBalanceBefore);
-        transaction.setBalanceAfter(sourceAccount.getBalance());
-        transaction.setStatus(TransactionStatus.SUCCESS);
+        // Transaction 1 : Débit du compte source (TRANSFER OUT)
+        Transaction sourceTransaction = new Transaction();
+        sourceTransaction.setTransactionType(TransactionType.TRANSFER);
+        sourceTransaction.setAmount(amount);
+        sourceTransaction.setDescription(description);
+        sourceTransaction.setAccount(sourceAccount);
+        sourceTransaction.setDestinationAccount(destinationAccount);
+        sourceTransaction.setBalanceBefore(sourceBalanceBefore);
+        sourceTransaction.setBalanceAfter(sourceAccount.getBalance());
+        sourceTransaction.setDestinationBalanceBefore(destinationBalanceBefore);
+        sourceTransaction.setDestinationBalanceAfter(destinationAccount.getBalance());
+        sourceTransaction.setStatus(TransactionStatus.SUCCESS);
 
-        // Sauvegarde la transaction
-        // Note : On pourrait créer une deuxième transaction pour le compte destination
-        // mais le cahier des charges demande simplement d'enregistrer la transaction
-        return transactionRepository.save(transaction);
+        Transaction savedSourceTransaction = transactionRepository.save(sourceTransaction);
+
+        // Transaction 2 : Crédit du compte destination (TRANSFER IN)
+        // Cette transaction permet au compte destination de voir le virement dans son historique
+        Transaction destinationTransaction = new Transaction();
+        destinationTransaction.setTransactionType(TransactionType.TRANSFER);
+        destinationTransaction.setAmount(amount);
+        destinationTransaction.setDescription(description != null ?
+                description + " (reçu de " + sourceAccount.getAccountNumber() + ")" :
+                "Virement reçu de " + sourceAccount.getAccountNumber());
+        destinationTransaction.setAccount(destinationAccount);
+        destinationTransaction.setDestinationAccount(sourceAccount); // Compte source en destination
+        destinationTransaction.setBalanceBefore(destinationBalanceBefore);
+        destinationTransaction.setBalanceAfter(destinationAccount.getBalance());
+        destinationTransaction.setDestinationBalanceBefore(sourceBalanceBefore);
+        destinationTransaction.setDestinationBalanceAfter(sourceAccount.getBalance());
+        destinationTransaction.setStatus(TransactionStatus.SUCCESS);
+
+        // Lier les deux transactions avec la même référence pour traçabilité
+        String commonReference = savedSourceTransaction.getTransactionReference();
+        destinationTransaction.setTransactionReference(commonReference + "-IN");
+
+        transactionRepository.save(destinationTransaction);
+
+        // Retourne la transaction du compte source (convention)
+        return savedSourceTransaction;
     }
 
     /**
@@ -157,8 +184,7 @@ public class TransactionServiceImpl implements TransactionService {
     public List<Transaction> getTransactionsByAccountId(Long accountId) {
         // Vérifie que le compte existe
         accountService.getAccountById(accountId);
-
-        return transactionRepository.findBySourceAccountIdOrderByTransactionDateDesc(accountId);
+        return transactionRepository.findAllByAccountId(accountId);
     }
 
     /**

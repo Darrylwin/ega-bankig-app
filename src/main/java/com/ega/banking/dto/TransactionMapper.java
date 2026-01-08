@@ -19,7 +19,7 @@ public class TransactionMapper {
         dto.setAmount(transaction.getAmount());
         dto.setTransactionDate(transaction.getTransactionDate());
         dto.setDescription(transaction.getDescription());
-        dto.setSourceAccountNumber(transaction.getSourceAccount().getAccountNumber());
+        dto.setSourceAccountNumber(transaction.getAccount().getAccountNumber());
 
         // Le compte destination est null pour les dépôts et retraits
         if (transaction.getDestinationAccount() != null) {
