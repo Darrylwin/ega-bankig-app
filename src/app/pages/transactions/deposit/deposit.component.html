@@ -163,7 +163,7 @@
             <nb-card-body>
               <!-- Montant -->
               <div class="form-section">
-                <label for="amount" class="form-label required">Montant (€)</label>
+                <label for="amount" class="form-label required">Montant (F CFA)</label>
                 <div class="amount-input-wrapper">
                   <nb-icon icon="cash-outline" class="input-icon"></nb-icon>
                   <input
@@ -184,8 +184,6 @@
                 <div *ngIf="f.amount.invalid && f.amount.touched" class="field-error">
                   <nb-icon icon="alert-circle-outline"></nb-icon>
                   <span *ngIf="f.amount. errors?.['required']">Le montant est obligatoire</span>
-                  <span *ngIf="f. amount.errors?.['min']">Montant minimum:  0.01 €</span>
-                  <span *ngIf="f. amount.errors?.['max']">Montant maximum: 1 000 000 €</span>
                 </div>
 
                 <!-- Montants rapides -->

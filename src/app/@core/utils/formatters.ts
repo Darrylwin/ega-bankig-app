@@ -1,4 +1,3 @@
-// src/app/@core/utils/formatters.ts
 import { formatCurrency, formatDate } from '@angular/common';
 import { Injectable } from '@angular/core';
 
@@ -6,8 +5,9 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class FormatterService {
-  formatCurrency(amount: number, currency: string = 'EUR'): string {
-    return formatCurrency(amount, 'fr-FR', '€', 'EUR', '1.2-2');
+  formatCurrency(amount: number): string {
+    // XOF does not have a minor unit, so no decimals
+    return formatCurrency(amount, 'fr-FR', 'F CFA', 'XOF', '1.0-0');
   }
 
   formatDate(date: string | Date, format: string = 'dd/MM/yyyy'): string {

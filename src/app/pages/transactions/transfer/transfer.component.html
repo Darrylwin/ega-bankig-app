@@ -376,10 +376,10 @@
               <!-- Montant -->
               <div class="form-section">
                 <label for="amount" class="form-label required"
-                  >Montant du virement (€)</label
+                  >Montant du virement (F CFA)</label
                 >
                 <div class="amount-input-wrapper">
-                  <nb-icon icon="euro-outline" class="input-icon"></nb-icon>
+                    <nb-icon icon="money-outline" class="input-icon"></nb-icon>
                   <input
                     type="number"
                     id="amount"
@@ -406,7 +406,7 @@
                     >Le montant est obligatoire</span
                   >
                   <span *ngIf="f.amount.errors?.['min']"
-                    >Montant minimum: 0.01 €</span
+                    >Montant minimum: 1 F CFA</span
                   >
                   <span *ngIf="f.amount.errors?.['max']">
                     Solde insuffisant (Max: 

@@ -196,9 +196,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
    * Formatage des montants
    */
   formatCurrency(amount: number): string {
-    return new Intl. NumberFormat('fr-FR', {
+    return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
-      currency: 'EUR',
+      currency: 'XOF',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(amount || 0);

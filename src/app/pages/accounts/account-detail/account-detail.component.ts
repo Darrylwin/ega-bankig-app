@@ -262,8 +262,10 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   formatCurrency(amount: number): string {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
-      currency: 'EUR',
-    }).format(amount || 0);
+      currency: 'XOF',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount || 0) + ' CFA';
   }
 
   formatDate(date: string): string {

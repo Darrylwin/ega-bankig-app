@@ -194,46 +194,6 @@
             </nb-card-body>
           </nb-card>
 
-          <!-- Étape 3: Devise -->
-          <nb-card class="form-card">
-            <nb-card-header>
-              <div class="card-header-content">
-                <div class="step-badge">3</div>
-                <div>
-                  <h5>Devise du Compte</h5>
-                  <p class="text-muted">Choisissez la devise de gestion</p>
-                </div>
-              </div>
-            </nb-card-header>
-            <nb-card-body>
-              <div class="currency-grid">
-                <div
-                  *ngFor="let currency of currencies"
-                  class="currency-card"
-                  [class.selected]="f.currency.value === currency.value"
-                  (click)="f.currency.setValue(currency.value)"
-                >
-                  <input
-                    type="radio"
-                    [id]="'currency-' + currency.value"
-                    [value]="currency.value"
-                    formControlName="currency"
-                    class="currency-radio"
-                  />
-                  <div class="currency-flag">{{ currency.flag }}</div>
-                  <div class="currency-code">{{ currency.value }}</div>
-                  <div class="currency-name">{{ currency.label }}</div>
-                  <div
-                    class="currency-check"
-                    *ngIf="f.currency.value === currency.value"
-                  >
-                    <nb-icon icon="checkmark-circle-2-outline"></nb-icon>
-                  </div>
-                </div>
-              </div>
-            </nb-card-body>
-          </nb-card>
-
           <!-- Actions -->
           <div class="form-actions">
             <button
@@ -257,8 +217,7 @@
             >
               <nb-icon
                 [icon]="isSubmitting ? 'loader-outline' : 'checkmark-outline'"
-                [class.
-                spin]="isSubmitting"
+                [class.spin]="isSubmitting"
               ></nb-icon>
               {{ isSubmitting ? "Création en cours..." : "Créer le compte" }}
             </button>
@@ -316,13 +275,7 @@
                   Devise
                 </div>
                 <div class="summary-value">
-                  <span *ngIf="getSelectedCurrency()">
-                    {{ getSelectedCurrency()?.flag }}
-                    {{ getSelectedCurrency()?.label }}
-                  </span>
-                  <span *ngIf="!getSelectedCurrency()" class="text-muted"
-                    >Non sélectionnée</span
-                  >
+                  {{ CURRENCY_LABEL }} ({{ CURRENCY }})
                 </div>
               </div>
 
@@ -334,7 +287,7 @@
                   Solde initial
                 </div>
                 <div class="summary-value">
-                  0. 00 {{ getSelectedCurrency()?.symbol || "€" }}
+                  0 {{ CURRENCY_SYMBOL }}
                 </div>
               </div>
 
@@ -348,16 +301,6 @@
                 <div class="summary-value">
                   {{ "now" | date : "dd/MM/yyyy" }}
                 </div>
-              </div>
-
-              <!-- Validation -->
-              <div class="summary-validation" *ngIf="accountForm.valid">
-                <nb-badge
-                  text="Toutes les informations sont complètes"
-                  status="success"
-                >
-                  <nb-icon icon="checkmark-circle-outline"></nb-icon>
-                </nb-badge>
               </div>
             </nb-card-body>
           </nb-card>

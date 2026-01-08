@@ -65,7 +65,7 @@ export class CustomerFormComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Crée le formulaire
+   * Crée le formulaire - SIMPLIFIÉ (uniquement les champs requis par l'API)
    */
   private createForm(): FormGroup {
     return this.fb.group({
@@ -87,16 +87,16 @@ export class CustomerFormComponent implements OnInit, OnDestroy {
       ],
       dateOfBirth: ["", [Validators.required]],
       gender: ["MALE", [Validators.required]],
-      address: ["", [Validators.required, Validators.maxLength(200)]],
+      address: ["", [Validators.required]],
       phoneNumber: [
         "",
         [Validators.required, Validators.pattern(/^\+[1-9]\d{1,14}$/)],
       ],
       email: [
         "",
-        [Validators.required, Validators.email, Validators.maxLength(100)],
+        [Validators.required, Validators.email],
       ],
-      nationality: ["", [Validators.required, Validators.maxLength(50)]],
+      nationality: ["", [Validators.required]],
     });
   }
 
@@ -113,11 +113,18 @@ export class CustomerFormComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (customer: Customer) => {
+          // Formater la date pour l'input date
           const formattedDate = customer.dateOfBirth.split("T")[0];
 
           this.customerForm.patchValue({
-            ...customer,
+            lastName: customer.lastName,
+            firstName: customer.firstName,
             dateOfBirth: formattedDate,
+            gender: customer.gender,
+            address: customer.address,
+            phoneNumber: customer.phoneNumber,
+            email: customer.email,
+            nationality: customer.nationality,
           });
 
           this.isLoading = false;
@@ -145,7 +152,17 @@ export class CustomerFormComponent implements OnInit, OnDestroy {
 
     this.isSubmitting = true;
 
-    const customerData: CustomerRequest = this.customerForm.value;
+    // Préparer les données selon le format exact de l'API
+    const customerData: CustomerRequest = {
+      lastName: this.customerForm.value.lastName,
+      firstName: this.customerForm.value.firstName,
+      dateOfBirth: this.customerForm.value.dateOfBirth, // Format YYYY-MM-DD
+      gender: this.customerForm.value.gender,
+      address: this.customerForm.value.address,
+      phoneNumber: this.customerForm.value.phoneNumber,
+      email: this.customerForm.value.email,
+      nationality: this.customerForm.value.nationality,
+    };
 
     if (this.isEditMode && this.customerId) {
       this.updateCustomer(customerData);
@@ -175,10 +192,9 @@ export class CustomerFormComponent implements OnInit, OnDestroy {
 
           if (error.status === 409) {
             this.toastr.warning(
-              "Un client avec cet email existe déjà",
+              "Un client avec cet email ou ce téléphone existe déjà",
               "Attention"
             );
-            this.customerForm.get("email")?.setErrors({ duplicate: true });
           } else {
             this.toastr.danger(
               "Erreur lors de la création du client",
@@ -248,7 +264,7 @@ export class CustomerFormComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Calcule l'âge
+   * Calcule l'âge - UTILE pour l'affichage uniquement
    */
   calculateAge(): number {
     if (!this.customerForm.value.dateOfBirth) return 0;

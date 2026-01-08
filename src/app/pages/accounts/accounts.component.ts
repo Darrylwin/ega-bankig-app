@@ -83,32 +83,35 @@ export class AccountsComponent implements OnInit, OnDestroy {
           if (value === 'SAVINGS') {
             return '<span class="badge badge-success">Épargne</span>';
           }
-          return '<span class="badge badge-primary">Courant</span>';
-        },
-      },
-      balance: {
-        title: 'Solde',
-        type: 'html',
-        filter: false,
-        valuePrepareFunction: (value: number) => {
-          const formatted = new Intl.NumberFormat('fr-FR', {
+            return '<span class="badge badge-primary">Courant</span>';
+          },
+          },
+          balance: {
+          title: 'Solde',
+          type: 'html',
+          filter: false,
+          valuePrepareFunction: (value: number) => {
+            const formatted = new Intl.NumberFormat('fr-FR', {
             style: 'currency',
-            currency: 'EUR',
-          }).format(value);
-          const color = value > 0 ?  'success' : value < 0 ? 'danger' :  'basic';
-          return `<span class="text-${color} fw-bold">${formatted}</span>`;
-        },
-      },
-      currency: {
-        title: 'Devise',
-        type: 'string',
-        filter: false,
-      },
-      status: {
-        title: 'Statut',
-        type: 'html',
-        filter: false,
-        valuePrepareFunction: (value: string) => {
+            currency: 'XOF',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+            currencyDisplay: 'symbol',
+            }).format(value || 0).replace('XOF', 'F CFA');
+            const color = value > 0 ? 'success' : value < 0 ? 'danger' : 'basic';
+            return `<span class="text-${color} fw-bold">${formatted}</span>`;
+          },
+          },
+          currency: {
+          title: 'Devise',
+          type: 'string',
+          filter: false,
+          },
+          status: {
+          title: 'Statut',
+          type: 'html',
+          filter: false,
+          valuePrepareFunction: (value: string) => {
           const statusMap:  any = {
             ACTIVE: '<span class="badge badge-success">Actif</span>',
             BLOCKED: '<span class="badge badge-danger">Bloqué</span>',
@@ -366,10 +369,14 @@ export class AccountsComponent implements OnInit, OnDestroy {
   }
 
   formatCurrency(amount: number): string {
+    // Formate en francs CFA (XOF)
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
-      currency: 'EUR',
-    }).format(amount || 0);
+      currency: 'XOF',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+      currencyDisplay: 'symbol',
+    }).format(amount || 0).replace('XOF', 'F CFA');
   }
 
   formatNumber(num: number): string {

@@ -26,7 +26,7 @@ export class AccountFormComponent implements OnInit, OnDestroy {
   filteredCustomers: Customer[] = [];
   selectedCustomer: Customer | null = null;
 
-  // Options
+  // Options - SIMPLIFIÉ
   accountTypes = [
     {
       value: "SAVINGS",
@@ -34,10 +34,9 @@ export class AccountFormComponent implements OnInit, OnDestroy {
       icon: "trending-up-outline",
       description: "Idéal pour épargner avec un taux d'intérêt attractif",
       features: [
-        "Taux d'intérêt: 2.0% par an",
+        "Taux d'intérêt attractif",
         "Pas de frais de tenue de compte",
         "Capital garanti",
-        "Virements gratuits",
       ],
       color: "success",
     },
@@ -47,21 +46,18 @@ export class AccountFormComponent implements OnInit, OnDestroy {
       icon: "credit-card-outline",
       description: "Pour vos opérations bancaires quotidiennes",
       features: [
-        "Découvert autorisé: 1 000 €",
+        "Découvert autorisé",
         "Carte bancaire incluse",
-        "Chéquier disponible",
         "Opérations illimitées",
       ],
       color: "primary",
     },
   ];
 
-  currencies = [
-    { value: "EUR", label: "Euro", symbol: "€", flag: "🇪🇺" },
-    { value: "USD", label: "Dollar", symbol: "$", flag: "🇺🇸" },
-    { value: "GBP", label: "Livre Sterling", symbol: "£", flag: "🇬🇧" },
-    { value: "CHF", label: "Franc Suisse", symbol: "CHF", flag: "🇨🇭" },
-  ];
+  // DEVISE FIXÉE À XOF (Francs CFA)
+  readonly CURRENCY = "XOF";
+  readonly CURRENCY_LABEL = "Francs CFA";
+  readonly CURRENCY_SYMBOL = "FCFA";
 
   constructor(
     private fb: FormBuilder,
@@ -89,11 +85,15 @@ export class AccountFormComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+  /**
+   * Formulaire simplifié - UNIQUEMENT les champs requis par l'API
+   * La devise est fixée à XOF automatiquement
+   */
   private createForm(): FormGroup {
     return this.fb.group({
       customerId: ["", [Validators.required]],
       accountType: ["SAVINGS", [Validators.required]],
-      currency: ["EUR", [Validators.required]],
+      // currency est fixe, pas besoin dans le formulaire
     });
   }
 
@@ -154,7 +154,13 @@ export class AccountFormComponent implements OnInit, OnDestroy {
 
     this.isSubmitting = true;
 
-    const accountData: AccountRequest = this.accountForm.value;
+    // Préparer les données selon le format exact de l'API
+    // La devise XOF est ajoutée automatiquement
+    const accountData: AccountRequest = {
+      customerId: this.accountForm.value.customerId,
+      accountType: this.accountForm.value.accountType,
+      currency: this.CURRENCY, // Devise fixe XOF
+    };
 
     this.accountApi
       .createAccount(accountData)
@@ -172,7 +178,9 @@ export class AccountFormComponent implements OnInit, OnDestroy {
           this.isSubmitting = false;
 
           if (error.status === 400) {
-            this.toastr.warning("Données invalides", "Erreur de validation");
+            // Erreur de validation (ex: client mineur pour compte courant)
+            const errorMessage = error.error?.message || "Données invalides";
+            this.toastr.warning(errorMessage, "Erreur de validation");
           } else if (error.status === 409) {
             this.toastr.warning(
               "Le client possède déjà un compte de ce type",
@@ -200,10 +208,6 @@ export class AccountFormComponent implements OnInit, OnDestroy {
     return this.accountTypes.find(
       (type) => type.value === this.f.accountType.value
     );
-  }
-
-  getSelectedCurrency() {
-    return this.currencies.find((cur) => cur.value === this.f.currency.value);
   }
 
   private markFormGroupTouched(formGroup: FormGroup): void {
