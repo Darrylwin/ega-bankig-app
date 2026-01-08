@@ -33,7 +33,7 @@ export class WithdrawalComponent implements OnInit, OnDestroy {
   quickAmounts = [50, 100, 200, 500, 1000, 2000];
 
   // Limite journalière (peut être configurée)
-  dailyLimit = 5000;
+  dailyLimit = 1000000;
 
   constructor(
     private fb: FormBuilder,

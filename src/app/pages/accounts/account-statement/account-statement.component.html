@@ -113,58 +113,6 @@
           </nb-card-body>
         </nb-card>
 
-        <!-- Sélection du format -->
-        <nb-card class="format-card">
-          <nb-card-header>
-            <div class="card-header-content">
-              <div class="step-badge">2</div>
-              <div>
-                <h5>Format du Relevé</h5>
-                <p class="text-muted">Choisissez le format de téléchargement</p>
-              </div>
-            </div>
-          </nb-card-header>
-          <nb-card-body>
-            <div class="formats-grid">
-              <div
-                *ngFor="let formatOption of formats"
-                class="format-option"
-                [class.selected]="format === formatOption.value"
-                (click)="onFormatChange(formatOption.value)"
-              >
-                <input
-                  type="radio"
-                  [id]="'format-' + formatOption.value"
-                  [value]="formatOption.value"
-                  [(ngModel)]="format"
-                  class="format-radio"
-                />
-
-                <div
-                  class="format-icon"
-                  [ngClass]="'icon-' + formatOption.color"
-                >
-                  <nb-icon [icon]="formatOption.icon"></nb-icon>
-                </div>
-
-                <h6 class="format-title">{{ formatOption.label }}</h6>
-                <p class="format-description">{{ formatOption.description }}</p>
-
-                <ul class="format-features">
-                  <li *ngFor="let feature of formatOption.features">
-                    <nb-icon icon="checkmark-outline"></nb-icon>
-                    <span>{{ feature }}</span>
-                  </li>
-                </ul>
-
-                <div class="format-check" *ngIf="format === formatOption.value">
-                  <nb-icon icon="checkmark-circle-2-outline"></nb-icon>
-                </div>
-              </div>
-            </div>
-          </nb-card-body>
-        </nb-card>
-
         <!-- Aperçu des transactions -->
         <nb-card class="preview-card" *ngIf="startDate && endDate">
           <nb-card-header>
@@ -387,31 +335,6 @@
                   <span>{{ account.currency }}</span>
                 </div>
               </div>
-            </div>
-          </nb-card-body>
-        </nb-card>
-
-        <!-- Format sélectionné -->
-        <nb-card
-          class="selected-format-card"
-          *ngIf="getSelectedFormat() as selectedFormat"
-        >
-          <nb-card-header>
-            <h6>
-              <nb-icon icon="checkmark-circle-outline"></nb-icon>
-              Format Sélectionné
-            </h6>
-          </nb-card-header>
-          <nb-card-body>
-            <div class="selected-format-display">
-              <div
-                class="format-icon-large"
-                [ngClass]="'icon-' + selectedFormat.color"
-              >
-                <nb-icon [icon]="selectedFormat.icon"></nb-icon>
-              </div>
-              <h6>{{ selectedFormat.label }}</h6>
-              <p class="text-muted">{{ selectedFormat.description }}</p>
             </div>
           </nb-card-body>
         </nb-card>
