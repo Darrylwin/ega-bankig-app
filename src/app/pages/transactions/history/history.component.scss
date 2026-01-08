@@ -1,11 +1,13 @@
 .history-container {
+  min-height: 100vh;
   padding: 0;
 
   // Header
   .page-header {
     background: linear-gradient(135deg, #3366ff 0%, #5580ff 100%);
+    color: white;
     padding: 2rem;
-    margin-bottom: 2rem;
+    margin: -1.5rem -1.5rem 2rem -1.5rem;
     border-radius: 0 0 2rem 2rem;
     box-shadow: 0 4px 20px rgba(51, 102, 255, 0.3);
 
@@ -15,25 +17,35 @@
       align-items: center;
       max-width: 1400px;
       margin: 0 auto;
+      gap: 2rem;
+      flex-wrap: wrap;
 
       .header-left {
         display: flex;
         align-items: center;
         gap: 1.5rem;
+        flex: 1;
 
         .back-btn {
           width: 40px;
           height: 40px;
           border-radius: 50%;
           background: rgba(255, 255, 255, 0.2);
-          backdrop-filter: blur(10px);
+          border: none;
+          color: white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.3s;
 
           &:hover {
             background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
           }
 
           nb-icon {
             color: white;
+            font-size: 1.5rem;
           }
         }
 
@@ -62,9 +74,9 @@
         nb-button-group {
           button {
             background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
             border: none;
             color: white;
+            transition: all 0.3s;
 
             &:hover {
               background: rgba(255, 255, 255, 0.3);
@@ -89,6 +101,8 @@
 
     nb-button-group {
       button {
+        display: flex;
+        align-items: center;
         gap: 0.5rem;
 
         nb-icon {
@@ -98,17 +112,18 @@
     }
   }
 
-  // Filtres
+  // Filtres Card
   .filters-card {
     max-width: 1400px;
     margin: 0 auto 2rem;
+    padding: 0 2rem;
     border-radius: 1 5rem;
     border: none;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 
     nb-card-header {
-      background: #f7f9fc;
-      border-bottom: 2px solid #edf1f7;
+      background: var(--color-basic-100);
+      border-bottom: 2px solid var(--border-basic-color-3);
       border-radius: 1.5rem 1.5rem 0 0;
 
       .filters-header {
@@ -122,7 +137,7 @@
           gap: 0.75rem;
           margin: 0;
           font-weight: 700;
-          color: #222b45;
+          color: var(--text-basic-color);
 
           nb-icon {
             font-size: 1.5rem;
@@ -148,7 +163,7 @@
             gap: 0.5rem;
             font-size: 0.875rem;
             font-weight: 600;
-            color: #8f9bb3;
+            color: var(--text-hint-color);
             margin-bottom: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -182,14 +197,14 @@
       }
 
       .quick-periods {
-        padding-top: 1 5rem;
-        border-top: 2px solid #edf1f7;
+        padding-top: 1.5rem;
+        border-top: 2px solid var(--border-basic-color-3);
 
         .quick-label {
           display: block;
           font-size: 0.875rem;
           font-weight: 600;
-          color: #8f9bb3;
+          color: var(--text-hint-color);
           margin-bottom: 1rem;
           text-transform: uppercase;
           letter-spacing: 0.5px;
@@ -227,6 +242,7 @@
       overflow: hidden;
       transition: all 0.3s;
       position: relative;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 
       &::before {
         content: "";
@@ -235,7 +251,6 @@
         left: 0;
         right: 0;
         height: 4px;
-        background: currentColor;
       }
 
       &:hover {
@@ -285,13 +300,13 @@
           .stat-value {
             font-size: 1.75rem;
             font-weight: 700;
-            color: #222b45;
+            color: var(--text-basic-color);
             margin-bottom: 0.25rem;
           }
 
           .stat-label {
             font-size: 0.875rem;
-            color: #8f9bb3;
+            color: var(--text-hint-color);
             font-weight: 500;
           }
         }
@@ -335,23 +350,24 @@
     margin: 0 auto;
 
     .loading-text {
-      margin-top: 1.5rem;
+      margin-top: 1 5rem;
       font-size: 1.25rem;
-      color: #8f9bb3;
+      color: var(--text-hint-color);
     }
   }
 
-  // Tableau
+  // Table Card
   .table-card {
     max-width: 1400px;
     margin: 0 auto 2rem;
+    padding: 0 2rem;
     border-radius: 1.5rem;
     border: none;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 
     nb-card-header {
-      background: #f7f9fc;
-      border-bottom: 2px solid #edf1f7;
+      background: var(--color-basic-100);
+      border-bottom: 2px solid var(--border-basic-color-3);
       border-radius: 1.5rem 1.5rem 0 0;
 
       .table-header {
@@ -362,12 +378,12 @@
         h6 {
           margin: 0;
           font-weight: 700;
-          color: #222b45;
+          color: var(--text-basic-color);
         }
 
         small {
           display: block;
-          color: #8f9bb3;
+          color: var(--text-hint-color);
           margin-top: 0.25rem;
         }
 
@@ -387,16 +403,16 @@
         ::ng-deep {
           ng2-smart-table {
             thead {
-              background: #f7f9fc;
+              background: var(--color-basic-100);
 
               th {
                 font-weight: 600;
-                color: #8f9bb3;
+                color: var(--text-hint-color);
                 text-transform: uppercase;
                 font-size: 0.75rem;
                 letter-spacing: 0.5px;
                 padding: 1rem;
-                border-bottom: 2px solid #edf1f7;
+                border-bottom: 2px solid var(--border-basic-color-3);
               }
             }
 
@@ -405,12 +421,12 @@
                 transition: all 0.2s;
 
                 &:hover {
-                  background: #f7f9fc;
+                  background: var(--color-basic-100);
                 }
 
                 td {
                   padding: 1rem;
-                  border-bottom: 1px solid #edf1f7;
+                  border-bottom: 1px solid var(--border-basic-color-3);
                   vertical-align: middle;
                 }
               }
@@ -484,7 +500,7 @@
 
       .transaction-card {
         border-radius: 1rem;
-        border: 2px solid #edf1f7;
+        border: 2px solid var(--border-basic-color-3);
         transition: all 0.3s;
         overflow: hidden;
 
@@ -506,8 +522,8 @@
         }
 
         nb-card-header {
-          background: #f7f9fc;
-          border-bottom: 1px solid #edf1f7;
+          background: var(--color-basic-100);
+          border-bottom: 1px solid var(--border-basic-color-3);
 
           .transaction-header {
             display: flex;
@@ -519,7 +535,7 @@
               align-items: center;
               gap: 0.75rem;
               font-weight: 600;
-              color: #222b45;
+              color: var(--text-basic-color);
 
               nb-icon {
                 font-size: 1.5rem;
@@ -532,18 +548,26 @@
           .transaction-amount {
             text-align: center;
             padding: 1.5rem 0;
-            border-bottom: 2px solid #edf1f7;
+            border-bottom: 2px solid var(--border-basic-color-3);
             margin-bottom: 1.5rem;
 
             .amount-value {
               font-size: 2rem;
               font-weight: 700;
               margin-bottom: 0.5rem;
+
+              &.text-success {
+                color: #00d68f;
+              }
+
+              &.text-danger {
+                color: #ff3d71;
+              }
             }
 
             .amount-label {
               font-size: 0.875rem;
-              color: #8f9bb3;
+              color: var(--text-hint-color);
               text-transform: uppercase;
               letter-spacing: 0.5px;
             }
@@ -560,7 +584,7 @@
               align-items: flex-start;
 
               small {
-                color: #8f9bb3;
+                color: var(--text-hint-color);
                 font-size: 0.75rem;
                 text-transform: uppercase;
                 letter-spacing: 0.5px;
@@ -569,7 +593,7 @@
 
               span {
                 text-align: right;
-                color: #222b45;
+                color: var(--text-basic-color);
                 font-weight: 500;
 
                 &.account-number {
@@ -580,7 +604,7 @@
                 &.reference {
                   font-family: "Courier New", monospace;
                   font-size: 0.75rem;
-                  color: #8f9bb3;
+                  color: var(--text-hint-color);
                 }
               }
             }
@@ -588,8 +612,8 @@
         }
 
         nb-card-footer {
-          background: #f7f9fc;
-          border-top: 1px solid #edf1f7;
+          background: var(--color-basic-100);
+          border-top: 1px solid var(--border-basic-color-3);
         }
       }
     }
@@ -617,7 +641,11 @@
           top: 0;
           bottom: 0;
           width: 2px;
-          background: linear-gradient(180deg, #3366ff 0%, #edf1f7 100%);
+          background: linear-gradient(
+            180deg,
+            #3366ff 0%,
+            var(--border-basic-color-3) 100%
+          );
         }
 
         .timeline-item {
@@ -639,7 +667,7 @@
             align-items: center;
             justify-content: center;
             background: white;
-            border: 3px solid #edf1f7;
+            border: 3px solid var(--border-basic-color-3);
             z-index: 2;
 
             &.success {
@@ -676,7 +704,7 @@
 
           .timeline-content {
             background: white;
-            border: 2px solid #edf1f7;
+            border: 2px solid var(--border-basic-color-3);
             border-radius: 1rem;
             padding: 1.5rem;
             transition: all 0.3s;
@@ -692,11 +720,11 @@
               align-items: center;
               margin-bottom: 1rem;
               padding-bottom: 1rem;
-              border-bottom: 1px solid #edf1f7;
+              border-bottom: 1px solid var(--border-basic-color-3);
 
               .timeline-date {
                 font-size: 0.875rem;
-                color: #8f9bb3;
+                color: var(--text-hint-color);
                 font-weight: 500;
               }
             }
@@ -715,7 +743,7 @@
 
                 strong {
                   font-size: 1.125rem;
-                  color: #222b45;
+                  color: var(--text-basic-color);
                 }
               }
 
@@ -723,6 +751,14 @@
                 font-size: 2rem;
                 font-weight: 700;
                 margin-bottom: 1rem;
+
+                &.text-success {
+                  color: #00d68f;
+                }
+
+                &.text-danger {
+                  color: #ff3d71;
+                }
               }
 
               .timeline-details {
@@ -731,7 +767,7 @@
                 gap: 0.5rem;
                 margin-bottom: 1rem;
                 padding: 1rem;
-                background: #f7f9fc;
+                background: var(--color-basic-100);
                 border-radius: 0.75rem;
 
                 div {
@@ -739,12 +775,12 @@
                   gap: 0.5rem;
 
                   small {
-                    color: #8f9bb3;
+                    color: var(--text-hint-color);
                     font-weight: 600;
                   }
 
                   span {
-                    color: #222b45;
+                    color: var(--text-basic-color);
 
                     &.account-number {
                       font-family: "Courier New", monospace;
@@ -756,10 +792,10 @@
 
               .timeline-balance {
                 font-size: 0.875rem;
-                color: #8f9bb3;
+                color: var(--text-hint-color);
 
                 strong {
-                  color: #222b45;
+                  color: var(--text-basic-color);
                   font-size: 1rem;
                 }
               }
@@ -787,8 +823,8 @@
         box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 
         nb-card-header {
-          background: #f7f9fc;
-          border-bottom: 2px solid #edf1f7;
+          background: var(--color-basic-100);
+          border-bottom: 2px solid var(--border-basic-color-3);
           border-radius: 1.5rem 1.5rem 0 0;
 
           h6 {
@@ -797,7 +833,7 @@
             gap: 0.75rem;
             margin: 0;
             font-weight: 700;
-            color: #222b45;
+            color: var(--text-basic-color);
 
             nb-icon {
               font-size: 1.5rem;
@@ -825,23 +861,25 @@
 
       nb-icon {
         font-size: 6rem;
-        color: #c5cee0;
+        color: var(--border-basic-color-2);
       }
     }
 
     h4 {
       font-weight: 700;
-      color: #222b45;
+      color: var(--text-basic-color);
       margin-bottom: 1rem;
     }
 
     p {
-      color: #8f9bb3;
+      color: var(--text-hint-color);
       font-size: 1.125rem;
       margin-bottom: 2rem;
     }
 
     button {
+      display: inline-flex;
+      align-items: center;
       gap: 0.75rem;
     }
   }
@@ -906,6 +944,7 @@
   .history-container {
     .page-header {
       padding: 1.5rem;
+      margin: -1.5rem -1.5rem 1.5rem -1.5rem;
       border-radius: 0 0 1.5rem 1.5rem;
 
       .header-content {
@@ -926,7 +965,9 @@
     }
 
     .view-selector,
+    .filters-card,
     .stats-grid,
+    .table-card,
     .cards-view,
     .timeline-view,
     .charts-section {
@@ -988,17 +1029,5 @@
         }
       }
     }
-  }
-}
-
-// Animations
-@keyframes fadeSlideIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
   }
 }

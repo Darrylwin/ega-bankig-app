@@ -1,19 +1,23 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { NbToastrService } from '@nebular/theme';
-import { WithdrawalRequest, Account } from '../../../@core/data/models/index';
+import { Component, OnInit, OnDestroy } from "@angular/core";
+import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { Router, ActivatedRoute } from "@angular/router";
+import { NbToastrService } from "@nebular/theme";
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
+import { WithdrawalRequest, Account } from "../../../@core/data/models/index";
 import {
   TransactionApiService,
   AccountApiService,
-} from '../../../@core/data/api/index';
+} from "../../../@core/data/api/index";
 
 @Component({
-  selector: 'ngx-withdrawal',
-  templateUrl: './withdrawal.component.html',
-  styleUrls: ['./withdrawal.component.scss'],
+  selector: "ngx-withdrawal",
+  templateUrl: "./withdrawal.component.html",
+  styleUrls: ["./withdrawal.component.scss"],
 })
-export class WithdrawalComponent implements OnInit {
+export class WithdrawalComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+
   withdrawalForm: FormGroup;
   isLoading = false;
   isSubmitting = false;
@@ -25,46 +29,15 @@ export class WithdrawalComponent implements OnInit {
   currentStep = 1;
   totalSteps = 3;
 
-  // Options
-  withdrawalReasons = [
-    { 
-      value: 'PERSONAL', 
-      label: 'Usage personnel',
-      icon: 'person-outline',
-      description: 'Besoins personnels quotidiens'
-    },
-    { 
-      value: 'BUSINESS', 
-      label:  'Affaires professionnelles',
-      icon: 'briefcase-outline',
-      description: 'Dépenses professionnelles'
-    },
-    { 
-      value: 'EMERGENCY', 
-      label: 'Urgence',
-      icon: 'alert-circle-outline',
-      description: 'Situation d\'urgence'
-    },
-    { 
-      value: 'OTHER', 
-      label: 'Autre',
-      icon: 'more-horizontal-outline',
-      description: 'Autre motif'
-    },
-  ];
-
   // Montants suggérés
-  quickAmounts = [1000, 2000, 5000, 10000, 20000, 50000];
+  quickAmounts = [50, 100, 200, 500, 1000, 2000];
 
-  // Limites de retrait
-  withdrawalLimits = {
-    daily: 1000,
-    weekly: 3000,
-    monthly: 5000,
-  };
+  // Limite journalière (peut être configurée)
+  dailyLimit = 5000;
 
   constructor(
     private fb: FormBuilder,
+    private route: ActivatedRoute,
     private router: Router,
     private transactionApi: TransactionApiService,
     private accountApi: AccountApiService,
@@ -75,39 +48,57 @@ export class WithdrawalComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadAccounts();
+
+    // Pré-remplir le accountId si passé en query params
+    const accountIdParam = this.route.snapshot.queryParams["accountId"];
+    if (accountIdParam) {
+      this.withdrawalForm.patchValue({ accountId: +accountIdParam });
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   /**
-   * Crée le formulaire
+   * Crée le formulaire (selon l'API:  accountId, amount, description optionnelle)
    */
   private createForm(): FormGroup {
     return this.fb.group({
-      accountId: ['', [Validators.required]],
-      amount: ['', [Validators. required, Validators.min(0.01)]],
-      reason: ['PERSONAL', [Validators.required]],
-      idVerified: [false, [Validators.requiredTrue]],
-      description: ['', [Validators.maxLength(200)]],
+      accountId: ["", [Validators.required]],
+      amount: ["", [Validators.required, Validators.min(0.01)]],
+      description: ["", [Validators.maxLength(200)]],
     });
   }
 
   /**
-   * Charge la liste des comptes
+   * Charge la liste des comptes actifs avec solde > 0
    */
   private loadAccounts(): void {
     this.isLoading = true;
 
     this.accountApi
-      .getAccounts({ page: 0, size: 100, sort: 'accountNumber,asc' })
+      .getAccounts({ page: 0, size: 1000, sort: "accountNumber,asc" })
+      .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
-          this.accounts = response.content. filter(
-            (acc) => acc.status === 'ACTIVE' && acc.balance > 0
+          this.accounts = response.content.filter(
+            (acc) => acc.status === "ACTIVE" && acc.balance > 0
           );
+
+          // Si accountId pré-rempli, sélectionner le compte
+          const preselectedId = this.withdrawalForm.value.accountId;
+          if (preselectedId) {
+            this.onAccountSelect();
+          }
+
           this.isLoading = false;
         },
         error: (error) => {
-          this. isLoading = false;
-          this.toastr.danger('Erreur lors du chargement des comptes', 'Erreur');
+          this.isLoading = false;
+          this.toastr.danger("Erreur lors du chargement des comptes", "Erreur");
+          console.error(error);
         },
       });
   }
@@ -116,34 +107,26 @@ export class WithdrawalComponent implements OnInit {
    * Lorsqu'un compte est sélectionné
    */
   onAccountSelect(): void {
-    const accountId = this.withdrawalForm.get('accountId')?.value;
+    const accountId = this.withdrawalForm.get("accountId")?.value;
     this.selectedAccount =
       this.accounts.find((acc) => acc.id === accountId) || null;
 
     if (this.selectedAccount) {
       // Calculer le montant maximum retirable
-      this.maxWithdrawalAmount = this.selectedAccount. balance;
-      
-      // Ajouter découvert pour compte courant
-      if (this.selectedAccount.accountType === 'CURRENT') {
-        this.maxWithdrawalAmount += 1000; // Découvert autorisé
-      }
-
-      // Limiter au maximum journalier
       this.maxWithdrawalAmount = Math.min(
-        this.maxWithdrawalAmount,
-        this. withdrawalLimits.daily
+        this.selectedAccount.balance,
+        this.dailyLimit
       );
 
       // Mettre à jour les validateurs
       this.withdrawalForm
-        .get('amount')
+        .get("amount")
         ?.setValidators([
-          Validators. required,
+          Validators.required,
           Validators.min(0.01),
           Validators.max(this.maxWithdrawalAmount),
         ]);
-      this.withdrawalForm.get('amount')?.updateValueAndValidity();
+      this.withdrawalForm.get("amount")?.updateValueAndValidity();
     }
   }
 
@@ -155,8 +138,8 @@ export class WithdrawalComponent implements OnInit {
       this.withdrawalForm.patchValue({ amount });
     } else {
       this.toastr.warning(
-        `Le montant dépasse la limite de ${this.formatCurrency(this.maxWithdrawalAmount)}`,
-        'Attention'
+        `Montant maximum:  ${this.formatCurrency(this.maxWithdrawalAmount)}`,
+        "Attention"
       );
     }
   }
@@ -169,22 +152,14 @@ export class WithdrawalComponent implements OnInit {
       // Valider l'étape actuelle
       if (this.currentStep === 1 && this.f.accountId.invalid) {
         this.f.accountId.markAsTouched();
-        this.toastr.warning('Veuillez sélectionner un compte', 'Attention');
+        this.toastr.warning("Veuillez sélectionner un compte", "Attention");
         return;
       }
 
-      if (this.currentStep === 2) {
-        if (this.f.amount.invalid || this.f.reason.invalid) {
-          this.f.amount.markAsTouched();
-          this.f.reason.markAsTouched();
-          this.toastr.warning('Veuillez remplir tous les champs', 'Attention');
-          return;
-        }
-
-        if (!this.f.idVerified.value) {
-          this.toastr. warning('La vérification d\'identité est obligatoire', 'Attention');
-          return;
-        }
+      if (this.currentStep === 2 && this.f.amount.invalid) {
+        this.f.amount.markAsTouched();
+        this.toastr.warning("Veuillez indiquer un montant valide", "Attention");
+        return;
       }
 
       this.currentStep++;
@@ -198,20 +173,24 @@ export class WithdrawalComponent implements OnInit {
   }
 
   /**
-   * Soumission du formulaire
+   * Soumission du formulaire (API:  POST /api/transactions/withdraw)
    */
   onSubmit(): void {
     if (this.withdrawalForm.invalid) {
       this.markFormGroupTouched(this.withdrawalForm);
-      this.toastr.warning('Veuillez remplir tous les champs correctement', 'Attention');
+      this.toastr.warning(
+        "Veuillez remplir tous les champs correctement",
+        "Attention"
+      );
       return;
     }
 
-    if (! this.f.idVerified.value) {
-      this.toastr.warning(
-        'La vérification de la pièce d\'identité est obligatoire',
-        'Attention'
-      );
+    // Vérifier que le solde est suffisant
+    if (
+      this.selectedAccount &&
+      this.f.amount.value > this.selectedAccount.balance
+    ) {
+      this.toastr.warning("Solde insuffisant", "Erreur");
       return;
     }
 
@@ -219,43 +198,54 @@ export class WithdrawalComponent implements OnInit {
 
     const withdrawalData: WithdrawalRequest = {
       accountId: this.withdrawalForm.value.accountId,
-      amount: this.withdrawalForm.value. amount,
+      amount: this.withdrawalForm.value.amount,
       description: this.withdrawalForm.value.description || undefined,
     };
 
-    this.transactionApi. withdraw(withdrawalData).subscribe({
-      next: (transaction) => {
-        this.isSubmitting = false;
+    this.transactionApi
+      .withdraw(withdrawalData)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (transaction) => {
+          this.isSubmitting = false;
 
-        this.toastr.success(
-          `Retrait de ${this.formatCurrency(transaction.amount)} effectué avec succès`,
-          'Succès',
-          { duration: 5000 }
-        );
+          this.toastr.success(
+            `Retrait de ${this.formatCurrency(
+              transaction.amount
+            )} effectué avec succès`,
+            "Succès",
+            { duration: 5000 }
+          );
 
-        setTimeout(() => {
-          this.router.navigate(['/pages/transactions/history']);
-        }, 1500);
-      },
-      error:  (error) => {
-        this.isSubmitting = false;
+          setTimeout(() => {
+            this.router.navigate([
+              "/pages/accounts/detail",
+              this.selectedAccount?.id,
+            ]);
+          }, 1500);
+        },
+        error: (error) => {
+          this.isSubmitting = false;
 
-        if (error.status === 400) {
-          this.toastr.warning('Solde insuffisant', 'Erreur');
-        } else if (error.status === 403) {
-          this.toastr.warning('Compte bloqué ou limité', 'Accès refusé');
-        } else {
-          this.toastr.danger('Erreur lors du retrait', 'Erreur');
-        }
-      },
-    });
+          if (error.status === 400) {
+            this.toastr.warning(
+              "Solde insuffisant ou données invalides",
+              "Erreur"
+            );
+          } else if (error.status === 404) {
+            this.toastr.warning("Compte introuvable", "Erreur");
+          } else {
+            this.toastr.danger("Erreur lors du retrait", "Erreur");
+          }
+        },
+      });
   }
 
   /**
    * Annule et retourne
    */
   onCancel(): void {
-    this.router.navigate(['/pages/transactions']);
+    this.router.navigate(["/pages/transactions"]);
   }
 
   /**
@@ -263,13 +253,6 @@ export class WithdrawalComponent implements OnInit {
    */
   get f() {
     return this.withdrawalForm.controls;
-  }
-
-  /**
-   * Récupère le motif sélectionné
-   */
-  getSelectedReason() {
-    return this.withdrawalReasons.find((r) => r.value === this. f.reason.value);
   }
 
   /**
@@ -287,20 +270,20 @@ export class WithdrawalComponent implements OnInit {
    */
   getProgressStatus(): string {
     const percentage = this.calculateWithdrawalPercentage();
-    if (percentage > 90) return 'danger';
-    if (percentage > 70) return 'warning';
-    return 'success';
+    if (percentage > 90) return "danger";
+    if (percentage > 70) return "warning";
+    return "success";
   }
 
   /**
-   * Vérifie si le montant est élevé
+   * Vérifie si le montant est élevé (> 70%)
    */
   isHighAmount(): boolean {
     return this.calculateWithdrawalPercentage() > 70;
   }
 
   /**
-   * Vérifie si le montant est critique
+   * Vérifie si le montant est critique (> 90%)
    */
   isCriticalAmount(): boolean {
     return this.calculateWithdrawalPercentage() > 90;
@@ -310,19 +293,19 @@ export class WithdrawalComponent implements OnInit {
    * Helpers
    */
   formatCurrency(amount: number): string {
-    return new Intl.NumberFormat('fr-FR', {
-      style: 'currency',
-      currency: 'EUR',
-    }).format(amount);
+    return new Intl.NumberFormat("fr-FR", {
+      style: "currency",
+      currency: "EUR",
+    }).format(amount || 0);
   }
 
   formatAccountNumber(iban: string): string {
-    return iban ?  iban.match(/.{1,4}/g)?.join(' ') || iban : '';
+    return iban ? iban.match(/.{1,4}/g)?.join(" ") || iban : "";
   }
 
   private markFormGroupTouched(formGroup: FormGroup): void {
     Object.values(formGroup.controls).forEach((control) => {
-      control. markAsTouched();
+      control.markAsTouched();
       if (control instanceof FormGroup) {
         this.markFormGroupTouched(control);
       }

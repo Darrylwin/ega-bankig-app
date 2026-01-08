@@ -1,6 +1,6 @@
-import { Component, OnInit, ViewChild } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
-import { NbToastrService, NbDialogService } from "@nebular/theme";
+import { NbToastrService } from "@nebular/theme";
 import { LocalDataSource } from "ng2-smart-table";
 import {
   TransactionApiService,
@@ -59,17 +59,7 @@ export class HistoryComponent implements OnInit {
           };
           return types[value] || value;
         },
-        filter: {
-          type: "list",
-          config: {
-            selectText: "Tous",
-            list: [
-              { value: "DEPOSIT", title: "Dépôt" },
-              { value: "WITHDRAWAL", title: "Retrait" },
-              { value: "TRANSFER", title: "Virement" },
-            ],
-          },
-        },
+        filter: false,
         width: "10%",
       },
       sourceAccountNumber: {
@@ -134,17 +124,7 @@ export class HistoryComponent implements OnInit {
           };
           return statusMap[value] || value;
         },
-        filter: {
-          type: "list",
-          config: {
-            selectText: "Tous",
-            list: [
-              { value: "SUCCESS", title: "Succès" },
-              { value: "PENDING", title: "En attente" },
-              { value: "FAILED", title: "Échoué" },
-            ],
-          },
-        },
+        filter: false,
         width: "10%",
       },
       description: {
@@ -190,7 +170,11 @@ export class HistoryComponent implements OnInit {
     types: [
       { value: "ALL", label: "Tous les types", icon: "list-outline" },
       { value: "DEPOSIT", label: "Dépôts", icon: "trending-up-outline" },
-      { value: "WITHDRAWAL", label: "Retraits", icon: "trending-down-outline" },
+      {
+        value: "WITHDRAWAL",
+        label: "Retraits",
+        icon: "trending-down-outline",
+      },
       { value: "TRANSFER", label: "Virements", icon: "swap-outline" },
     ],
     statuses: [
@@ -229,8 +213,7 @@ export class HistoryComponent implements OnInit {
     private router: Router,
     private transactionApi: TransactionApiService,
     private accountApi: AccountApiService,
-    private toastr: NbToastrService,
-    private dialogService: NbDialogService
+    private toastr: NbToastrService
   ) {}
 
   ngOnInit(): void {
@@ -420,60 +403,44 @@ export class HistoryComponent implements OnInit {
    * Prépare les données pour les graphiques
    */
   private prepareChartData(): void {
-    // Graphique par type
+    // 1. Répartition par type
     this.transactionsByTypeData = [
       { name: "Dépôts", value: this.stats.depositsCount },
       { name: "Retraits", value: this.stats.withdrawalsCount },
       { name: "Virements", value: this.stats.transfersCount },
     ].filter((item) => item.value > 0);
 
-    // Graphique par date
-    this.transactionsByDateData = this.generateTransactionsByDate();
-  }
-
-  /**
-   * Génère les données par date
-   */
-  private generateTransactionsByDate(): any[] {
+    // 2. Transactions par date (derniers 7 jours)
     const dateMap: { [key: string]: number } = {};
-
-    this.filteredTransactions.forEach((tx) => {
-      const date = new Date(tx.transactionDate).toLocaleDateString("fr-FR", {
+    const last7Days = Array.from({ length: 7 }, (_, i) => {
+      const date = new Date();
+      date.setDate(date.getDate() - (6 - i));
+      const key = date.toLocaleDateString("fr-FR", {
         day: "2-digit",
-        month: "2-digit",
+        month: "short",
       });
-
-      dateMap[date] = (dateMap[date] || 0) + 1;
+      dateMap[key] = 0;
+      return key;
     });
 
-    return Object.entries(dateMap)
-      .map(([name, value]) => ({ name, value }))
-      .slice(-10);
+    this.filteredTransactions.forEach((tx) => {
+      const date = new Date(tx.transactionDate);
+      const key = date.toLocaleDateString("fr-FR", {
+        day: "2-digit",
+        month: "short",
+      });
+      if (dateMap.hasOwnProperty(key)) {
+        dateMap[key]++;
+      }
+    });
+
+    this.transactionsByDateData = Object.entries(dateMap).map(
+      ([name, value]) => ({ name, value })
+    );
   }
 
   /**
-   * Change le mode d'affichage
-   */
-  setViewMode(mode: "table" | "cards" | "timeline"): void {
-    this.viewMode = mode;
-  }
-
-  /**
-   * Réinitialise les filtres
-   */
-  resetFilters(): void {
-    this.selectedAccountId = this.accountIdFromRoute
-      ? this.accountIdFromRoute.toString()
-      : "ALL";
-    this.selectedType = "ALL";
-    this.selectedStatus = "ALL";
-    this.searchTerm = "";
-    this.setDefaultDates();
-    this.loadTransactions();
-  }
-
-  /**
-   * Périodes prédéfinies
+   * Périodes rapides
    */
   setToday(): void {
     const today = new Date();
@@ -496,7 +463,6 @@ export class HistoryComponent implements OnInit {
     const today = new Date();
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(today.getDate() - 7);
-
     this.startDate = sevenDaysAgo.toISOString().split("T")[0];
     this.endDate = today.toISOString().split("T")[0];
     this.currentPeriod = "week";
@@ -507,7 +473,6 @@ export class HistoryComponent implements OnInit {
     const today = new Date();
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(today.getDate() - 30);
-
     this.startDate = thirtyDaysAgo.toISOString().split("T")[0];
     this.endDate = today.toISOString().split("T")[0];
     this.currentPeriod = "30days";
@@ -517,7 +482,6 @@ export class HistoryComponent implements OnInit {
   setCurrentMonth(): void {
     const today = new Date();
     const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
-
     this.startDate = firstDay.toISOString().split("T")[0];
     this.endDate = today.toISOString().split("T")[0];
     this.currentPeriod = "month";
@@ -528,7 +492,6 @@ export class HistoryComponent implements OnInit {
     const today = new Date();
     const firstDay = new Date(today.getFullYear(), today.getMonth() - 1, 1);
     const lastDay = new Date(today.getFullYear(), today.getMonth(), 0);
-
     this.startDate = firstDay.toISOString().split("T")[0];
     this.endDate = lastDay.toISOString().split("T")[0];
     this.currentPeriod = "lastMonth";
@@ -538,7 +501,6 @@ export class HistoryComponent implements OnInit {
   setCurrentYear(): void {
     const today = new Date();
     const firstDay = new Date(today.getFullYear(), 0, 1);
-
     this.startDate = firstDay.toISOString().split("T")[0];
     this.endDate = today.toISOString().split("T")[0];
     this.currentPeriod = "year";
@@ -546,28 +508,43 @@ export class HistoryComponent implements OnInit {
   }
 
   /**
-   * Voir les détails d'une transaction
+   * Réinitialise les filtres
    */
-  onViewTransaction(event: any): void {
-    const transaction = event.data as Transaction;
-    this.showTransactionDetails(transaction);
+  resetFilters(): void {
+    this.selectedType = "ALL";
+    this.selectedStatus = "ALL";
+    this.searchTerm = "";
+    this.setDefaultDates();
+    if (this.selectedAccountId !== "ALL") {
+      this.loadTransactions();
+    }
+  }
+
+  /**
+   * Change le mode d'affichage
+   */
+  setViewMode(mode: "table" | "cards" | "timeline"): void {
+    this.viewMode = mode;
+  }
+
+  /**
+   * Action personnalisée du tableau
+   */
+  onCustomAction(event: any): void {
+    if (event.action === "view") {
+      this.showTransactionDetails(event.data);
+    }
   }
 
   /**
    * Affiche les détails d'une transaction
    */
   showTransactionDetails(transaction: Transaction): void {
-    // TODO: Ouvrir un dialog avec les détails
-    console.log("Transaction details:", transaction);
-  }
-
-  /**
-   * Actions personnalisées du tableau
-   */
-  onCustomAction(event: any): void {
-    if (event.action === "view") {
-      this.onViewTransaction(event);
-    }
+    this.toastr.info(
+      `Référence: ${transaction.transactionReference}`,
+      "Détails de la transaction",
+      { duration: 5000 }
+    );
   }
 
   /**
@@ -579,127 +556,76 @@ export class HistoryComponent implements OnInit {
       return;
     }
 
-    const csvContent = this.convertToCSV(this.filteredTransactions);
-    this.downloadFile(
-      csvContent,
-      `transactions_${this.selectedAccountId}_${
-        new Date().toISOString().split("T")[0]
-      }.csv`,
-      "text/csv"
-    );
-    this.toastr.success("Export CSV réussi", "Succès");
-  }
-
-  /**
-   * Export PDF
-   */
-  exportToPDF(): void {
-    if (this.filteredTransactions.length === 0) {
-      this.toastr.warning("Aucune transaction à exporter", "Attention");
-      return;
-    }
-
-    this.toastr.info("Génération du PDF en cours...", "Export PDF");
-
-    // TODO: Implémenter l'export PDF avec jsPDF
-    setTimeout(() => {
-      this.toastr.success("Export PDF réussi", "Succès");
-    }, 1500);
-  }
-
-  /**
-   * Export Excel
-   */
-  exportToExcel(): void {
-    if (this.filteredTransactions.length === 0) {
-      this.toastr.warning("Aucune transaction à exporter", "Attention");
-      return;
-    }
-
-    this.toastr.info("Génération du fichier Excel... ", "Export Excel");
-
-    // TODO: Implémenter l'export Excel
-    setTimeout(() => {
-      this.toastr.success("Export Excel réussi", "Succès");
-    }, 1500);
-  }
-
-  /**
-   * Imprimer
-   */
-  print(): void {
-    window.print();
-  }
-
-  /**
-   * Convertit en CSV
-   */
-  private convertToCSV(transactions: Transaction[]): string {
     const headers = [
       "Date",
       "Type",
       "Compte Source",
       "Compte Destination",
       "Montant",
-      "Solde après",
+      "Solde Après",
       "Statut",
-      "Référence",
       "Description",
+      "Référence",
     ];
 
-    const rows = transactions.map((tx) => [
+    const rows = this.filteredTransactions.map((tx) => [
       new Date(tx.transactionDate).toLocaleString("fr-FR"),
       tx.transactionType === "DEPOSIT"
         ? "Dépôt"
         : tx.transactionType === "WITHDRAWAL"
         ? "Retrait"
         : "Virement",
-      this.formatAccountNumber(tx.sourceAccountNumber),
-      tx.destinationAccountNumber
-        ? this.formatAccountNumber(tx.destinationAccountNumber)
-        : "",
-      this.formatCurrency(tx.amount),
-      this.formatCurrency(tx.balanceAfter),
+      tx.sourceAccountNumber || "—",
+      tx.destinationAccountNumber || "—",
+      tx.amount.toString(),
+      tx.balanceAfter.toString(),
       tx.status === "SUCCESS"
         ? "Succès"
         : tx.status === "PENDING"
         ? "En attente"
         : "Échoué",
+      tx.description || "—",
       tx.transactionReference,
-      tx.description || "",
     ]);
 
-    return [
+    const csvContent = [
       headers.join(","),
       ...rows.map((row) => row.map((cell) => `"${cell}"`).join(",")),
     ].join("\n");
-  }
 
-  /**
-   * Télécharge un fichier
-   */
-  private downloadFile(
-    content: string,
-    filename: string,
-    mimeType: string
-  ): void {
-    const blob = new Blob(["\ufeff" + content], {
-      type: `${mimeType};charset=utf-8;`,
+    const blob = new Blob(["\ufeff" + csvContent], {
+      type: "text/csv;charset=utf-8;",
     });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = filename;
+    link.download = `transactions_${
+      new Date().toISOString().split("T")[0]
+    }.csv`;
     link.click();
-    URL.revokeObjectURL(link.href);
+
+    this.toastr.success("Export CSV réussi", "Succès");
+  }
+
+  /**
+   * Export PDF (simulation)
+   */
+  exportToPDF(): void {
+    this.toastr.info("Génération du PDF en cours...", "Export PDF");
+    setTimeout(() => {
+      this.toastr.success("Export PDF réussi", "Succès");
+    }, 1500);
+  }
+
+  /**
+   * Impression
+   */
+  print(): void {
+    window.print();
   }
 
   /**
    * Helpers
    */
-  formatAccountNumber(iban: string): string {
-    return iban ? iban.match(/.{1,4}/g)?.join(" ") || iban : "";
-  }
-
   formatCurrency(amount: number): string {
     return new Intl.NumberFormat("fr-FR", {
       style: "currency",
@@ -707,18 +633,22 @@ export class HistoryComponent implements OnInit {
     }).format(amount);
   }
 
-  formatNumber(num: number): string {
-    return num.toLocaleString("fr-FR");
+  formatAccountNumber(iban: string): string {
+    return iban ? iban.match(/.{1,4}/g)?.join(" ") || iban : "";
   }
 
   formatDate(dateString: string): string {
-    return new Date(dateString).toLocaleDateString("fr-FR", {
+    return new Date(dateString).toLocaleString("fr-FR", {
+      day: "2-digit",
+      month: "2-digit",
       year: "numeric",
-      month: "long",
-      day: "numeric",
       hour: "2-digit",
       minute: "2-digit",
     });
+  }
+
+  formatNumber(num: number): string {
+    return num.toLocaleString("fr-FR");
   }
 
   getTransactionIcon(type: string): string {
@@ -748,16 +678,6 @@ export class HistoryComponent implements OnInit {
     return colors[status] || "basic";
   }
 
-  /**
-   * Retourne le compte sélectionné
-   */
-  getSelectedAccount(): Account | undefined {
-    return this.accounts.find((acc) => acc.id === +this.selectedAccountId);
-  }
-
-  /**
-   * Calcule le solde net
-   */
   getNetBalance(): number {
     return this.stats.totalDeposits - this.stats.totalWithdrawals;
   }

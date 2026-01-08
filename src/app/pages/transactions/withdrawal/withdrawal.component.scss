@@ -1,106 +1,400 @@
-@import "../deposit/deposit.component.scss";
-
 .withdrawal-container {
-  // Hérite de tous les styles de deposit
+  min-height: 100vh;
+  padding-bottom: 3rem;
 
-  // Header spécifique au retrait
+  // Header
   .page-header {
     background: linear-gradient(
       135deg,
-      var(--color-danger-500) 0%,
-      var(--color-danger-300) 100%
+      var(--color-danger-500),
+      var(--color-danger-700)
     );
-    box-shadow: 0 4px 20px rgba(var(--color-danger-500-rgb), 0.3);
+    color: white;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border-radius: 0 0 1 5rem 1.5rem;
+    box-shadow: 0 4px 20px rgba(255, 61, 113, 0.3);
+
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+
+      .back-btn {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.3);
+        }
+      }
+    }
+
+    .page-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+
+      nb-icon {
+        font-size: 2rem;
+      }
+    }
+
+    .page-subtitle {
+      font-size: 1rem;
+      opacity: 0.9;
+      margin: 0;
+    }
   }
 
-  // Steps spécifiques
-  .step-item {
-    &.active {
-      .step-circle {
-        background: linear-gradient(
-          135deg,
-          var(--color-danger-500) 0%,
-          var(--color-danger-300) 100%
-        );
-        box-shadow: 0 4px 12px rgba(var(--color-danger-500-rgb), 0.3);
+  // Progress Steps
+  .steps-progress {
+    max-width: 1400px;
+    margin: 0 auto 3rem;
+    padding: 0 2rem;
+
+    .steps-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+
+      .step-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.75rem;
+
+        .step-circle {
+          width: 60px;
+          height: 60px;
+          border-radius: 50%;
+          border: 3px solid var(--border-basic-color-3);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 700;
+          font-size: 1.25rem;
+          color: var(--text-hint-color);
+          background: var(--background-basic-color-1);
+          transition: all 0.3s;
+
+          nb-icon {
+            font-size: 1.75rem;
+          }
+        }
+
+        .step-label {
+          font-size: 0.875rem;
+          color: var(--text-hint-color);
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          transition: all 0.3s;
+        }
+
+        &.active {
+          .step-circle {
+            background: var(--color-danger-500);
+            border-color: var(--color-danger-500);
+            color: white;
+          }
+
+          .step-label {
+            color: var(--text-basic-color);
+          }
+        }
+
+        &.completed {
+          .step-circle {
+            background: var(--color-danger-500);
+            border-color: var(--color-danger-500);
+            color: white;
+          }
+        }
       }
 
-      .step-label {
+      .step-line {
+        flex: 1;
+        max-width: 120px;
+        height: 3px;
+        background: var(--border-basic-color-3);
+        transition: all 0.3s;
+
+        &.active {
+          background: var(--color-danger-500);
+        }
+      }
+    }
+  }
+
+  // Loading
+  .loading-container {
+    text-align: center;
+    padding: 4rem 2rem;
+
+    .loading-text {
+      margin-top: 1 5rem;
+      color: var(--text-hint-color);
+    }
+  }
+
+  // Form Content
+  .form-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 2rem;
+  }
+
+  // Step Cards
+  .step-card {
+    border-radius: 1.5rem;
+    border: none;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    margin-bottom: 2rem;
+    background: var(--background-basic-color-1);
+
+    nb-card-header {
+      border-bottom: 1px solid var(--border-basic-color-3);
+      padding: 1.5rem 2rem;
+
+      .step-header {
+        .step-badge {
+          display: inline-block;
+          padding: 0.25rem 0.75rem;
+          background: var(--color-danger-500);
+          color: white;
+          border-radius: 2rem;
+          font-size: 0.75rem;
+          font-weight: 700;
+          margin-bottom: 1rem;
+        }
+
+        h3 {
+          margin: 0 0 0.5rem;
+          font-weight: 700;
+          color: var(--text-basic-color);
+          font-size: 1.5rem;
+        }
+
+        p {
+          margin: 0;
+          color: var(--text-hint-color);
+          font-size: 0.9375rem;
+        }
+      }
+    }
+
+    nb-card-body {
+      padding: 2rem;
+    }
+
+    nb-card-footer {
+      border-top: 1px solid var(--border-basic-color-3);
+      padding: 1.5rem 2rem;
+
+      .step-actions {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+
+        button {
+          min-width: 140px;
+        }
+      }
+    }
+  }
+
+  // Form Sections
+  .form-section {
+    margin-bottom: 2rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .form-label {
+    display: block;
+    font-weight: 600;
+    color: var(--text-basic-color);
+    margin-bottom: 0.75rem;
+    font-size: 0.9375rem;
+
+    &.required::after {
+      content: " *";
+      color: var(--color-danger-500);
+    }
+  }
+
+  .field-error {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-danger-500);
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+
+    nb-icon {
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+  }
+
+  .field-hint {
+    display: block;
+    font-size: 0.8125rem;
+    color: var(--text-hint-color);
+    margin-top: 0.5rem;
+  }
+
+  // Account Option
+  .account-option {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem;
+
+    .account-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 0.75rem;
+      background: rgba(255, 61, 113, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+
+      nb-icon {
+        color: var(--color-danger-500);
+        font-size: 1.25rem;
+      }
+    }
+
+    .account-details {
+      flex: 1;
+
+      .account-number {
+        font-weight: 600;
+        color: var(--text-basic-color);
+        font-family: "Courier New", monospace;
+        font-size: 0.9375rem;
+      }
+
+      small {
+        font-size: 0.8125rem;
+        color: var(--text-hint-color);
+      }
+    }
+
+    .account-balance {
+      font-weight: 700;
+      color: var(--text-basic-color);
+      font-size: 0.9375rem;
+    }
+  }
+
+  // Selected Account Card
+  .selected-account-card {
+    margin-top: 1.5rem;
+    background: var(--background-basic-color-3);
+    border-radius: 1rem;
+    border: 2px solid var(--color-danger-500);
+    overflow: hidden;
+
+    .account-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.25rem;
+      background: rgba(255, 61, 113, 0.08);
+      border-bottom: 1px solid var(--border-basic-color-3);
+
+      nb-icon {
+        font-size: 2rem;
         color: var(--color-danger-500);
       }
     }
 
-    &.completed {
-      .step-circle {
-        background: var(--color-danger-500);
+    .account-card-body {
+      padding: 1.25rem;
+    }
+
+    .account-info-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border-basic-color-3);
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      small {
+        font-size: 0.8125rem;
+        color: var(--text-hint-color);
+      }
+
+      strong {
+        font-weight: 600;
+        color: var(--text-basic-color);
+
+        &.balance {
+          font-size: 1.125rem;
+          color: var(--color-danger-500);
+        }
+
+        &.max-amount {
+          font-size: 1.125rem;
+          color: var(--color-danger-500);
+        }
       }
     }
   }
 
-  .step-line {
-    &.active {
-      background: linear-gradient(
-        90deg,
-        var(--color-danger-500) 0%,
-        var(--color-danger-300) 100%
-      );
-    }
-  }
+  // Amount Input
+  .amount-input-wrapper {
+    position: relative;
 
-  // Badge étape
-  .step-badge {
-    background: linear-gradient(
-      135deg,
-      var(--color-danger-500) 0%,
-      var(--color-danger-300) 100%
-    ) !important;
-  }
-
-  // Compte sélectionné
-  .selected-account-card {
-    border-color: var(--color-danger-500);
-
-    .account-card-header nb-icon {
-      color: var(--color-danger-500);
-    }
-
-    .balance {
-      color: var(--color-danger-500);
-    }
-
-    .max-amount {
-      color: var(--color-danger-500);
-      font-size: 1.25rem;
-    }
-  }
-
-  .account-info-banner {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 1rem;
-    background: rgba(var(--color-warning-500-rgb), 0.1);
-    border-radius: 0.75rem;
-    margin-top: 1rem;
-    border-left: 4px solid var(--color-warning-500);
-
-    nb-icon {
+    .input-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
       font-size: 1.5rem;
-      color: var(--color-warning-800);
-      flex-shrink: 0;
+      color: var(--color-danger-500);
+      z-index: 2;
     }
 
-    span {
-      color: var(--color-warning-800);
-      font-weight: 600;
+    input {
+      padding-left: 3 5rem !important;
+      font-size: 1.5rem;
+      font-weight: 700;
+      text-align: right;
     }
   }
 
-  // Barre de progression du retrait
+  // Withdrawal Progress
   .withdrawal-progress {
     margin-top: 1.5rem;
     padding: 1rem;
-    background: var(--color-basic-100);
+    background: var(--background-basic-color-3);
     border-radius: 0.75rem;
 
     .progress-header {
@@ -111,14 +405,13 @@
 
       small {
         color: var(--text-hint-color);
-        font-size: 0.85rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
+        font-size: 0.875rem;
+        font-weight: 600;
       }
 
       strong {
         color: var(--text-basic-color);
-        font-size: 1.25rem;
+        font-size: 1.125rem;
       }
     }
 
@@ -128,196 +421,88 @@
 
       small {
         color: var(--text-hint-color);
-        font-size: 0.8rem;
+        font-size: 0.8125rem;
       }
     }
   }
 
-  // Motifs de retrait
-  .reason-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-  }
+  // Quick Amounts
+  .quick-amounts {
+    margin-top: 1.5rem;
 
-  .reason-card {
-    position: relative;
-    border: 2px solid var(--border-basic-color-3);
-    border-radius: 1rem;
-    padding: 1.25rem;
-    cursor: pointer;
-    transition: all 0.3s;
-    background: var(--background-basic-color-1);
-
-    &:hover {
-      border-color: var(--border-basic-color-2);
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-hover);
-    }
-
-    &.selected {
-      border-color: var(--color-danger-500);
-      background: linear-gradient(
-        135deg,
-        rgba(var(--color-danger-500-rgb), 0.05) 0%,
-        rgba(var(--color-danger-300-rgb), 0.05) 100%
-      );
-      box-shadow: 0 4px 12px rgba(var(--color-danger-500-rgb), 0.2);
-
-      .reason-icon {
-        background: linear-gradient(
-          135deg,
-          var(--color-danger-500) 0%,
-          var(--color-danger-300) 100%
-        );
-
-        nb-icon {
-          color: var(--text-control-color);
-        }
-      }
-    }
-
-    .reason-radio {
-      display: none;
-    }
-
-    .reason-icon {
-      width: 45px;
-      height: 45px;
-      border-radius: 0.75rem;
-      background: var(--color-basic-100);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 0.75rem;
-      transition: all 0.3s;
-
-      nb-icon {
-        font-size: 1.25rem;
-        color: var(--color-danger-500);
-      }
-    }
-
-    .reason-info {
-      h6 {
-        font-weight: 700;
-        color: var(--text-basic-color);
-        margin: 0 0 0.25rem 0;
-        font-size: 0.95rem;
-      }
-
-      p {
-        font-size: 0.8rem;
-        color: var(--text-hint-color);
-        margin: 0;
-        line-height: 1.3;
-      }
-    }
-
-    .reason-check {
-      position: absolute;
-      top: 0 75rem;
-      right: 0.75rem;
-      color: var(--color-danger-500);
-
-      nb-icon {
-        font-size: 1.5rem;
-      }
-    }
-  }
-
-  // Carte de vérification
-  .verification-card {
-    background: linear-gradient(
-      135deg,
-      var(--color-basic-100) 0%,
-      var(--background-basic-color-1) 100%
-    );
-    border: 2px solid var(--color-primary-500);
-    border-radius: 1rem;
-    padding: 1.5rem;
-
-    .verification-header {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-      padding-bottom: 1rem;
-      border-bottom: 1px solid var(--border-basic-color-3);
-
-      nb-icon {
-        font-size: 2rem;
-        color: var(--color-primary-500);
-      }
-
-      h6 {
-        margin: 0;
-        font-weight: 700;
-        color: var(--text-basic-color);
-      }
-    }
-
-    .verification-body {
-      nb-checkbox {
-        ::ng-deep {
-          .label {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-
-            strong {
-              font-size: 1rem;
-              color: var(--text-basic-color);
-            }
-          }
-        }
-      }
-
-      .verification-hint {
-        font-size: 0.85rem;
-        color: var(--text-hint-color);
-        margin: 0.5rem 0 0 0;
-        line-height: 1.4;
-      }
-    }
-
-    .verification-error {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: var(--color-danger-500);
+    .quick-label {
+      display: block;
       font-size: 0.875rem;
-      margin-top: 1rem;
-      padding: 0.75rem;
-      background: rgba(var(--color-danger-500-rgb), 0.1);
-      border-radius: 0.5rem;
+      color: var(--text-hint-color);
+      margin-bottom: 0.75rem;
+      font-weight: 600;
+    }
 
-      nb-icon {
-        font-size: 1rem;
-        flex-shrink: 0;
+    .quick-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+
+      button {
+        transition: all 0.2s;
+
+        &:hover:not(:disabled) {
+          background: rgba(255, 61, 113, 0.1);
+          border-color: var(--color-danger-500);
+          color: var(--color-danger-500);
+          transform: translateY(-2px);
+        }
       }
     }
   }
 
-  // Confirmation - montant danger
-  .summary-amount {
-    &.danger {
-      background: linear-gradient(
-        135deg,
-        rgba(var(--color-danger-500-rgb), 0.05) 0%,
-        rgba(var(--color-danger-300-rgb), 0.05) 100%
-      );
+  // Confirmation Summary
+  .confirmation-summary {
+    .summary-amount {
+      text-align: center;
+      margin-bottom: 2rem;
+
+      &.danger {
+        .amount-icon {
+          background: linear-gradient(
+            135deg,
+            var(--color-danger-500),
+            var(--color-danger-600)
+          );
+        }
+
+        .amount-value {
+          color: var(--color-danger-500);
+        }
+      }
 
       .amount-icon {
-        background: linear-gradient(
-          135deg,
-          var(--color-danger-500) 0%,
-          var(--color-danger-300) 100%
-        );
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+
+        nb-icon {
+          font-size: 3rem;
+          color: white;
+        }
       }
 
       .amount-value {
-        color: var(--color-danger-500);
+        font-size: 2 5rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+      }
+
+      .amount-label {
+        font-size: 0.9375rem;
+        color: var(--text-hint-color);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 600;
       }
 
       .amount-warning {
@@ -329,8 +514,8 @@
         padding: 0.75rem;
         background: rgba(var(--color-warning-500-rgb), 0.1);
         border-radius: 0.5rem;
-        color: var(--color-warning-800);
-        font-size: 0.85rem;
+        color: var(--color-warning-700);
+        font-size: 0.875rem;
         font-weight: 600;
 
         nb-icon {
@@ -338,209 +523,232 @@
         }
       }
     }
-  }
 
-  .detail-row {
-    &.danger {
-      .detail-value {
-        color: var(--color-danger-500);
-      }
-    }
+    .summary-details {
+      background: var(--background-basic-color-3);
+      border-radius: 1rem;
+      overflow: hidden;
 
-    &.usage {
-      background: var(--color-basic-100);
-
-      .detail-value {
+      .detail-row {
         display: flex;
+        justify-content: space-between;
         align-items: center;
-        gap: 0.5rem;
-      }
-    }
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--border-basic-color-3);
 
-    .detail-value.success {
-      color: var(--color-success-500);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
+        &:last-child {
+          border-bottom: none;
+        }
 
-      nb-icon {
-        font-size: 1.25rem;
-      }
-    }
-  }
+        &.divider {
+          border-top: 2px solid var(--border-basic-color-3);
+        }
 
-  // Sidebar spécifique
-  .summary-card {
-    nb-progress-bar {
-      ::ng-deep .progress-value {
-        background: linear-gradient(
-          90deg,
-          var(--color-danger-500) 0%,
-          var(--color-danger-300) 100%
-        );
-      }
-    }
-  }
+        &.highlight {
+          &.danger {
+            background: rgba(255, 61, 113, 0.08);
 
-  .limits-card {
-    border-radius: 1rem;
-    border: none;
-    box-shadow: var(--shadow);
+            .detail-value {
+              color: var(--color-danger-500);
+            }
+          }
+        }
 
-    nb-card-header {
-      background: var(--color-basic-100);
-      border-bottom: 1px solid var(--border-basic-color-3);
+        &.usage {
+          background: var(--background-basic-color-2);
 
-      h6 {
-        margin: 0;
-        font-weight: 600;
-        color: var(--text-basic-color);
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
+          .detail-value {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+          }
+        }
 
-        nb-icon {
-          font-size: 1.25rem;
+        .detail-label {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-size: 0.9375rem;
+          color: var(--text-hint-color);
+
+          nb-icon {
+            font-size: 1 125rem;
+          }
+        }
+
+        .detail-value {
+          font-weight: 600;
+          color: var(--text-basic-color);
         }
       }
     }
-
-    nb-card-body {
-      padding: 1.5rem;
-    }
-
-    .limit-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem;
-      background: var(--color-basic-100);
-      border-radius: 0.75rem;
-      margin-bottom: 0.75rem;
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-
-      .limit-label {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        color: var(--text-hint-color);
-        font-size: 0.9rem;
-        font-weight: 500;
-
-        nb-icon {
-          font-size: 1 25rem;
-        }
-      }
-
-      .limit-value {
-        font-weight: 700;
-        color: var(--color-danger-500);
-        font-size: 1rem;
-      }
-    }
   }
 
-  .security-card {
-    border-radius: 1rem;
-    border: none;
-    box-shadow: var(--shadow);
-
-    nb-card-header {
-      background: var(--color-basic-100);
-      border-bottom: 1px solid var(--border-basic-color-3);
-
-      h6 {
-        margin: 0;
-        font-weight: 600;
-        color: var(--text-basic-color);
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-
-        nb-icon {
-          font-size: 1.25rem;
-        }
-      }
-    }
-
-    nb-card-body {
-      padding: 1.5rem;
-    }
-
-    .security-item {
-      display: flex;
-      gap: 1rem;
-      padding: 0.75rem 0;
-      border-bottom: 1px solid var(--border-basic-color-3);
-
-      &:last-child {
-        border-bottom: none;
-        padding-bottom: 0;
-      }
-
-      nb-icon {
-        font-size: 1.5rem;
-        flex-shrink: 0;
-      }
-
-      strong {
-        display: block;
-        color: var(--text-basic-color);
-        margin-bottom: 0.25rem;
-        font-weight: 700;
-        font-size: 0.9rem;
-      }
-
-      p {
-        font-size: 0.8rem;
-        color: var(--text-hint-color);
-        margin: 0;
-        line-height: 1.3;
-      }
-    }
-  }
-
-  // Boutons d'action
-  .step-actions {
-    button[status="danger"] {
-      background: linear-gradient(
-        135deg,
-        var(--color-danger-500) 0%,
-        var(--color-danger-300) 100%
-      );
+  // Sidebar
+  .form-sidebar {
+    .summary-card {
+      border-radius: 1.5rem;
       border: none;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+      background: var(--background-basic-color-1);
 
-      &:hover:not(:disabled) {
-        background: linear-gradient(
-          135deg,
-          var(--color-danger-600) 0%,
-          var(--color-danger-400) 100%
-        );
+      &.sticky {
+        position: sticky;
+        top: 1rem;
+      }
+
+      nb-card-header {
+        border-bottom: 1px solid var(--border-basic-color-3);
+        padding: 1.5rem;
+
+        h6 {
+          margin: 0;
+          font-weight: 600;
+          color: var(--text-basic-color);
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+
+          nb-icon {
+            color: var(--color-danger-500);
+          }
+        }
+      }
+
+      nb-card-body {
+        padding: 1.5rem;
       }
     }
   }
 
-  .help-card {
-    button[status="danger"] {
-      border-color: var(--color-danger-500);
-      color: var(--color-danger-500);
+  // Summary Items
+  .summary-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border-basic-color-3);
 
-      &:hover {
-        background: var(--color-danger-500);
-        color: var(--text-control-color);
+    &:last-child {
+      border-bottom: none;
+    }
+
+    small {
+      font-size: 0.875rem;
+      color: var(--text-hint-color);
+      font-weight: 600;
+    }
+
+    strong {
+      font-weight: 600;
+      color: var(--text-basic-color);
+
+      &.text-danger {
+        color: var(--color-danger-500);
       }
     }
   }
-}
 
-// Responsive
-@media (max-width: 768px) {
-  .withdrawal-container {
-    .reason-grid {
+  .summary-divider {
+    height: 1px;
+    background: var(--border-basic-color-3);
+    margin: 1rem 0;
+  }
+
+  .summary-progress {
+    margin-top: 1.5rem;
+
+    small {
+      display: block;
+      font-size: 0.875rem;
+      color: var(--text-hint-color);
+      margin-bottom: 0.5rem;
+    }
+  }
+
+  // Animations
+  .spin {
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  // Responsive
+  @media (max-width: 1200px) {
+    .form-grid {
       grid-template-columns: 1fr;
+    }
+
+    .summary-card.sticky {
+      position: static;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .page-header {
+      padding: 1.5rem 1rem;
+
+      .header-left {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .page-title {
+        font-size: 1.5rem;
+      }
+    }
+
+    .steps-progress {
+      padding: 0 1rem;
+
+      .steps-container {
+        .step-item {
+          .step-circle {
+            width: 50px;
+            height: 50px;
+            font-size: 1rem;
+
+            nb-icon {
+              font-size: 1.5rem;
+            }
+          }
+
+          .step-label {
+            font-size: 0.75rem;
+          }
+        }
+
+        .step-line {
+          max-width: 60px;
+        }
+      }
+    }
+
+    .form-content {
+      padding: 0 1rem;
+    }
+
+    .step-actions {
+      flex-direction: column;
+
+      button {
+        width: 100%;
+      }
+    }
+
+    .confirmation-summary {
+      .summary-amount {
+        .amount-value {
+          font-size: 2rem;
+        }
+      }
     }
   }
 }

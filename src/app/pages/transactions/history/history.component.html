@@ -17,9 +17,6 @@
       <div class="header-right">
         <!-- Actions rapides -->
         <nb-button-group>
-          <button nbButton ghost size="small" (click)="print()" nbTooltip="Imprimer">
-            <nb-icon icon="printer-outline"></nb-icon>
-          </button>
           <button nbButton ghost size="small" (click)="exportToCSV()" nbTooltip="Exporter CSV">
             <nb-icon icon="download-outline"></nb-icon>
           </button>
@@ -30,6 +27,8 @@
       </div>
     </div>
   </div>
+
+  <br/>
 
   <!-- View Mode Selector -->
   <div class="view-selector">
@@ -110,10 +109,10 @@
             size="small"
             [(ngModel)]="selectedType"
             (ngModelChange)="applyFilters()">
-            <nb-option *ngFor="let type of filterOptions.types" [value]="type. value">
+            <nb-option *ngFor="let type of filterOptions.types" [value]="type.value">
               <span class="option-with-icon">
                 <nb-icon [icon]="type.icon"></nb-icon>
-                {{ type.label }}
+                {{ type. label }}
               </span>
             </nb-option>
           </nb-select>
@@ -192,28 +191,26 @@
       <div class="quick-periods">
         <label class="quick-label">Périodes rapides :</label>
         <div class="period-buttons">
-          <button
-            *ngFor="let period of [
-              { label: 'Aujourd\'hui', value: 'today', action: 'setToday' },
-              { label:  'Hier', value: 'yesterday', action: 'setYesterday' },
-              { label: '7 jours', value: 'week', action: 'setLast7Days' },
-              { label: '30 jours', value: '30days', action: 'setLast30Days' },
-              { label: 'Ce mois', value: 'month', action: 'setCurrentMonth' },
-              { label: 'Mois dernier', value: 'lastMonth', action: 'setLastMonth' },
-              { label: 'Cette année', value: 'year', action: 'setCurrentYear' }
-            ]"
-            nbButton
-            ghost
-            size="tiny"
-            [status]="currentPeriod === period.value ? 'primary' :  'basic'"
-            (click)="period.action === 'setToday' ? setToday() :
-                     period.action === 'setYesterday' ? setYesterday() :
-                     period.action === 'setLast7Days' ? setLast7Days() :
-                     period.action === 'setLast30Days' ? setLast30Days() :
-                     period.action === 'setCurrentMonth' ? setCurrentMonth() :
-                     period. action === 'setLastMonth' ? setLastMonth() :
-                     setCurrentYear()">
-            {{ period.label }}
+          <button nbButton ghost size="tiny" [status]="currentPeriod === 'today' ? 'primary' : 'basic'" (click)="setToday()">
+            Aujourd'hui
+          </button>
+          <button nbButton ghost size="tiny" [status]="currentPeriod === 'yesterday' ? 'primary' : 'basic'" (click)="setYesterday()">
+            Hier
+          </button>
+          <button nbButton ghost size="tiny" [status]="currentPeriod === 'week' ? 'primary' : 'basic'" (click)="setLast7Days()">
+            7 jours
+          </button>
+          <button nbButton ghost size="tiny" [status]="currentPeriod === '30days' ? 'primary' : 'basic'" (click)="setLast30Days()">
+            30 jours
+          </button>
+          <button nbButton ghost size="tiny" [status]="currentPeriod === 'month' ? 'primary' : 'basic'" (click)="setCurrentMonth()">
+            Ce mois
+          </button>
+          <button nbButton ghost size="tiny" [status]="currentPeriod === 'lastMonth' ? 'primary' :  'basic'" (click)="setLastMonth()">
+            Mois dernier
+          </button>
+          <button nbButton ghost size="tiny" [status]="currentPeriod === 'year' ? 'primary' : 'basic'" (click)="setCurrentYear()">
+            Cette année
           </button>
         </div>
       </div>
@@ -280,7 +277,7 @@
   </div>
 
   <!-- Contenu principal -->
-  <div *ngIf="!isLoading">
+  <div *ngIf="! isLoading">
     <!-- VUE TABLEAU -->
     <div *ngIf="viewMode === 'table'">
       <nb-card class="table-card">
@@ -318,15 +315,15 @@
     <!-- VUE CARTES -->
     <div *ngIf="viewMode === 'cards'" class="cards-view">
       <div class="transactions-grid">
-        <nb-card *ngFor="let transaction of filteredTransactions" class="transaction-card" [status]="getTransactionColor(transaction.transactionType)">
+        <nb-card *ngFor="let transaction of filteredTransactions" class="transaction-card" [ngClass]="'card-' + getTransactionColor(transaction. transactionType)">
           <nb-card-header>
             <div class="transaction-header">
               <div class="transaction-type">
                 <nb-icon [icon]="getTransactionIcon(transaction.transactionType)"></nb-icon>
-                <span>{{ transaction.transactionType === 'DEPOSIT' ? 'Dépôt' : transaction.transactionType === 'WITHDRAWAL' ? 'Retrait' : 'Virement' }}</span>
+                <span>{{ getTransactionLabel(transaction.transactionType) }}</span>
               </div>
               <nb-badge
-                [text]="transaction.status === 'SUCCESS' ? 'Succès' : transaction.status === 'PENDING' ? 'En attente' : 'Échoué'"
+                [text]="getStatusLabel(transaction.status)"
                 [status]="getStatusColor(transaction.status)">
               </nb-badge>
             </div>
@@ -343,7 +340,7 @@
             <div class="transaction-details">
               <div class="detail-row">
                 <small>Date</small>
-                <span>{{ formatDate(transaction.transactionDate) }}</span>
+                <span>{{ formatDateTime(transaction.transactionDate) }}</span>
               </div>
               <div class="detail-row" *ngIf="transaction.sourceAccountNumber">
                 <small>Compte source</small>
@@ -384,17 +381,17 @@
         <nb-card-body>
           <div class="timeline">
             <div *ngFor="let transaction of filteredTransactions; let i = index" class="timeline-item">
-              <div class="timeline-marker" [class]="getTransactionColor(transaction. transactionType)">
+              <div class="timeline-marker" [ngClass]="getTransactionColor(transaction.transactionType)">
                 <nb-icon [icon]="getTransactionIcon(transaction.transactionType)"></nb-icon>
               </div>
 
               <div class="timeline-content">
                 <div class="timeline-header">
                   <div class="timeline-date">
-                    {{ formatDate(transaction. transactionDate) }}
+                    {{ formatDateTime(transaction. transactionDate) }}
                   </div>
                   <nb-badge
-                    [text]="transaction.status === 'SUCCESS' ? 'Succès' : transaction.status === 'PENDING' ? 'En attente' : 'Échoué'"
+                    [text]="getStatusLabel(transaction.status)"
                     [status]="getStatusColor(transaction.status)"
                     size="tiny">
                   </nb-badge>
@@ -403,7 +400,7 @@
                 <div class="timeline-body">
                   <div class="timeline-type">
                     <nb-icon [icon]="getTransactionIcon(transaction.transactionType)"></nb-icon>
-                    <strong>{{ transaction.transactionType === 'DEPOSIT' ? 'Dépôt' : transaction.transactionType === 'WITHDRAWAL' ? 'Retrait' : 'Virement' }}</strong>
+                    <strong>{{ getTransactionLabel(transaction.transactionType) }}</strong>
                   </div>
 
                   <div class="timeline-amount" [class.text-success]="transaction.transactionType === 'DEPOSIT'" [class.text-danger]="transaction.transactionType === 'WITHDRAWAL'">

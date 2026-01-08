@@ -25,6 +25,8 @@
     </div>
   </div>
 
+  <br/>
+
   <!-- Progress Steps -->
   <div class="steps-progress">
     <div class="steps-container">
@@ -60,7 +62,7 @@
 
       <div class="step-line" [class.active]="currentStep >= 3"></div>
 
-      <div class="step-item" [class.active]="currentStep >= 3">
+      <div class="step-item" [class. active]="currentStep >= 3">
         <div class="step-circle">
           <nb-icon icon="checkmark-circle-outline"></nb-icon>
           <span>3</span>
@@ -73,7 +75,7 @@
   <!-- Chargement -->
   <div *ngIf="isLoading" class="loading-container">
     <nb-spinner size="giant" status="primary"></nb-spinner>
-    <p class="loading-text">Chargement des comptes...</p>
+    <p class="loading-text">Chargement des comptes... </p>
   </div>
 
   <!-- Formulaire -->
@@ -83,11 +85,7 @@
         <!-- Colonne principale -->
         <div class="form-main">
           <!-- ÉTAPE 1: Sélection des comptes -->
-          <nb-card
-            *ngIf="currentStep === 1"
-            class="step-card step-1"
-            [@slideIn]
-          >
+          <nb-card *ngIf="currentStep === 1" class="step-card step-1">
             <nb-card-header>
               <div class="step-header">
                 <div class="step-badge">Étape 1/3</div>
@@ -113,7 +111,7 @@
                   formControlName="sourceAccountId"
                   placeholder="Compte à débiter..."
                   [status]="
-                    f.sourceAccountId.invalid && f.sourceAccountId.touched
+                    f.sourceAccountId. invalid && f.sourceAccountId.touched
                       ? 'danger'
                       : 'basic'
                   "
@@ -162,10 +160,10 @@
                       [text]="
                         selectedSourceAccount.accountType === 'SAVINGS'
                           ? 'Épargne'
-                          : 'Courant'
+                          :  'Courant'
                       "
                       [status]="
-                        selectedSourceAccount.accountType === 'SAVINGS'
+                        selectedSourceAccount. accountType === 'SAVINGS'
                           ? 'success'
                           : 'primary'
                       "
@@ -268,7 +266,7 @@
                 <div
                   *ngIf="
                     f.destinationAccountId.invalid &&
-                    f.destinationAccountId.touched
+                    f. destinationAccountId.touched
                   "
                   class="field-error"
                 >
@@ -365,16 +363,12 @@
           </nb-card>
 
           <!-- ÉTAPE 2: Montant et options -->
-          <nb-card
-            *ngIf="currentStep === 2"
-            class="step-card step-2"
-            [@slideIn]
-          >
+          <nb-card *ngIf="currentStep === 2" class="step-card step-2">
             <nb-card-header>
               <div class="step-header">
                 <div class="step-badge">Étape 2/3</div>
                 <h3>Montant et Options</h3>
-                <p>Définissez le montant et le type de virement</p>
+                <p>Définissez le montant du virement</p>
               </div>
             </nb-card-header>
 
@@ -393,12 +387,12 @@
                     fullWidth
                     size="giant"
                     formControlName="amount"
-                    placeholder="0.00"
+                    placeholder="0. 00"
                     step="0.01"
                     min="0.01"
-                    [attr.max]="selectedSourceAccount?.balance"
+                    [attr.max]="selectedSourceAccount?. balance"
                     [status]="
-                      f.amount.invalid && f.amount.touched ? 'danger' : 'basic'
+                      f.amount.invalid && f.amount.touched ?  'danger' : 'basic'
                     "
                   />
                 </div>
@@ -411,12 +405,12 @@
                   <span *ngIf="f.amount. errors?.['required']"
                     >Le montant est obligatoire</span
                   >
-                  <span *ngIf="f. amount.errors?.['min']"
+                  <span *ngIf="f.amount.errors?.['min']"
                     >Montant minimum: 0.01 €</span
                   >
-                  <span *ngIf="f. amount.errors?.['max']">
-                    Solde insuffisant (Max:
-                    {{ formatCurrency(selectedSourceAccount!.balance) }})
+                  <span *ngIf="f.amount.errors?.['max']">
+                    Solde insuffisant (Max: 
+                    {{ formatCurrency(selectedSourceAccount! .balance) }})
                   </span>
                 </div>
 
@@ -431,7 +425,7 @@
                       size="small"
                       type="button"
                       [disabled]="
-                        !selectedSourceAccount ||
+                        ! selectedSourceAccount ||
                         quickAmount > selectedSourceAccount.balance
                       "
                       (click)="applyQuickAmount(quickAmount)"
@@ -439,77 +433,6 @@
                       {{ formatCurrency(quickAmount) }}
                     </button>
                   </div>
-                </div>
-              </div>
-
-              <!-- Type de virement -->
-              <div class="form-section">
-                <label class="form-label required">Type de virement</label>
-                <div class="transfer-types-grid">
-                  <div
-                    *ngFor="let type of transferTypes"
-                    class="transfer-type-card"
-                    [class.selected]="f.transferType.value === type.value"
-                    (click)="
-                      transferForm.patchValue({ transferType: type.value })
-                    "
-                  >
-                    <input
-                      type="radio"
-                      [id]="'type-' + type.value"
-                      [value]="type.value"
-                      formControlName="transferType"
-                      class="type-radio"
-                    />
-
-                    <div class="type-icon">
-                      <nb-icon [icon]="type.icon"></nb-icon>
-                    </div>
-
-                    <div class="type-info">
-                      <h6>{{ type.label }}</h6>
-                      <p>{{ type.description }}</p>
-                      <div class="type-meta">
-                        <small>
-                          <nb-icon icon="clock-outline"></nb-icon>
-                          {{ type.delay }}
-                        </small>
-                        <small>
-                          <nb-icon icon="pricetags-outline"></nb-icon>
-                          Frais: {{ formatCurrency(type.fee) }}
-                        </small>
-                      </div>
-                    </div>
-
-                    <div
-                      class="type-check"
-                      *ngIf="f.transferType.value === type.value"
-                    >
-                      <nb-icon icon="checkmark-circle-2-outline"></nb-icon>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Date programmée -->
-                <div
-                  *ngIf="f.transferType.value === 'SCHEDULED'"
-                  class="scheduled-date-section"
-                >
-                  <label for="scheduledDate" class="form-label required"
-                    >Date d'exécution</label
-                  >
-                  <input
-                    type="date"
-                    id="scheduledDate"
-                    nbInput
-                    fullWidth
-                    formControlName="scheduledDate"
-                    [min]="getMinScheduledDate()"
-                  />
-                  <small class="field-hint"
-                    >Le virement sera exécuté automatiquement à cette
-                    date</small
-                  >
                 </div>
               </div>
 
@@ -558,7 +481,7 @@
                       }}
                     </div>
                     <div class="flow-balance">
-                      Nouveau solde:
+                      Nouveau solde: 
                       {{
                         formatCurrency(
                           selectedSourceAccount.balance - f.amount.value
@@ -576,7 +499,7 @@
                       <nb-icon icon="arrow-upward-outline"></nb-icon>
                     </div>
                     <div class="flow-amount">
-                      + {{ formatCurrency(f.amount.value) }}
+                      + {{ formatCurrency(f.amount. value) }}
                     </div>
                     <div class="flow-account">
                       {{
@@ -622,11 +545,7 @@
           </nb-card>
 
           <!-- ÉTAPE 3: Confirmation -->
-          <nb-card
-            *ngIf="currentStep === 3"
-            class="step-card step-3"
-            [@slideIn]
-          >
+          <nb-card *ngIf="currentStep === 3" class="step-card step-3">
             <nb-card-header>
               <div class="step-header">
                 <div class="step-badge">Étape 3/3</div>
@@ -646,14 +565,6 @@
                     {{ formatCurrency(f.amount.value) }}
                   </div>
                   <div class="amount-label">Montant du virement</div>
-                  <div class="amount-type">
-                    <nb-icon
-                      [icon]="
-                        getSelectedTransferType()?.icon || 'flash-outline'
-                      "
-                    ></nb-icon>
-                    {{ getSelectedTransferType()?.label }}
-                  </div>
                 </div>
 
                 <!-- Flux du virement -->
@@ -667,7 +578,7 @@
                       <div class="flow-account-number">
                         {{
                           formatAccountNumber(
-                            selectedSourceAccount!.accountNumber
+                            selectedSourceAccount! .accountNumber
                           )
                         }}
                       </div>
@@ -685,7 +596,7 @@
                           <small>Nouveau solde</small>
                           <strong class="text-danger">{{
                             formatCurrency(
-                              selectedSourceAccount!.balance - f.amount.value
+                              selectedSourceAccount! .balance - f.amount.value
                             )
                           }}</strong>
                         </div>
@@ -710,7 +621,7 @@
                       <div class="flow-account-number">
                         {{
                           formatAccountNumber(
-                            selectedDestAccount!.accountNumber
+                            selectedDestAccount!. accountNumber
                           )
                         }}
                       </div>
@@ -728,7 +639,7 @@
                           <small>Nouveau solde</small>
                           <strong class="text-success">{{
                             formatCurrency(
-                              selectedDestAccount!.balance + f.amount.value
+                              selectedDestAccount! .balance + f.amount.value
                             )
                           }}</strong>
                         </div>
@@ -754,32 +665,6 @@
                     </span>
                     <span class="detail-value reference">{{
                       transactionReference
-                    }}</span>
-                  </div>
-
-                  <div class="detail-row">
-                    <span class="detail-label">
-                      <nb-icon icon="flash-outline"></nb-icon>
-                      Type de virement
-                    </span>
-                    <span class="detail-value">{{
-                      getSelectedTransferType()?.label
-                    }}</span>
-                  </div>
-
-                  <div
-                    class="detail-row"
-                    *ngIf="
-                      f.transferType.value === 'SCHEDULED' &&
-                      f.scheduledDate.value
-                    "
-                  >
-                    <span class="detail-label">
-                      <nb-icon icon="calendar-outline"></nb-icon>
-                      Date d'exécution
-                    </span>
-                    <span class="detail-value">{{
-                      formatDate(f.scheduledDate.value)
                     }}</span>
                   </div>
 
@@ -811,7 +696,7 @@
                     <strong>Virement définitif</strong>
                     <p class="mb-0 mt-1">
                       Une fois confirmé, ce virement sera exécuté et ne pourra
-                      pas être annulé. Vérifiez attentivement les comptes et le
+                      pas être annulé.  Vérifiez attentivement les comptes et le
                       montant.
                     </p>
                   </div>
@@ -845,10 +730,10 @@
                         ? 'loader-outline'
                         : 'checkmark-circle-outline'
                     "
-                    [class.spin]="isSubmitting"
+                    [class. spin]="isSubmitting"
                   ></nb-icon>
                   {{
-                    isSubmitting ? "Traitement.. ." : "Confirmer le virement"
+                    isSubmitting ?  "Traitement..." : "Confirmer le virement"
                   }}
                 </button>
               </div>

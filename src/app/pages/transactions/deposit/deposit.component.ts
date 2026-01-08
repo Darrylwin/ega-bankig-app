@@ -1,19 +1,20 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { NbToastrService } from '@nebular/theme';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { DepositRequest, Account } from '../../../@core/data/models/index';
-import {
-  AccountApiService,
-  TransactionApiService,
-} from '../../../@core/data/api/index';
+import { AccountApiService, TransactionApiService } from '../../../@core/data/api/index';
 
 @Component({
   selector: 'ngx-deposit',
   templateUrl: './deposit.component.html',
   styleUrls: ['./deposit.component.scss'],
 })
-export class DepositComponent implements OnInit {
+export class DepositComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+
   depositForm: FormGroup;
   isLoading = false;
   isSubmitting = false;
@@ -24,47 +25,12 @@ export class DepositComponent implements OnInit {
   currentStep = 1;
   totalSteps = 3;
 
-  // Options
-  paymentMethods = [
-    {
-      value: 'CASH',
-      label: 'Espèces',
-      icon: 'cube-outline',
-      description: 'Dépôt en espèces au guichet',
-      limit: 5000,
-      delay: 'Immédiat',
-    },
-    {
-      value: 'CHECK',
-      label: 'Chèque',
-      icon:  'file-text-outline',
-      description: 'Dépôt par chèque bancaire',
-      limit: 10000,
-      delay: '2 jours ouvrés',
-    },
-    {
-      value: 'WIRE_TRANSFER',
-      label: 'Virement',
-      icon: 'swap-horizontal-outline',
-      description: 'Virement bancaire entrant',
-      limit: 50000,
-      delay: '24 heures',
-    },
-    {
-      value: 'CARD',
-      label: 'Carte Bancaire',
-      icon: 'credit-card-outline',
-      description: 'Paiement par carte',
-      limit: 3000,
-      delay: 'Immédiat',
-    },
-  ];
-
   // Montants suggérés
-  quickAmounts = [1000, 2000, 5000, 10000, 20000, 50000];
+  quickAmounts = [50, 100, 200, 500, 1000, 2000];
 
   constructor(
     private fb: FormBuilder,
+    private route: ActivatedRoute,
     private router: Router,
     private transactionApi: TransactionApiService,
     private accountApi: AccountApiService,
@@ -75,42 +41,55 @@ export class DepositComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadAccounts();
+
+    // Pré-remplir le accountId si passé en query params
+    const accountIdParam = this.route.snapshot.queryParams['accountId'];
+    if (accountIdParam) {
+      this.depositForm.patchValue({ accountId: +accountIdParam });
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   /**
-   * Crée le formulaire
+   * Crée le formulaire (selon l'API:  accountId, amount, description optionnelle)
    */
   private createForm(): FormGroup {
     return this.fb.group({
-      accountId: ['', [Validators. required]],
-      amount: [
-        '',
-        [Validators.required, Validators.min(0.01), Validators.max(100000)],
-      ],
-      paymentMethod: ['CASH', [Validators.required]],
-      reference: [''],
-      description: ['', [Validators.maxLength(200)]],
+      accountId: ['', [Validators.required]],
+      amount: ['', [Validators. required, Validators.min(0.01), Validators.max(1000000)]],
+      description:  ['', [Validators.maxLength(200)]],
     });
   }
 
   /**
-   * Charge la liste des comptes
+   * Charge la liste des comptes actifs
    */
   private loadAccounts(): void {
     this.isLoading = true;
 
     this.accountApi
-      .getAccounts({ page: 0, size: 100, sort: 'accountNumber,asc' })
+      .getAccounts({ page: 0, size: 1000, sort: 'accountNumber,asc' })
+      .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
-          this.accounts = response.content. filter(
-            (acc) => acc.status === 'ACTIVE'
-          );
+          this.accounts = response.content. filter((acc) => acc.status === 'ACTIVE');
+          
+          // Si accountId pré-rempli, sélectionner le compte
+          const preselectedId = this.depositForm.value.accountId;
+          if (preselectedId) {
+            this.onAccountSelect();
+          }
+          
           this.isLoading = false;
         },
         error: (error) => {
           this.isLoading = false;
           this.toastr.danger('Erreur lors du chargement des comptes', 'Erreur');
+          console.error(error);
         },
       });
   }
@@ -119,9 +98,8 @@ export class DepositComponent implements OnInit {
    * Lorsqu'un compte est sélectionné
    */
   onAccountSelect(): void {
-    const accountId = this.depositForm.get('accountId')?.value;
-    this.selectedAccount =
-      this.accounts.find((acc) => acc.id === accountId) || null;
+    const accountId = this.depositForm. get('accountId')?.value;
+    this.selectedAccount = this.accounts. find((acc) => acc.id === accountId) || null;
   }
 
   /**
@@ -136,17 +114,16 @@ export class DepositComponent implements OnInit {
    */
   nextStep(): void {
     if (this.currentStep < this.totalSteps) {
-      // Valider l'étape actuelle avant de passer à la suivante
-      if (this. currentStep === 1 && this.f.accountId.invalid) {
+      // Valider l'étape actuelle
+      if (this.currentStep === 1 && this.f.accountId.invalid) {
         this.f.accountId.markAsTouched();
         this.toastr.warning('Veuillez sélectionner un compte', 'Attention');
         return;
       }
 
-      if (this.currentStep === 2 && (this.f.amount.invalid || this.f.paymentMethod.invalid)) {
+      if (this.currentStep === 2 && this.f.amount. invalid) {
         this.f.amount.markAsTouched();
-        this.f.paymentMethod.markAsTouched();
-        this.toastr.warning('Veuillez remplir tous les champs', 'Attention');
+        this.toastr.warning('Veuillez indiquer un montant valide', 'Attention');
         return;
       }
 
@@ -161,7 +138,7 @@ export class DepositComponent implements OnInit {
   }
 
   /**
-   * Soumission du formulaire
+   * Soumission du formulaire (API:  POST /api/transactions/deposit)
    */
   onSubmit(): void {
     if (this.depositForm.invalid) {
@@ -175,35 +152,38 @@ export class DepositComponent implements OnInit {
     const depositData: DepositRequest = {
       accountId: this.depositForm.value.accountId,
       amount: this.depositForm.value.amount,
-      description: this.depositForm.value. description || undefined,
+      description: this.depositForm.value.description || undefined,
     };
 
-    this.transactionApi. deposit(depositData).subscribe({
-      next: (transaction) => {
-        this.isSubmitting = false;
+    this. transactionApi
+      .deposit(depositData)
+      .pipe(takeUntil(this. destroy$))
+      .subscribe({
+        next: (transaction) => {
+          this.isSubmitting = false;
 
-        this.toastr.success(
-          `Dépôt de ${this.formatCurrency(transaction.amount)} effectué avec succès`,
-          'Succès',
-          { duration: 5000 }
-        );
+          this.toastr.success(
+            `Dépôt de ${this.formatCurrency(transaction.amount)} effectué avec succès`,
+            'Succès',
+            { duration: 5000 }
+          );
 
-        setTimeout(() => {
-          this.router.navigate(['/pages/transactions/history']);
-        }, 1500);
-      },
-      error: (error) => {
-        this.isSubmitting = false;
+          setTimeout(() => {
+            this.router.navigate(['/pages/accounts/detail', this.selectedAccount?.id]);
+          }, 1500);
+        },
+        error:  (error) => {
+          this.isSubmitting = false;
 
-        if (error.status === 400) {
-          this.toastr.warning('Données invalides', 'Erreur de validation');
-        } else if (error.status === 409) {
-          this.toastr.warning('Limite de dépôt atteinte', 'Attention');
-        } else {
-          this.toastr.danger('Erreur lors du dépôt', 'Erreur');
-        }
-      },
-    });
+          if (error.status === 400) {
+            this.toastr.warning('Données invalides', 'Erreur de validation');
+          } else if (error.status === 404) {
+            this.toastr.warning('Compte introuvable', 'Erreur');
+          } else {
+            this.toastr.danger('Erreur lors du dépôt', 'Erreur');
+          }
+        },
+      });
   }
 
   /**
@@ -221,22 +201,13 @@ export class DepositComponent implements OnInit {
   }
 
   /**
-   * Récupère le mode de paiement sélectionné
-   */
-  getSelectedPaymentMethod() {
-    return this.paymentMethods.find(
-      (m) => m.value === this. f.paymentMethod.value
-    );
-  }
-
-  /**
    * Helpers
    */
   formatCurrency(amount: number): string {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
-      currency: 'FCFA',
-    }).format(amount);
+      currency: 'EUR',
+    }).format(amount || 0);
   }
 
   formatAccountNumber(iban: string): string {
@@ -253,26 +224,9 @@ export class DepositComponent implements OnInit {
   }
 
   /**
-   * Calcule les frais (ici 0€ pour tous)
-   */
-  calculateFees(): number {
-    return 0;
-  }
-
-  /**
-   * Calcule le total
+   * Calcule le total (pas de frais)
    */
   calculateTotal(): number {
-    const amount = this.f.amount.value || 0;
-    return amount + this.calculateFees();
-  }
-
-  /**
-   * Vérifie si le montant dépasse la limite
-   */
-  isAmountOverLimit(): boolean {
-    const method = this.getSelectedPaymentMethod();
-    const amount = this.f.amount. value || 0;
-    return method ?  amount > method.limit : false;
+    return this.f.amount.value || 0;
   }
 }
