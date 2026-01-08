@@ -1,20 +1,77 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, OnDestroy } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
-import { NbToastrService } from "@nebular/theme";
+import { NbToastrService, NbDialogService } from "@nebular/theme";
 import { LocalDataSource } from "ng2-smart-table";
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
+import {
+  Transaction,
+  Account,
+  PaginationParams,
+  Page,
+} from "../../../@core/data/models/index";
 import {
   TransactionApiService,
   AccountApiService,
 } from "../../../@core/data/api/index";
-import { Transaction, Account } from "../../../@core/data/models/index";
+import { ConfirmDialogComponent } from "../../../@core/components/confirm-dialog.component";
 
 @Component({
   selector: "ngx-history",
   templateUrl: "./history.component.html",
   styleUrls: ["./history.component.scss"],
 })
-export class HistoryComponent implements OnInit {
+export class HistoryComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+
+  // Données
+  transactions: Transaction[] = [];
+  filteredTransactions: Transaction[] = [];
+  accounts: Account[] = [];
+  totalItems = 0;
+  pageSize = 15;
+  currentPage = 0;
+
+  // Filtres
+  selectedAccountId: string = "ALL";
+  selectedType: string = "ALL";
+  selectedStatus: string = "ALL";
+  startDate: string = "";
+  endDate: string = "";
+  searchTerm: string = "";
+
+  // États
+  isLoading = false;
+  accountIdFromRoute: number | null = null;
+
+  // Vue active
+  viewMode: "table" | "timeline" = "table";
+
+  // Options
+  filterOptions = {
+    types: [
+      { value: "ALL", label: "Tous les types", icon: "list-outline" },
+      { value: "DEPOSIT", label: "Dépôts", icon: "trending-up-outline" },
+      {
+        value: "WITHDRAWAL",
+        label: "Retraits",
+        icon: "trending-down-outline",
+      },
+      { value: "TRANSFER", label: "Virements", icon: "swap-outline" },
+    ],
+    statuses: [
+      { value: "ALL", label: "Tous les statuts" },
+      { value: "SUCCESS", label: "Succès" },
+      { value: "PENDING", label: "En attente" },
+      { value: "FAILED", label: "Échoué" },
+    ],
+  };
+
+  // Période actuelle
+  currentPeriod: string = "month";
+
   // Tableau
+  source = new LocalDataSource();
   settings = {
     actions: {
       columnTitle: "Actions",
@@ -48,54 +105,38 @@ export class HistoryComponent implements OnInit {
       transactionType: {
         title: "Type",
         type: "html",
-        valuePrepareFunction: (value: string) => {
+        valuePrepareFunction: (value: string, row: Transaction) => {
           const types: any = {
             DEPOSIT:
               '<span class="badge badge-success"><i class="nb-arrow-up"></i> Dépôt</span>',
             WITHDRAWAL:
               '<span class="badge badge-danger"><i class="nb-arrow-down"></i> Retrait</span>',
-            TRANSFER:
-              '<span class="badge badge-primary"><i class="nb-shuffle"></i> Virement</span>',
+            TRANSFER: {
+              true: '<span class="badge badge-primary"><i class="nb-arrow-down"></i> Virement reçu</span>',
+              false: '<span class="badge badge-primary"><i class="nb-arrow-up"></i> Virement envoyé</span>',
+            },
           };
+          
+          if (value === "TRANSFER") {
+            const isIncoming = this.isIncomingTransfer(row);
+            return types[value][isIncoming.toString()] || '<span class="badge badge-primary">Virement</span>';
+          }
+          
           return types[value] || value;
         },
         filter: false,
         width: "10%",
       },
-      sourceAccountNumber: {
-        title: "Compte Source",
-        type: "string",
-        valuePrepareFunction: (value: string) => {
-          return value ? this.formatAccountNumber(value) : "—";
-        },
-        filter: false,
-        width: "15%",
-      },
-      destinationAccountNumber: {
-        title: "Compte Destination",
-        type: "string",
-        valuePrepareFunction: (value: string) => {
-          return value ? this.formatAccountNumber(value) : "—";
-        },
-        filter: false,
-        width: "15%",
-      },
       amount: {
         title: "Montant",
         type: "html",
         valuePrepareFunction: (value: number, row: Transaction) => {
+          const isIncoming = this.isIncomingTransfer(row);
+          const isCredit = row.transactionType === "DEPOSIT" || isIncoming;
           const formatted = this.formatCurrency(Math.abs(value));
-          let color = "text-primary";
-          let icon = "";
-
-          if (row.transactionType === "DEPOSIT") {
-            color = "text-success";
-            icon = '<i class="nb-plus"></i> ';
-          } else if (row.transactionType === "WITHDRAWAL") {
-            color = "text-danger";
-            icon = '<i class="nb-minus"></i> ';
-          }
-
+          const color = isCredit ? "text-success" : "text-danger";
+          const icon = isCredit ? '<i class="nb-plus"></i> ' : '<i class="nb-minus"></i> ';
+          
           return `<span class="${color} fw-bold">${icon}${formatted}</span>`;
         },
         filter: false,
@@ -104,8 +145,9 @@ export class HistoryComponent implements OnInit {
       balanceAfter: {
         title: "Solde après",
         type: "string",
-        valuePrepareFunction: (value: number) => {
-          return this.formatCurrency(value);
+        valuePrepareFunction: (value: number, row: Transaction) => {
+          const displayBalance = this.getDisplayBalance(row, false);
+          return this.formatCurrency(displayBalance);
         },
         filter: false,
         width: "12%",
@@ -137,56 +179,12 @@ export class HistoryComponent implements OnInit {
         width: "14%",
       },
     },
+    mode: "external",
     pager: {
-      display: true,
-      perPage: 15,
+      display: false,
     },
     noDataMessage: "Aucune transaction trouvée",
   };
-
-  // Données
-  source = new LocalDataSource();
-  transactions: Transaction[] = [];
-  filteredTransactions: Transaction[] = [];
-  accounts: Account[] = [];
-
-  // Filtres
-  selectedAccountId: string = "ALL";
-  selectedType: string = "ALL";
-  selectedStatus: string = "ALL";
-  startDate: string = "";
-  endDate: string = "";
-  searchTerm: string = "";
-
-  // États
-  isLoading = false;
-  accountIdFromRoute: number | null = null;
-
-  // Vue active
-  viewMode: "table" | "cards" | "timeline" = "table";
-
-  // Options
-  filterOptions = {
-    types: [
-      { value: "ALL", label: "Tous les types", icon: "list-outline" },
-      { value: "DEPOSIT", label: "Dépôts", icon: "trending-up-outline" },
-      {
-        value: "WITHDRAWAL",
-        label: "Retraits",
-        icon: "trending-down-outline",
-      },
-      { value: "TRANSFER", label: "Virements", icon: "swap-outline" },
-    ],
-    statuses: [
-      { value: "ALL", label: "Tous les statuts" },
-      { value: "SUCCESS", label: "Succès" },
-      { value: "PENDING", label: "En attente" },
-      { value: "FAILED", label: "Échoué" },
-    ],
-  };
-
-  // Période actuelle
-  currentPeriod: string = "all";
 
   // Statistiques
   stats = {
@@ -197,15 +195,7 @@ export class HistoryComponent implements OnInit {
     totalDeposits: 0,
     totalWithdrawals: 0,
     totalTransfers: 0,
-    successRate: 0,
-  };
-
-  // Données graphiques
-  transactionsByTypeData: any[] = [];
-  transactionsByDateData: any[] = [];
-
-  colorScheme = {
-    domain: ["#00d68f", "#ff3d71", "#3366ff", "#ffaa00"],
+    successCount: 0,
   };
 
   constructor(
@@ -213,7 +203,8 @@ export class HistoryComponent implements OnInit {
     private router: Router,
     private transactionApi: TransactionApiService,
     private accountApi: AccountApiService,
-    private toastr: NbToastrService
+    private toastr: NbToastrService,
+    private dialogService: NbDialogService
   ) {}
 
   ngOnInit(): void {
@@ -226,6 +217,11 @@ export class HistoryComponent implements OnInit {
 
     this.loadAccounts();
     this.setDefaultDates();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   /**
@@ -244,11 +240,21 @@ export class HistoryComponent implements OnInit {
    * Charge la liste des comptes
    */
   private loadAccounts(): void {
+    this.isLoading = true;
+    
+    const params: PaginationParams = {
+      page: 0,
+      size: 100,
+      sort: "accountNumber,asc",
+    };
+
     this.accountApi
-      .getAccounts({ page: 0, size: 100, sort: "accountNumber,asc" })
+      .getAccounts(params)
+      .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (response) => {
+        next: (response: Page<Account>) => {
           this.accounts = response.content;
+          this.isLoading = false;
 
           // Charger les transactions après avoir chargé les comptes
           if (this.selectedAccountId !== "ALL") {
@@ -256,6 +262,7 @@ export class HistoryComponent implements OnInit {
           }
         },
         error: (error) => {
+          this.isLoading = false;
           console.error("Erreur chargement comptes:", error);
           this.toastr.danger("Erreur lors du chargement des comptes", "Erreur");
         },
@@ -268,6 +275,9 @@ export class HistoryComponent implements OnInit {
   loadTransactions(): void {
     if (this.selectedAccountId === "ALL") {
       this.toastr.info("Veuillez sélectionner un compte", "Information");
+      this.transactions = [];
+      this.filteredTransactions = [];
+      this.applyFilters();
       return;
     }
 
@@ -281,12 +291,12 @@ export class HistoryComponent implements OnInit {
 
       this.transactionApi
         .getTransactionsByPeriod(accountId, startISO, endISO)
+        .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: (transactions) => {
             this.transactions = transactions;
             this.applyFilters();
             this.calculateStatistics();
-            this.prepareChartData();
             this.isLoading = false;
           },
           error: (error) => {
@@ -295,25 +305,29 @@ export class HistoryComponent implements OnInit {
               "Erreur lors du chargement des transactions",
               "Erreur"
             );
+            console.error(error);
           },
         });
     } else {
-      this.transactionApi.getTransactionsByAccount(accountId).subscribe({
-        next: (transactions) => {
-          this.transactions = transactions;
-          this.applyFilters();
-          this.calculateStatistics();
-          this.prepareChartData();
-          this.isLoading = false;
-        },
-        error: (error) => {
-          this.isLoading = false;
-          this.toastr.danger(
-            "Erreur lors du chargement des transactions",
-            "Erreur"
-          );
-        },
-      });
+      this.transactionApi
+        .getTransactionsByAccount(accountId)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (transactions) => {
+            this.transactions = transactions;
+            this.applyFilters();
+            this.calculateStatistics();
+            this.isLoading = false;
+          },
+          error: (error) => {
+            this.isLoading = false;
+            this.toastr.danger(
+              "Erreur lors du chargement des transactions",
+              "Erreur"
+            );
+            console.error(error);
+          },
+        });
     }
   }
 
@@ -356,6 +370,8 @@ export class HistoryComponent implements OnInit {
     );
 
     this.filteredTransactions = filtered;
+    this.totalItems = filtered.length;
+    this.currentPage = 0; // Réinitialiser la pagination
     this.source.load(filtered);
   }
 
@@ -385,58 +401,9 @@ export class HistoryComponent implements OnInit {
       .filter((t) => t.transactionType === "WITHDRAWAL")
       .reduce((sum, t) => sum + Math.abs(t.amount), 0);
 
-    this.stats.totalTransfers = this.filteredTransactions
-      .filter((t) => t.transactionType === "TRANSFER")
-      .reduce((sum, t) => sum + t.amount, 0);
-
-    const successCount = this.filteredTransactions.filter(
+    this.stats.successCount = this.filteredTransactions.filter(
       (t) => t.status === "SUCCESS"
     ).length;
-
-    this.stats.successRate =
-      this.stats.totalTransactions > 0
-        ? (successCount / this.stats.totalTransactions) * 100
-        : 0;
-  }
-
-  /**
-   * Prépare les données pour les graphiques
-   */
-  private prepareChartData(): void {
-    // 1. Répartition par type
-    this.transactionsByTypeData = [
-      { name: "Dépôts", value: this.stats.depositsCount },
-      { name: "Retraits", value: this.stats.withdrawalsCount },
-      { name: "Virements", value: this.stats.transfersCount },
-    ].filter((item) => item.value > 0);
-
-    // 2. Transactions par date (derniers 7 jours)
-    const dateMap: { [key: string]: number } = {};
-    const last7Days = Array.from({ length: 7 }, (_, i) => {
-      const date = new Date();
-      date.setDate(date.getDate() - (6 - i));
-      const key = date.toLocaleDateString("fr-FR", {
-        day: "2-digit",
-        month: "short",
-      });
-      dateMap[key] = 0;
-      return key;
-    });
-
-    this.filteredTransactions.forEach((tx) => {
-      const date = new Date(tx.transactionDate);
-      const key = date.toLocaleDateString("fr-FR", {
-        day: "2-digit",
-        month: "short",
-      });
-      if (dateMap.hasOwnProperty(key)) {
-        dateMap[key]++;
-      }
-    });
-
-    this.transactionsByDateData = Object.entries(dateMap).map(
-      ([name, value]) => ({ name, value })
-    );
   }
 
   /**
@@ -517,13 +484,15 @@ export class HistoryComponent implements OnInit {
     this.setDefaultDates();
     if (this.selectedAccountId !== "ALL") {
       this.loadTransactions();
+    } else {
+      this.applyFilters();
     }
   }
 
   /**
    * Change le mode d'affichage
    */
-  setViewMode(mode: "table" | "cards" | "timeline"): void {
+  setViewMode(mode: "table" | "timeline"): void {
     this.viewMode = mode;
   }
 
@@ -540,28 +509,49 @@ export class HistoryComponent implements OnInit {
    * Affiche les détails d'une transaction
    */
   showTransactionDetails(transaction: Transaction): void {
-    this.toastr.info(
-      `Référence: ${transaction.transactionReference}`,
-      "Détails de la transaction",
-      { duration: 5000 }
+    const selectedAccount = this.accounts.find(
+      (acc) => acc.id === +this.selectedAccountId
     );
-  }
+    const currentAccountNumber = selectedAccount?.accountNumber || "";
+    const isIncoming = this.isIncomingTransfer(transaction);
+    const displayBalance = this.getDisplayBalance(transaction, false);
 
-  /**
-   * Export PDF (simulation)
-   */
-  exportToPDF(): void {
-    this.toastr.info("Génération du PDF en cours...", "Export PDF");
-    setTimeout(() => {
-      this.toastr.success("Export PDF réussi", "Succès");
-    }, 1500);
-  }
-
-  /**
-   * Impression
-   */
-  print(): void {
-    window.print();
+    this.dialogService.open(ConfirmDialogComponent, {
+      context: {
+        title: "Détails de la transaction",
+        message: `
+          <div class="transaction-details-modal">
+            <div class="detail-row">
+              <strong>Référence :</strong> ${transaction.transactionReference}
+            </div>
+            <div class="detail-row">
+              <strong>Type :</strong> ${this.getTransactionLabel(transaction.transactionType, isIncoming)}
+            </div>
+            <div class="detail-row">
+              <strong>Date :</strong> ${this.formatDateTime(transaction.transactionDate)}
+            </div>
+            <div class="detail-row">
+              <strong>Montant :</strong> 
+              <span class="${isIncoming || transaction.transactionType === 'DEPOSIT' ? 'text-success' : 'text-danger'}">
+                ${isIncoming || transaction.transactionType === 'DEPOSIT' ? '+' : '-'}${this.formatCurrency(Math.abs(transaction.amount))}
+              </span>
+            </div>
+            <div class="detail-row">
+              <strong>Solde après :</strong> ${this.formatCurrency(displayBalance)}
+            </div>
+            <div class="detail-row">
+              <strong>Statut :</strong> ${this.getStatusLabel(transaction.status)}
+            </div>
+            ${transaction.description ? `<div class="detail-row"><strong>Description :</strong> ${transaction.description}</div>` : ''}
+            ${transaction.sourceAccountNumber ? `<div class="detail-row"><strong>Compte source :</strong> ${this.formatAccountNumber(transaction.sourceAccountNumber)}</div>` : ''}
+            ${transaction.destinationAccountNumber ? `<div class="detail-row"><strong>Compte destination :</strong> ${this.formatAccountNumber(transaction.destinationAccountNumber)}</div>` : ''}
+          </div>
+        `,
+        confirmText: "Fermer",
+        cancelText: "",
+        status: "info",
+      },
+    });
   }
 
   /**
@@ -580,7 +570,7 @@ export class HistoryComponent implements OnInit {
     return iban ? iban.match(/.{1,4}/g)?.join(" ") || iban : "";
   }
 
-  formatDate(dateString: string): string {
+  formatDateTime(dateString: string): string {
     return new Date(dateString).toLocaleString("fr-FR", {
       day: "2-digit",
       month: "2-digit",
@@ -603,13 +593,31 @@ export class HistoryComponent implements OnInit {
     return icons[type] || "repeat-outline";
   }
 
-  getTransactionColor(type: string): string {
+  getTransactionLabel(type: string, isIncoming: boolean = false): string {
+    const labels: any = {
+      DEPOSIT: "Dépôt",
+      WITHDRAWAL: "Retrait",
+      TRANSFER: isIncoming ? "Virement reçu" : "Virement envoyé",
+    };
+    return labels[type] || type;
+  }
+
+  getTransactionColor(type: string, isIncoming: boolean = false): string {
     const colors: any = {
       DEPOSIT: "success",
       WITHDRAWAL: "danger",
-      TRANSFER: "primary",
+      TRANSFER: isIncoming ? "success" : "primary",
     };
     return colors[type] || "basic";
+  }
+
+  getStatusLabel(status: string): string {
+    const labels: any = {
+      SUCCESS: "Succès",
+      PENDING: "En attente",
+      FAILED: "Échoué",
+    };
+    return labels[status] || status;
   }
 
   getStatusColor(status: string): string {
@@ -621,7 +629,80 @@ export class HistoryComponent implements OnInit {
     return colors[status] || "basic";
   }
 
+  isIncomingTransfer(transaction: Transaction): boolean {
+    if (transaction.transactionType !== "TRANSFER") {
+      return false;
+    }
+
+    const selectedAccount = this.accounts.find(
+      (acc) => acc.id === +this.selectedAccountId
+    );
+    if (!selectedAccount) {
+      return false;
+    }
+
+    // Si le compte courant est le compte destination, c'est un virement reçu
+    return transaction.destinationAccountNumber === selectedAccount.accountNumber;
+  }
+
+  getDisplayBalance(transaction: Transaction, before: boolean = false): number {
+    const isIncoming = this.isIncomingTransfer(transaction);
+    
+    if (isIncoming) {
+      // Pour un virement reçu, utiliser le solde du compte destination
+      return before ? transaction.balanceBefore : transaction.balanceAfter;
+    } else {
+      // Pour les autres transactions, utiliser le solde normal
+      return before ? transaction.balanceBefore : transaction.balanceAfter;
+    }
+  }
+
   getNetBalance(): number {
     return this.stats.totalDeposits - this.stats.totalWithdrawals;
+  }
+
+  getSuccessRate(): number {
+    return this.stats.totalTransactions > 0
+      ? (this.stats.successCount / this.stats.totalTransactions) * 100
+      : 0;
+  }
+
+  // Pagination methods (similaires à customers)
+  goToFirstPage(): void {
+    this.currentPage = 0;
+    this.applyFilters();
+  }
+
+  goToPreviousPage(): void {
+    if (this.currentPage > 0) {
+      this.currentPage--;
+      this.applyFilters();
+    }
+  }
+
+  goToNextPage(): void {
+    if (this.currentPage < this.totalPages - 1) {
+      this.currentPage++;
+      this.applyFilters();
+    }
+  }
+
+  goToLastPage(): void {
+    this.currentPage = this.totalPages - 1;
+    this.applyFilters();
+  }
+
+  get totalPages(): number {
+    return Math.ceil(this.totalItems / this.pageSize);
+  }
+
+  get currentPageDisplay(): number {
+    return this.currentPage + 1;
+  }
+
+  get pagedTransactions(): Transaction[] {
+    const startIndex = this.currentPage * this.pageSize;
+    const endIndex = startIndex + this.pageSize;
+    return this.filteredTransactions.slice(startIndex, endIndex);
   }
 }
