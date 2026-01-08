@@ -23,7 +23,7 @@
             {{
               isEditMode
                 ? "Mettez à jour les informations du client"
-                : "Ajoutez un nouveau client à la banque"
+                : "Ajoutez un nouveau client"
             }}
           </p>
         </div>
@@ -31,9 +31,7 @@
     </div>
   </div>
 
-  <br/>
-
-  <!-- Chargement -->
+  <!-- Loading -->
   <div *ngIf="isLoading" class="loading-container">
     <nb-spinner size="giant" status="primary"></nb-spinner>
     <p class="loading-text">Chargement des données...</p>
@@ -42,377 +40,341 @@
   <!-- Formulaire -->
   <div *ngIf="!isLoading" class="form-content">
     <form [formGroup]="customerForm" (ngSubmit)="onSubmit()">
-      <div class="form-grid">
-        <!-- Colonne principale -->
-        <div class="form-main">
-          <!-- Étape 1: Identité -->
-          <nb-card class="form-card">
-            <nb-card-header>
-              <div class="card-header-content">
-                <div class="step-badge">1</div>
-                <div>
-                  <h5>Identité</h5>
-                  <p class="text-muted mb-0">
-                    Informations personnelles du client
-                  </p>
-                </div>
-              </div>
-            </nb-card-header>
-            <nb-card-body>
-              <div class="row">
-                <!-- Nom -->
-                <div class="col-md-6 mb-3">
-                  <label for="lastName" class="form-label required">Nom</label>
-                  <input
-                    type="text"
-                    id="lastName"
-                    nbInput
-                    fullWidth
-                    formControlName="lastName"
-                    placeholder="DUPONT"
-                    [status]="
-                      f.lastName.invalid && f.lastName.touched
-                        ? 'danger'
-                        : 'basic'
-                    "
-                  />
-
-                  <div
-                    *ngIf="f.lastName.invalid && f.lastName.touched"
-                    class="field-error"
-                  >
-                    <nb-icon icon="alert-circle-outline"></nb-icon>
-                    <span *ngIf="f.lastName. errors?.['required']"
-                      >Le nom est obligatoire</span
-                    >
-                    <span *ngIf="f.lastName.errors?.['minlength']"
-                      >Minimum 2 caractères</span
-                    >
-                    <span *ngIf="f.lastName.errors?.['maxlength']"
-                      >Maximum 50 caractères</span
-                    >
-                  </div>
-                </div>
-
-                <!-- Prénom -->
-                <div class="col-md-6 mb-3">
-                  <label for="firstName" class="form-label required"
-                    >Prénom</label
-                  >
-                  <input
-                    type="text"
-                    id="firstName"
-                    nbInput
-                    fullWidth
-                    formControlName="firstName"
-                    placeholder="Jean"
-                    [status]="
-                      f.firstName.invalid && f.firstName.touched
-                        ? 'danger'
-                        : 'basic'
-                    "
-                  />
-
-                  <div
-                    *ngIf="f.firstName.invalid && f.firstName.touched"
-                    class="field-error"
-                  >
-                    <nb-icon icon="alert-circle-outline"></nb-icon>
-                    <span *ngIf="f.firstName.errors?.['required']"
-                      >Le prénom est obligatoire</span
-                    >
-                    <span *ngIf="f.firstName.errors?.['minlength']"
-                      >Minimum 2 caractères</span
-                    >
-                    <span *ngIf="f.firstName.errors?.['maxlength']"
-                      >Maximum 50 caractères</span
-                    >
-                  </div>
-                </div>
-
-                <!-- Date de naissance -->
-                <div class="col-md-6 mb-3">
-                  <label for="dateOfBirth" class="form-label required"
-                    >Date de naissance</label
-                  >
-                  <input
-                    type="date"
-                    id="dateOfBirth"
-                    nbInput
-                    fullWidth
-                    formControlName="dateOfBirth"
-                    [max]="today"
-                    [status]="
-                      f.dateOfBirth.invalid && f.dateOfBirth.touched
-                        ? 'danger'
-                        : 'basic'
-                    "
-                  />
-
-                  <div
-                    *ngIf="f.dateOfBirth.invalid && f.dateOfBirth.touched"
-                    class="field-error"
-                  >
-                    <nb-icon icon="alert-circle-outline"></nb-icon>
-                    <span>La date de naissance est obligatoire</span>
-                  </div>
-
-                  <!-- Info âge -->
-                  <div *ngIf="f.dateOfBirth.value" class="age-info">
-                    <nb-alert
-                      [status]="isAdult() ? 'success' : 'warning'"
-                      size="tiny"
-                    >
-                      <nb-icon
-                        [icon]="
-                          isAdult()
-                            ? 'checkmark-circle-outline'
-                            : 'alert-circle-outline'
-                        "
-                      ></nb-icon>
-                      Âge: {{ calculateAge() }} ans
-                      {{ isAdult() ? "(Majeur)" : "(Mineur)" }}
-                    </nb-alert>
-                  </div>
-                </div>
-
-                <!-- Nationalité -->
-                <div class="col-md-6 mb-3">
-                  <label for="nationality" class="form-label required"
-                    >Nationalité</label
-                  >
-                  <input
-                    type="text"
-                    id="nationality"
-                    nbInput
-                    fullWidth
-                    formControlName="nationality"
-                    placeholder="Française"
-                    [nbAutocomplete]="nationalityAuto"
-                    [status]="
-                      f.nationality.invalid && f.nationality.touched
-                        ? 'danger'
-                        : 'basic'
-                    "
-                  />
-
-                  <div
-                    *ngIf="f.nationality.invalid && f.nationality.touched"
-                    class="field-error"
-                  >
-                    <nb-icon icon="alert-circle-outline"></nb-icon>
-                    <span>La nationalité est obligatoire</span>
-                  </div>
-                </div>
-              </div>
-            </nb-card-body>
-          </nb-card>
-
-          <!-- Étape 2: Genre -->
-          <nb-card class="form-card">
-            <nb-card-header>
-              <div class="card-header-content">
-                <div class="step-badge">2</div>
-                <div>
-                  <h5>Genre</h5>
-                  <p class="text-muted mb-0">Sélectionnez le genre</p>
-                </div>
-              </div>
-            </nb-card-header>
-            <nb-card-body>
-              <div class="gender-grid">
-                <div
-                  *ngFor="let gender of genderOptions"
-                  class="gender-card"
-                  [class.selected]="f.gender.value === gender.value"
-                  (click)="f.gender.setValue(gender.value)"
-                >
-                  <input
-                    type="radio"
-                    [id]="'gender-' + gender.value"
-                    [value]="gender.value"
-                    formControlName="gender"
-                    class="gender-radio"
-                  />
-
-                  <div class="gender-icon" [ngClass]="'icon-' + gender.color">
-                    <nb-icon [icon]="gender.icon"></nb-icon>
-                  </div>
-
-                  <div class="gender-label">{{ gender.label }}</div>
-
-                  <div
-                    class="gender-check"
-                    *ngIf="f.gender.value === gender.value"
-                  >
-                    <nb-icon icon="checkmark-circle-2-outline"></nb-icon>
-                  </div>
-                </div>
-              </div>
-            </nb-card-body>
-          </nb-card>
-
-          <!-- Étape 3: Coordonnées -->
-          <nb-card class="form-card">
-            <nb-card-header>
-              <div class="card-header-content">
-                <div class="step-badge">3</div>
-                <div>
-                  <h5>Coordonnées</h5>
-                  <p class="text-muted mb-0">Informations de contact</p>
-                </div>
-              </div>
-            </nb-card-header>
-            <nb-card-body>
-              <div class="row">
-                <!-- Adresse -->
-                <div class="col-12 mb-3">
-                  <label for="address" class="form-label required"
-                    >Adresse complète</label
-                  >
-                  <textarea
-                    id="address"
-                    nbInput
-                    fullWidth
-                    rows="3"
-                    formControlName="address"
-                    placeholder="12 Rue de la Paix, 75001 Paris"
-                    [status]="
-                      f.address.invalid && f.address.touched
-                        ? 'danger'
-                        : 'basic'
-                    "
-                  ></textarea>
-
-                  <div
-                    *ngIf="f.address.invalid && f.address.touched"
-                    class="field-error"
-                  >
-                    <nb-icon icon="alert-circle-outline"></nb-icon>
-                    <span *ngIf="f.address. errors?.['required']"
-                      >L'adresse est obligatoire</span
-                    >
-                    <span *ngIf="f.address.errors?.['maxlength']"
-                      >Maximum 200 caractères</span
-                    >
-                  </div>
-                </div>
-
-                <!-- Téléphone -->
-                <div class="col-md-6 mb-3">
-                  <label for="phoneNumber" class="form-label required"
-                    >Téléphone</label
-                  >
-                  <input
-                    type="tel"
-                    id="phoneNumber"
-                    nbInput
-                    fullWidth
-                    formControlName="phoneNumber"
-                    placeholder="+33123456789"
-                    [status]="
-                      f.phoneNumber.invalid && f.phoneNumber.touched
-                        ? 'danger'
-                        : 'basic'
-                    "
-                  />
-
-                  <div
-                    *ngIf="f.phoneNumber.invalid && f.phoneNumber.touched"
-                    class="field-error"
-                  >
-                    <nb-icon icon="alert-circle-outline"></nb-icon>
-                    <span *ngIf="f.phoneNumber.errors?.['required']"
-                      >Le téléphone est obligatoire</span
-                    >
-                    <span *ngIf="f.phoneNumber.errors?.['pattern']"
-                      >Format: +33123456789 (format international)</span
-                    >
-                  </div>
-                </div>
-
-                <!-- Email -->
-                <div class="col-md-6 mb-3">
-                  <label for="email" class="form-label required">Email</label>
-                  <input
-                    type="email"
-                    id="email"
-                    nbInput
-                    fullWidth
-                    formControlName="email"
-                    placeholder="jean.dupont@example.com"
-                    [status]="
-                      f.email.invalid && f.email.touched ? 'danger' : 'basic'
-                    "
-                  />
-
-                  <div
-                    *ngIf="f.email.invalid && f.email.touched"
-                    class="field-error"
-                  >
-                    <nb-icon icon="alert-circle-outline"></nb-icon>
-                    <span *ngIf="f.email.errors?.['required']"
-                      >L'email est obligatoire</span
-                    >
-                    <span *ngIf="f.email.errors?.['email']"
-                      >Format d'email invalide</span
-                    >
-                    <span *ngIf="f.email.errors?.['maxlength']"
-                      >Maximum 100 caractères</span
-                    >
-                    <span *ngIf="f.email.errors?.['duplicate']"
-                      >Cet email est déjà utilisé</span
-                    >
-                  </div>
-                </div>
-              </div>
-            </nb-card-body>
-          </nb-card>
-
-          <!-- Actions -->
-          <div class="form-actions">
-            <button
-              nbButton
-              size="large"
-              status="basic"
-              type="button"
-              (click)="onCancel()"
-              [disabled]="isSubmitting"
-            >
-              <nb-icon icon="close-outline"></nb-icon>
-              Annuler
-            </button>
-
-            <button
-              nbButton
-              size="large"
-              status="primary"
-              type="submit"
-              [disabled]="customerForm.invalid || isSubmitting"
-              [class.btn-loading]="isSubmitting"
-            >
-              <nb-icon
-                [icon]="
-                  isSubmitting
-                    ? 'loader-outline'
-                    : isEditMode
-                    ? 'save-outline'
-                    : 'checkmark-outline'
-                "
-                [class.spin]="isSubmitting"
-              ></nb-icon>
-              {{
-                isSubmitting
-                  ? isEditMode
-                    ? "Mise à jour..."
-                    : "Création... "
-                  : isEditMode
-                  ? "Mettre à jour"
-                  : "Créer le client"
-              }}
-            </button>
+      <!-- Identité -->
+      <nb-card class="form-card">
+        <nb-card-header>
+          <div class="card-header-content">
+            <div class="step-badge">1</div>
+            <div>
+              <h5>Identité</h5>
+              <p class="text-muted">Informations personnelles du client</p>
+            </div>
           </div>
-        </div>
+        </nb-card-header>
+        <nb-card-body>
+          <div class="row">
+            <!-- Nom -->
+            <div class="col-md-6 mb-3">
+              <label for="lastName" class="form-label required">Nom</label>
+              <input
+                type="text"
+                id="lastName"
+                nbInput
+                fullWidth
+                formControlName="lastName"
+                placeholder="DUPONT"
+                [status]="
+                  f.lastName.invalid && f.lastName.touched ? 'danger' : 'basic'
+                "
+              />
+              <div
+                *ngIf="f.lastName.invalid && f.lastName.touched"
+                class="field-error"
+              >
+                <nb-icon icon="alert-circle-outline"></nb-icon>
+                <span *ngIf="f.lastName.errors?.['required']"
+                  >Le nom est obligatoire</span
+                >
+                <span *ngIf="f. lastName.errors?.['minlength']"
+                  >Minimum 2 caractères</span
+                >
+                <span *ngIf="f.lastName.errors?.['maxlength']"
+                  >Maximum 50 caractères</span
+                >
+              </div>
+            </div>
+
+            <!-- Prénom -->
+            <div class="col-md-6 mb-3">
+              <label for="firstName" class="form-label required">Prénom</label>
+              <input
+                type="text"
+                id="firstName"
+                nbInput
+                fullWidth
+                formControlName="firstName"
+                placeholder="Jean"
+                [status]="
+                  f.firstName.invalid && f.firstName.touched
+                    ? 'danger'
+                    : 'basic'
+                "
+              />
+              <div
+                *ngIf="f.firstName.invalid && f.firstName.touched"
+                class="field-error"
+              >
+                <nb-icon icon="alert-circle-outline"></nb-icon>
+                <span *ngIf="f.firstName.errors?.['required']"
+                  >Le prénom est obligatoire</span
+                >
+                <span *ngIf="f.firstName.errors?. ['minlength']"
+                  >Minimum 2 caractères</span
+                >
+                <span *ngIf="f.firstName.errors?.['maxlength']"
+                  >Maximum 50 caractères</span
+                >
+              </div>
+            </div>
+
+            <!-- Date de naissance -->
+            <div class="col-md-6 mb-3">
+              <label for="dateOfBirth" class="form-label required"
+                >Date de naissance</label
+              >
+              <input
+                type="date"
+                id="dateOfBirth"
+                nbInput
+                fullWidth
+                formControlName="dateOfBirth"
+                [max]="today"
+                [status]="
+                  f.dateOfBirth.invalid && f.dateOfBirth.touched
+                    ? 'danger'
+                    : 'basic'
+                "
+              />
+              <div
+                *ngIf="f.dateOfBirth.invalid && f.dateOfBirth.touched"
+                class="field-error"
+              >
+                <nb-icon icon="alert-circle-outline"></nb-icon>
+                <span>La date de naissance est obligatoire</span>
+              </div>
+              <div *ngIf="f.dateOfBirth.value" class="age-info">
+                <nb-badge
+                  [text]="
+                    calculateAge() +
+                    ' ans ' +
+                    (isAdult() ? '(Majeur)' : '(Mineur)')
+                  "
+                  [status]="isAdult() ? 'success' : 'warning'"
+                ></nb-badge>
+              </div>
+            </div>
+
+            <!-- Nationalité -->
+            <div class="col-md-6 mb-3">
+              <label for="nationality" class="form-label required"
+                >Nationalité</label
+              >
+              <input
+                type="text"
+                id="nationality"
+                nbInput
+                fullWidth
+                formControlName="nationality"
+                placeholder="Française"
+                [status]="
+                  f.nationality.invalid && f.nationality.touched
+                    ? 'danger'
+                    : 'basic'
+                "
+              />
+              <div
+                *ngIf="f.nationality.invalid && f.nationality.touched"
+                class="field-error"
+              >
+                <nb-icon icon="alert-circle-outline"></nb-icon>
+                <span>La nationalité est obligatoire</span>
+              </div>
+            </div>
+          </div>
+        </nb-card-body>
+      </nb-card>
+
+      <!-- Genre -->
+      <nb-card class="form-card">
+        <nb-card-header>
+          <div class="card-header-content">
+            <div class="step-badge">2</div>
+            <div>
+              <h5>Genre</h5>
+              <p class="text-muted">Sélectionnez le genre</p>
+            </div>
+          </div>
+        </nb-card-header>
+        <nb-card-body>
+          <div class="gender-grid">
+            <div
+              *ngFor="let gender of genderOptions"
+              class="gender-card"
+              [class.selected]="f.gender.value === gender.value"
+              (click)="f.gender.setValue(gender.value)"
+            >
+              <input
+                type="radio"
+                [id]="'gender-' + gender.value"
+                [value]="gender.value"
+                formControlName="gender"
+                class="gender-radio"
+              />
+              <div class="gender-icon" [ngClass]="'icon-' + gender.color">
+                <nb-icon [icon]="gender.icon"></nb-icon>
+              </div>
+              <div class="gender-label">{{ gender.label }}</div>
+              <div class="gender-check" *ngIf="f.gender.value === gender.value">
+                <nb-icon icon="checkmark-circle-2-outline"></nb-icon>
+              </div>
+            </div>
+          </div>
+        </nb-card-body>
+      </nb-card>
+
+      <!-- Coordonnées -->
+      <nb-card class="form-card">
+        <nb-card-header>
+          <div class="card-header-content">
+            <div class="step-badge">3</div>
+            <div>
+              <h5>Coordonnées</h5>
+              <p class="text-muted">Informations de contact</p>
+            </div>
+          </div>
+        </nb-card-header>
+        <nb-card-body>
+          <div class="row">
+            <!-- Adresse -->
+            <div class="col-12 mb-3">
+              <label for="address" class="form-label required"
+                >Adresse complète</label
+              >
+              <textarea
+                id="address"
+                nbInput
+                fullWidth
+                rows="3"
+                formControlName="address"
+                placeholder="12 Rue de la Paix, 75001 Paris"
+                [status]="
+                  f.address.invalid && f.address.touched ? 'danger' : 'basic'
+                "
+              ></textarea>
+              <div
+                *ngIf="f.address.invalid && f.address.touched"
+                class="field-error"
+              >
+                <nb-icon icon="alert-circle-outline"></nb-icon>
+                <span *ngIf="f.address. errors?.['required']"
+                  >L'adresse est obligatoire</span
+                >
+                <span *ngIf="f.address.errors?. ['maxlength']"
+                  >Maximum 200 caractères</span
+                >
+              </div>
+            </div>
+
+            <!-- Téléphone -->
+            <div class="col-md-6 mb-3">
+              <label for="phoneNumber" class="form-label required"
+                >Téléphone</label
+              >
+              <input
+                type="tel"
+                id="phoneNumber"
+                nbInput
+                fullWidth
+                formControlName="phoneNumber"
+                placeholder="+33123456789"
+                [status]="
+                  f.phoneNumber.invalid && f.phoneNumber.touched
+                    ? 'danger'
+                    : 'basic'
+                "
+              />
+              <div
+                *ngIf="f.phoneNumber.invalid && f.phoneNumber.touched"
+                class="field-error"
+              >
+                <nb-icon icon="alert-circle-outline"></nb-icon>
+                <span *ngIf="f.phoneNumber. errors?.['required']"
+                  >Le téléphone est obligatoire</span
+                >
+                <span *ngIf="f.phoneNumber.errors?.['pattern']"
+                  >Format: +33123456789 (international)</span
+                >
+              </div>
+            </div>
+
+            <!-- Email -->
+            <div class="col-md-6 mb-3">
+              <label for="email" class="form-label required">Email</label>
+              <input
+                type="email"
+                id="email"
+                nbInput
+                fullWidth
+                formControlName="email"
+                placeholder="jean.dupont@example.com"
+                [status]="
+                  f.email.invalid && f.email.touched ? 'danger' : 'basic'
+                "
+              />
+              <div
+                *ngIf="f.email.invalid && f.email.touched"
+                class="field-error"
+              >
+                <nb-icon icon="alert-circle-outline"></nb-icon>
+                <span *ngIf="f.email.errors?.['required']"
+                  >L'email est obligatoire</span
+                >
+                <span *ngIf="f.email. errors?.['email']"
+                  >Format d'email invalide</span
+                >
+                <span *ngIf="f.email.errors?.['maxlength']"
+                  >Maximum 100 caractères</span
+                >
+                <span *ngIf="f.email.errors?.['duplicate']"
+                  >Cet email est déjà utilisé</span
+                >
+              </div>
+            </div>
+          </div>
+        </nb-card-body>
+      </nb-card>
+
+      <!-- Actions -->
+      <div class="form-actions">
+        <button
+          nbButton
+          size="large"
+          status="basic"
+          type="button"
+          (click)="onCancel()"
+          [disabled]="isSubmitting"
+        >
+          <nb-icon icon="close-outline"></nb-icon>
+          Annuler
+        </button>
+
+        <button
+          nbButton
+          size="large"
+          status="primary"
+          type="submit"
+          [disabled]="customerForm.invalid || isSubmitting"
+        >
+          <nb-icon
+            [icon]="
+              isSubmitting
+                ? 'loader-outline'
+                : isEditMode
+                ? 'save-outline'
+                : 'checkmark-outline'
+            "
+            [class.spin]="isSubmitting"
+          ></nb-icon>
+          {{
+            isSubmitting
+              ? isEditMode
+                ? "Mise à jour..."
+                : "Création..."
+              : isEditMode
+              ? "Mettre à jour"
+              : "Créer le client"
+          }}
+        </button>
       </div>
     </form>
   </div>

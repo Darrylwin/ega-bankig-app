@@ -9,7 +9,7 @@
         <div>
           <h1 class="detail-title">
             <nb-icon icon="person-outline"></nb-icon>
-            Fiche Client
+            Détails du Client
           </h1>
           <p class="detail-subtitle" *ngIf="customer">
             {{ customer.firstName }} {{ customer.lastName }}
@@ -28,71 +28,82 @@
     </div>
   </div>
 
-  <br/>
-
-  <!-- Chargement -->
+  <!-- Loading -->
   <div *ngIf="isLoading" class="loading-container">
     <nb-spinner size="giant" status="primary"></nb-spinner>
-    <p class="loading-text">Chargement des détails... </p>
+    <p class="loading-text">Chargement des détails...</p>
   </div>
 
   <!-- Contenu -->
-  <div *ngIf="! isLoading && customer" class="detail-content">
-    <!-- Carte principale du client -->
-    <div class="customer-main-card">
-      <nb-card class="profile-card">
-        <nb-card-body>
-          <div class="profile-content">
-            <div class="profile-avatar">
-              <nb-icon icon="person-outline"></nb-icon>
+  <div *ngIf="!isLoading && customer" class="detail-content">
+    <!-- Carte de profil -->
+    <nb-card class="profile-card">
+      <nb-card-body>
+        <div class="profile-content">
+          <div class="profile-avatar">
+            <nb-icon icon="person-outline"></nb-icon>
+          </div>
+          <div class="profile-info">
+            <h2 class="profile-name">
+              {{ customer.firstName }} {{ customer.lastName }}
+            </h2>
+            <div class="profile-badges">
+              <nb-badge
+                [text]="getGenderLabel(customer.gender)"
+                [status]="getGenderColor(customer.gender)"
+              ></nb-badge>
+              <nb-badge
+                [text]="customer.age + ' ans'"
+                [status]="
+                  customer.age < 18
+                    ? 'warning'
+                    : customer.age >= 65
+                    ? 'info'
+                    : 'success'
+                "
+              ></nb-badge>
+              <nb-badge [text]="customer.nationality" status="basic"></nb-badge>
             </div>
-            <div class="profile-info">
-              <h2 class="profile-name">{{ customer.firstName }} {{ customer.lastName }}</h2>
-              <div class="profile-badges">
-                <nb-badge
-                  [text]="getGenderLabel(customer.gender)"
-                  [status]="getGenderColor(customer.gender)">
-                </nb-badge>
-                <nb-badge
-                  [text]="customer.age + ' ans'"
-                  [status]="customer.age < 18 ? 'warning' : customer.age >= 65 ? 'info' : 'success'">
-                </nb-badge>
-                <nb-badge
-                  [text]="customer.nationality"
-                  status="basic">
-                </nb-badge>
+            <div class="profile-contact">
+              <div class="contact-item">
+                <nb-icon icon="email-outline"></nb-icon>
+                <span>{{ customer.email }}</span>
               </div>
-              <div class="profile-contact">
-                <div class="contact-item">
-                  <nb-icon icon="email-outline"></nb-icon>
-                  <span>{{ customer. email }}</span>
-                </div>
-                <div class="contact-item">
-                  <nb-icon icon="phone-outline"></nb-icon>
-                  <span>{{ customer.phoneNumber }}</span>
-                </div>
-                <div class="contact-item">
-                  <nb-icon icon="pin-outline"></nb-icon>
-                  <span>{{ customer. address }}</span>
-                </div>
+              <div class="contact-item">
+                <nb-icon icon="phone-outline"></nb-icon>
+                <span>{{ customer.phoneNumber }}</span>
+              </div>
+              <div class="contact-item">
+                <nb-icon icon="pin-outline"></nb-icon>
+                <span>{{ customer.address }}</span>
               </div>
             </div>
           </div>
-        </nb-card-body>
-      </nb-card>
-    </div>
+        </div>
+      </nb-card-body>
+    </nb-card>
 
     <!-- Actions rapides -->
     <div class="quick-actions">
-      <button nbButton status="primary" size="large" (click)="onCreateAccount()" class="action-btn">
+      <button
+        nbButton
+        status="primary"
+        size="large"
+        (click)="onCreateAccount()"
+      >
         <nb-icon icon="plus-outline"></nb-icon>
         <span>Ouvrir un compte</span>
       </button>
-      <button nbButton status="info" size="large" (click)="onViewTransactions()" class="action-btn">
+      <button
+        nbButton
+        status="info"
+        size="large"
+        (click)="onViewTransactions()"
+      >
         <nb-icon icon="list-outline"></nb-icon>
         <span>Transactions</span>
       </button>
-      <button nbButton status="success" size="large" (click)="onEdit()" class="action-btn">
+      <button nbButton status="success" size="large" (click)="onEdit()">
         <nb-icon icon="edit-outline"></nb-icon>
         <span>Modifier</span>
       </button>
@@ -117,7 +128,9 @@
                   <nb-icon icon="calendar-outline"></nb-icon>
                   Date de naissance
                 </div>
-                <div class="info-value">{{ formatDate(customer.dateOfBirth) }}</div>
+                <div class="info-value">
+                  {{ formatDate(customer.dateOfBirth) }}
+                </div>
               </div>
               <div class="info-item">
                 <div class="info-label">
@@ -131,7 +144,9 @@
                   <nb-icon icon="person-outline"></nb-icon>
                   Genre
                 </div>
-                <div class="info-value">{{ getGenderLabel(customer.gender) }}</div>
+                <div class="info-value">
+                  {{ getGenderLabel(customer.gender) }}
+                </div>
               </div>
               <div class="info-item">
                 <div class="info-label">
@@ -146,8 +161,8 @@
                   Client depuis
                 </div>
                 <div class="info-value">
-                  {{ formatDate(customer. createdAt) }}
-                  <small class="text-muted">({{ customerStats.accountAge }} jours)</small>
+                  {{ formatDate(customer.createdAt) }}
+                  <small>({{ customerStats.accountAge }} jours)</small>
                 </div>
               </div>
               <div class="info-item">
@@ -168,11 +183,14 @@
               <h6>
                 <nb-icon icon="credit-card-outline"></nb-icon>
                 Comptes Bancaires
-                <nb-badge [text]="formatNumber(customerStats.totalAccounts)" status="primary" class="ms-2"></nb-badge>
+                <nb-badge
+                  [text]="formatNumber(customerStats.totalAccounts)"
+                  status="primary"
+                ></nb-badge>
               </h6>
-              <button nbButton ghost size="tiny" (click)="onCreateAccount()">
+              <button nbButton ghost size="small" (click)="onCreateAccount()">
                 <nb-icon icon="plus-outline"></nb-icon>
-                Nouveau compte
+                Nouveau
               </button>
             </div>
           </nb-card-header>
@@ -181,28 +199,50 @@
               <nb-spinner size="large" status="primary"></nb-spinner>
             </div>
 
-            <div *ngIf="! isLoadingAccounts && customerAccounts.length > 0" class="accounts-list">
-              <div *ngFor="let account of customerAccounts" class="account-item" (click)="onViewAccount(account)">
-                <div class="account-icon" [ngClass]="'icon-' + (account.accountType === 'SAVINGS' ? 'success' : 'primary')">
-                  <nb-icon [icon]="getAccountTypeIcon(account.accountType)"></nb-icon>
+            <div
+              *ngIf="!isLoadingAccounts && customerAccounts.length > 0"
+              class="accounts-list"
+            >
+              <div
+                *ngFor="let account of customerAccounts"
+                class="account-item"
+                (click)="onViewAccount(account)"
+              >
+                <div
+                  class="account-icon"
+                  [ngClass]="
+                    'icon-' +
+                    (account.accountType === 'SAVINGS' ? 'success' : 'primary')
+                  "
+                >
+                  <nb-icon
+                    [icon]="getAccountTypeIcon(account.accountType)"
+                  ></nb-icon>
                 </div>
                 <div class="account-info">
-                  <div class="account-type">{{ getAccountTypeLabel(account.accountType) }}</div>
-                  <small class="account-number">{{ formatAccountNumber(account.accountNumber) }}</small>
+                  <div class="account-type">
+                    {{ getAccountTypeLabel(account.accountType) }}
+                  </div>
+                  <small class="account-number">{{
+                    formatAccountNumber(account.accountNumber)
+                  }}</small>
                 </div>
                 <div class="account-balance">
-                  <div class="balance-value" [ngClass]="{
-                    'positive': account.balance > 0,
-                    'zero': account.balance === 0,
-                    'negative': account. balance < 0
-                  }">
+                  <div
+                    class="balance-value"
+                    [ngClass]="{
+                      positive: account.balance > 0,
+                      zero: account.balance === 0,
+                      negative: account.balance < 0
+                    }"
+                  >
                     {{ formatCurrency(account.balance) }}
                   </div>
                   <nb-badge
                     [text]="getStatusLabel(account.status)"
                     [status]="getStatusColor(account.status)"
-                    size="tiny">
-                  </nb-badge>
+                    size="tiny"
+                  ></nb-badge>
                 </div>
                 <div class="account-action">
                   <nb-icon icon="chevron-right-outline"></nb-icon>
@@ -210,60 +250,23 @@
               </div>
             </div>
 
-            <div *ngIf="! isLoadingAccounts && customerAccounts.length === 0" class="no-accounts">
+            <div
+              *ngIf="!isLoadingAccounts && customerAccounts.length === 0"
+              class="no-accounts"
+            >
               <nb-icon icon="credit-card-outline"></nb-icon>
               <p>Aucun compte bancaire</p>
-              <button nbButton status="primary" size="small" (click)="onCreateAccount()">
+              <button
+                nbButton
+                status="primary"
+                size="small"
+                (click)="onCreateAccount()"
+              >
                 Ouvrir un compte
               </button>
             </div>
           </nb-card-body>
         </nb-card>
-
-        <!-- Graphiques -->
-        <div class="charts-row" *ngIf="customerAccounts.length > 0">
-          <nb-card class="chart-card">
-            <nb-card-header>
-              <h6>
-                <nb-icon icon="pie-chart-outline"></nb-icon>
-                Types de Comptes
-              </h6>
-            </nb-card-header>
-            <nb-card-body>
-              <ngx-charts-pie-chart
-                *ngIf="accountTypeChartData. length > 0"
-                [view]="[undefined, 250]"
-                [scheme]="colorScheme"
-                [results]="accountTypeChartData"
-                [legend]="true"
-                [labels]="true"
-                [doughnut]="true">
-              </ngx-charts-pie-chart>
-            </nb-card-body>
-          </nb-card>
-
-          <nb-card class="chart-card">
-            <nb-card-header>
-              <h6>
-                <nb-icon icon="bar-chart-outline"></nb-icon>
-                Répartition des Soldes
-              </h6>
-            </nb-card-header>
-            <nb-card-body>
-              <ngx-charts-bar-vertical
-                *ngIf="balanceChartData.length > 0"
-                [view]="[undefined, 250]"
-                [scheme]="colorScheme"
-                [results]="balanceChartData"
-                [xAxis]="true"
-                [yAxis]="true"
-                [legend]="false"
-                [showXAxisLabel]="false"
-                [showYAxisLabel]="false">
-              </ngx-charts-bar-vertical>
-            </nb-card-body>
-          </nb-card>
-        </div>
       </div>
 
       <!-- Sidebar -->
@@ -273,7 +276,7 @@
           <nb-card-header>
             <h6>
               <nb-icon icon="bar-chart-outline"></nb-icon>
-              Statistiques Financières
+              Statistiques
             </h6>
           </nb-card-header>
           <nb-card-body>
@@ -282,21 +285,28 @@
                 <nb-icon icon="wallet-outline"></nb-icon>
                 Solde total
               </div>
-              <div class="stat-value text-primary">{{ formatCurrency(customerStats.totalBalance) }}</div>
+              <div class="stat-value text-primary">
+                {{ formatCurrency(customerStats.totalBalance) }}
+              </div>
             </div>
             <div class="stat-item">
               <div class="stat-label">
                 <nb-icon icon="trending-up-outline"></nb-icon>
                 Solde moyen
               </div>
-              <div class="stat-value">{{ formatCurrency(customerStats. averageBalance) }}</div>
+              <div class="stat-value">
+                {{ formatCurrency(customerStats.averageBalance) }}
+              </div>
             </div>
             <div class="stat-item">
               <div class="stat-label">
                 <nb-icon icon="credit-card-outline"></nb-icon>
                 Comptes actifs
               </div>
-              <div class="stat-value text-success">{{ customerStats.activeAccounts }} / {{ customerStats.totalAccounts }}</div>
+              <div class="stat-value text-success">
+                {{ customerStats.activeAccounts }} /
+                {{ customerStats.totalAccounts }}
+              </div>
             </div>
             <div class="stat-item">
               <div class="stat-label">
@@ -327,48 +337,26 @@
             <div class="action-list">
               <button nbButton fullWidth ghost (click)="onCreateAccount()">
                 <nb-icon icon="plus-circle-outline"></nb-icon>
-                Ouvrir un nouveau compte
+                Ouvrir un compte
               </button>
               <button nbButton fullWidth ghost (click)="onViewTransactions()">
                 <nb-icon icon="repeat-outline"></nb-icon>
-                Voir toutes les transactions
+                Voir les transactions
               </button>
               <button nbButton fullWidth ghost (click)="onEdit()">
                 <nb-icon icon="edit-outline"></nb-icon>
-                Modifier les informations
+                Modifier
               </button>
-              <button nbButton fullWidth ghost status="warning" disabled>
-                <nb-icon icon="lock-outline"></nb-icon>
-                Bloquer le client
-              </button>
-              <button nbButton fullWidth ghost status="danger" (click)="onDelete()">
+              <button
+                nbButton
+                fullWidth
+                ghost
+                status="danger"
+                (click)="onDelete()"
+              >
                 <nb-icon icon="trash-outline"></nb-icon>
-                Supprimer le client
+                Supprimer
               </button>
-            </div>
-          </nb-card-body>
-        </nb-card>
-
-        <!-- Informations système -->
-        <nb-card class="system-card">
-          <nb-card-header>
-            <h6>
-              <nb-icon icon="settings-outline"></nb-icon>
-              Informations Système
-            </h6>
-          </nb-card-header>
-          <nb-card-body>
-            <div class="system-item">
-              <small>Statut du compte</small>
-              <nb-badge text="Actif" status="success"></nb-badge>
-            </div>
-            <div class="system-item">
-              <small>Dernière connexion</small>
-              <div class="text-muted">Non disponible</div>
-            </div>
-            <div class="system-item">
-              <small>Dernière modification</small>
-              <div class="text-muted">{{ formatDate(customer.createdAt) }}</div>
             </div>
           </nb-card-body>
         </nb-card>
@@ -377,8 +365,8 @@
   </div>
 
   <!-- Message d'erreur -->
-  <div *ngIf="! isLoading && !customer" class="error-container">
-    <nb-icon icon="alert-circle-outline" class="error-icon"></nb-icon>
+  <div *ngIf="!isLoading && !customer" class="error-container">
+    <nb-icon icon="alert-circle-outline"></nb-icon>
     <h4>Client introuvable</h4>
     <p>Le client demandé n'existe pas ou a été supprimé</p>
     <button nbButton status="primary" size="large" (click)="onBack()">
