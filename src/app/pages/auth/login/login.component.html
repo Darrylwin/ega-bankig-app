@@ -1,100 +1,145 @@
-<div class="login-container">
-  <nb-layout>
-    <nb-layout-column>
-      <div class="login-wrapper">
-        <div class="login-card-wrapper">
-          <nb-card class="login-card">
-            <!-- Header cohérent avec customers -->
-            <nb-card-header class="login-header">
-              <div class="logo-container">
-                <nb-icon icon="shield-outline" class="logo-icon"></nb-icon>
-                <h1 class="logo-title">EGA Bank</h1>
-                <p class="logo-subtitle">Système de gestion bancaire</p>
-              </div>
-            </nb-card-header>
-
-            <!-- Body simplifié -->
-            <nb-card-body>
-              <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
-                <!-- Email Field -->
-                <div class="form-group">
-                  <label for="email" class="form-label">
-                    <nb-icon icon="email-outline"></nb-icon>
-                    Adresse email
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    nbInput
-                    fullWidth
-                    formControlName="email"
-                    placeholder="logossoudarryl20@gmail.com"
-                    [status]="f['email'].invalid && f['email'].touched ? 'danger' : 'basic'"
-                  />
-                  <div *ngIf="f['email'].invalid && f['email'].touched" class="error-message">
-                    <nb-icon icon="alert-circle-outline"></nb-icon>
-                    <span *ngIf="f['email'].errors?.['required']">L'email est requis</span>
-                    <span *ngIf="f['email'].errors?.['email']">Format d'email invalide</span>
-                  </div>
-                </div>
-
-                <!-- Password Field -->
-                <div class="form-group">
-                  <label for="password" class="form-label">
-                    <nb-icon icon="lock-outline"></nb-icon>
-                    Mot de passe
-                  </label>
-                  <div class="password-input-wrapper">
-                    <input
-                      [type]="showPassword ? 'text' : 'password'"
-                      id="password"
-                      nbInput
-                      fullWidth
-                      formControlName="password"
-                      placeholder="password"
-                      [status]="f['password'].invalid && f['password'].touched ? 'danger' : 'basic'"
-                    />
-                    <button
-                      nbButton
-                      ghost
-                      type="button"
-                      class="password-toggle"
-                      (click)="togglePasswordVisibility()"
-                    >
-                      <nb-icon [icon]="showPassword ? 'eye-off-outline' : 'eye-outline'"></nb-icon>
-                    </button>
-                  </div>
-                  <div *ngIf="f['password'].invalid && f['password'].touched" class="error-message">
-                    <nb-icon icon="alert-circle-outline"></nb-icon>
-                    <span *ngIf="f['password'].errors?.['required']">Le mot de passe est requis</span>
-                    <span *ngIf="f['password'].errors?.['minlength']">Minimum 6 caractères</span>
-                  </div>
-                </div>
-
-                <!-- Submit Button -->
-                <button
-                  nbButton
-                  fullWidth
-                  status="primary"
-                  size="large"
-                  type="submit"
-                  [disabled]="loginForm.invalid || isLoading"
-                  class="login-button"
-                >
-                  <span *ngIf="!isLoading" class="button-content">
-                    <nb-icon icon="log-in-outline"></nb-icon>
-                    Se connecter
-                  </span>
-                  <span *ngIf="isLoading" class="button-content">
-                    <nb-icon icon="loader-outline" class="spin"></nb-icon>
-                    Connexion en cours...
-                  </span>
-                </button>
-              </form>
-            </nb-card-body>
-          </nb-card>
+<nb-layout>
+  <nb-layout-column class="login-layout">
+    <div class="login-container">
+      <!-- Section gauche - Branding -->
+      <div class="login-branding">
+        <div class="branding-content">
+          <div class="brand-logo">
+            <nb-icon icon="shield-outline"></nb-icon>
+          </div>
+          <h1 class="brand-title">EGA Bank</h1>
         </div>
       </div>
-    </nb-layout-column>
-  </nb-layout>
+
+      <!-- Section droite - Formulaire -->
+      <div class="login-form-section">
+    <div class="login-wrapper">
+      <div class="login-card-wrapper">
+        <nb-card class="login-card">
+          <nb-card-header>
+            <div class="card-header-content">
+              <p class="welcome-text">Bienvenue sur Ega Bank</p>
+              <h2 class="card-title">Connexion à votre compte</h2>
+              <p class="card-subtitle">
+                Entrez vos identifiants pour accéder à l'application
+              </p>
+            </div>
+          </nb-card-header>
+
+          <nb-card-body>
+            <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
+              <!-- Email Field -->
+              <div class="form-group">
+                <label for="email" class="form-label">Adresse email</label>
+                <input
+                  type="email"
+                  id="email"
+                  nbInput
+                  fullWidth
+                  formControlName="email"
+                  placeholder="votre.email@exemple.com"
+                  [status]="
+                    f['email'].invalid && f['email'].touched
+                      ? 'danger'
+                      : 'basic'
+                  "
+                  [attr.aria-invalid]="f['email'].invalid && f['email'].touched"
+                />
+                <div
+                  *ngIf="f['email'].invalid && f['email'].touched"
+                  class="error-message"
+                >
+                  <nb-icon icon="alert-circle-outline"></nb-icon>
+                  <span *ngIf="f['email'].errors?.['required']"
+                    >L'email est requis</span
+                  >
+                  <span *ngIf="f['email'].errors?.['email']"
+                    >Format d'email invalide</span
+                  >
+                </div>
+              </div>
+
+              <!-- Password Field -->
+              <div class="form-group">
+                <label for="password" class="form-label">Mot de passe</label>
+                <div class="password-input-wrapper">
+                  <input
+                    [type]="showPassword ? 'text' : 'password'"
+                    id="password"
+                    nbInput
+                    fullWidth
+                    formControlName="password"
+                    placeholder="Entrez votre mot de passe"
+                    [status]="
+                      f['password'].invalid && f['password'].touched
+                        ? 'danger'
+                        : 'basic'
+                    "
+                    [attr.aria-invalid]="
+                      f['password'].invalid && f['password'].touched
+                    "
+                  />
+                  <button
+                    nbButton
+                    ghost
+                    type="button"
+                    class="password-toggle"
+                    (click)="togglePasswordVisibility()"
+                    [attr.aria-label]="
+                      showPassword
+                        ? 'Masquer le mot de passe'
+                        : 'Afficher le mot de passe'
+                    "
+                  >
+                    <nb-icon
+                      [icon]="showPassword ? 'eye-off-outline' : 'eye-outline'"
+                    ></nb-icon>
+                  </button>
+                </div>
+                <div
+                  *ngIf="f['password'].invalid && f['password'].touched"
+                  class="error-message"
+                >
+                  <nb-icon icon="alert-circle-outline"></nb-icon>
+                  <span *ngIf="f['password'].errors?.['required']"
+                    >Le mot de passe est requis</span
+                  >
+                  <span *ngIf="f['password'].errors?.['minlength']"
+                    >Minimum 6 caractères</span
+                  >
+                </div>
+              </div>
+
+
+              <!-- Submit Button -->
+              <button
+                nbButton
+                fullWidth
+                status="primary"
+                size="large"
+                type="submit"
+                [disabled]="loginForm.invalid || isLoading"
+                class="login-button"
+              >
+                <span *ngIf="!isLoading" class="button-content">
+                  <nb-icon icon="log-in-outline"></nb-icon>
+                  Se connecter
+                </span>
+                <span *ngIf="isLoading" class="button-content">
+                  <nb-icon icon="loader-outline" class="spin"></nb-icon>
+                  Connexion en cours...
+                </span>
+              </button>
+            </form>
+          </nb-card-body>
+
+          <nb-card-footer>
+            <p class="footer-text">© 2026 EGA Bank. Tous droits réservés.</p>
+          </nb-card-footer>
+        </nb-card>
+      </div>
+    </div>
+  </div>
 </div>
+  </nb-layout-column>
+</nb-layout>

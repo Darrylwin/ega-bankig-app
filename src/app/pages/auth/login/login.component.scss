@@ -2,234 +2,412 @@
   display: block;
   width: 100%;
   height: 100%;
+
+  ::ng-deep {
+    nb-layout.with-scroll .scrollable-container {
+      overflow: hidden !important;
+    }
+
+    nb-layout .layout {
+      min-height: 100vh;
+    }
+
+    nb-layout-column {
+      padding: 0 !important;
+    }
+
+    .login-layout {
+      padding: 0 !important;
+    }
+  }
 }
 
 .login-container {
   min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
-  background: var(--background-basic-color-2);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--background-basic-color-1);
   position: relative;
+  overflow: hidden;
 
-  .login-wrapper {
+  // Section gauche - Branding
+  .login-branding {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(
+      135deg,
+      var(--color-primary-500),
+      var(--color-primary-700)
+    );
+    padding: 3rem;
     position: relative;
-    width: 100%;
-    max-width: 420px; // Largeur cohérente
-    margin: 0 auto;
-  }
-
-  .login-card-wrapper {
-    animation: fadeIn 0.5s ease-out;
-  }
-
-  .login-card {
-    border-radius: 1rem; // Même rayon que customers
-    border: none;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08); // Même ombre
     overflow: hidden;
-    background: var(--background-basic-color-1);
-    width: 100%;
 
-    .login-header {
-      background: linear-gradient(
-        135deg,
-        var(--color-primary-500),
-        var(--color-primary-700)
+    // Effet de fond décoratif
+    &::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(
+        circle,
+        rgba(255, 255, 255, 0.1) 0%,
+        transparent 70%
       );
-      border-bottom: none;
-      padding: 2rem;
+      animation: pulse 8s ease-in-out infinite;
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -30%;
+      left: -30%;
+      width: 80%;
+      height: 80%;
+      background: radial-gradient(
+        circle,
+        rgba(255, 255, 255, 0.05) 0%,
+        transparent 70%
+      );
+      animation: pulse 6s ease-in-out infinite reverse;
+    }
+
+    .branding-content {
+      position: relative;
+      z-index: 1;
       text-align: center;
       color: white;
-      box-shadow: 0 4px 20px rgba(51, 102, 255, 0.3); // Même effet que customers
 
-      .logo-container {
-        .logo-icon {
-          font-size: 3.5rem;
+      .brand-logo {
+        width: 120px;
+        height: 120px;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        border-radius: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 2rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+
+        nb-icon {
+          font-size: 4rem;
           color: white;
-          margin-bottom: 1rem;
         }
+      }
 
-        .logo-title {
-          font-size: 1.5rem;
-          font-weight: 700;
-          color: white;
-          margin: 0 0 0.5rem 0;
-        }
+      .brand-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin: 0 0 1rem;
+        letter-spacing: -0.5px;
+      }
 
-        .logo-subtitle {
-          font-size: 0.875rem;
-          color: rgba(255, 255, 255, 0.9);
-          margin: 0;
+      .brand-subtitle {
+        font-size: 1.125rem;
+        opacity: 0.95;
+        margin: 0 0 3rem;
+        font-weight: 400;
+      }
+
+      .brand-features {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        text-align: left;
+        max-width: 400px;
+
+        .feature-item {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          padding: 1rem;
+          background: rgba(255, 255, 255, 0.1);
+          backdrop-filter: blur(10px);
+          border-radius: 0.75rem;
+          border: 1px solid rgba(255, 255, 255, 0.15);
+
+          .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+
+            nb-icon {
+              font-size: 1.5rem;
+              color: white;
+            }
+          }
+
+          .feature-content {
+            .feature-title {
+              font-size: 1rem;
+              font-weight: 600;
+              margin: 0 0 0.25rem;
+            }
+
+            .feature-description {
+              font-size: 0.875rem;
+              opacity: 0.9;
+              margin: 0;
+            }
+          }
         }
       }
     }
+  }
 
-    nb-card-body {
-      padding: 2rem; // Même padding que customers
+  // Section droite - Formulaire
+  .login-form-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    background: var(--background-basic-color-1);
 
-      .form-group {
-        margin-bottom: 1.5rem; // Même espacement
+    .login-wrapper {
+      width: 100%;
+      max-width: 480px;
+    }
 
-        .form-label {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          font-size: 0.875rem;
-          font-weight: 600;
-          color: var(--text-basic-color);
-          margin-bottom: 0.5rem;
+    .login-card-wrapper {
+      animation: slideInRight 0.6s ease-out;
+    }
 
-          nb-icon {
-            font-size: 1.125rem;
-            color: var(--color-primary-500);
-          }
-        }
+    .login-card {
+      border-radius: 1rem;
+      border: 1px solid var(--border-basic-color-3);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+      background: var(--background-basic-color-1);
 
-        input[nbInput] {
-          border-radius: 0.5rem; // Même rayon
-          font-size: 0.9375rem;
-          padding: 0.75rem 1rem;
-          transition: all 0.2s ease;
-          border: 1px solid var(--border-basic-color-3);
-          background: var(--background-basic-color-1);
+      nb-card-header {
+        background: var(--background-basic-color-1);
+        border-bottom: 1px solid var(--border-basic-color-3);
+        padding: 2rem 2rem 1.5rem;
 
-          &:focus {
-            border-color: var(--color-primary-500);
-            box-shadow: 0 0 0 3px rgba(51, 102, 255, 0.1);
-          }
-        }
-
-        .password-input-wrapper {
-          position: relative;
-
-          input {
-            padding-right: 3rem;
-          }
-
-          .password-toggle {
-            position: absolute;
-            right: 0.5rem;
-            top: 50%;
-            transform: translateY(-50%);
-            padding: 0.25rem;
-            z-index: 2;
-            background: transparent;
-            border: none;
+        .card-header-content {
+          .welcome-text {
+            font-size: 0.875rem;
             color: var(--text-hint-color);
-            cursor: pointer;
+            margin: 0 0 0.5rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+
+          .card-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-basic-color);
+            margin: 0 0 0.5rem;
+          }
+
+          .card-subtitle {
+            font-size: 0.9375rem;
+            color: var(--text-hint-color);
+            margin: 0;
+          }
+        }
+      }
+
+      nb-card-body {
+        padding: 2rem;
+
+        .form-group {
+          margin-bottom: 1.5rem;
+
+          .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-basic-color);
+            margin-bottom: 0.5rem;
+          }
+
+          input[nbInput] {
+            border-radius: 0.5rem;
+            font-size: 0.9375rem;
+            padding: 0.875rem 1rem;
+            transition: all 0.2s ease;
+            border: 1px solid var(--border-basic-color-3);
+            background: var(--background-basic-color-1);
+            width: 100%;
+
+            &::placeholder {
+              color: var(--text-disabled-color);
+            }
+
+            &:focus {
+              border-color: var(--color-primary-500);
+              box-shadow: 0 0 0 3px rgba(51, 102, 255, 0.1);
+            }
+
+            &:hover:not(:focus) {
+              border-color: var(--border-basic-color-2);
+            }
+          }
+
+          .password-input-wrapper {
+            position: relative;
+
+            input {
+              padding-right: 3rem;
+            }
+
+            .password-toggle {
+              position: absolute;
+              right: 0.5rem;
+              top: 50%;
+              transform: translateY(-50%);
+              padding: 0.5rem;
+              z-index: 2;
+              background: transparent;
+              border: none;
+              color: var(--text-hint-color);
+              cursor: pointer;
+              transition: color 0.2s;
+
+              &:hover {
+                color: var(--color-primary-500);
+              }
+
+              nb-icon {
+                font-size: 1.25rem;
+              }
+            }
+          }
+
+          .error-message {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            margin-top: 0.5rem;
+            font-size: 0.8125rem;
+            color: var(--color-danger-500);
+
+            nb-icon {
+              font-size: 1rem;
+            }
+          }
+        }
+
+        .form-options {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 1.5rem;
+
+          nb-checkbox {
+            font-size: 0.875rem;
+            color: var(--text-hint-color);
+          }
+
+          .forgot-password {
+            font-size: 0.875rem;
+            color: var(--color-primary-500);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
 
             &:hover {
-              color: var(--text-basic-color);
+              color: var(--color-primary-600);
+              text-decoration: underline;
             }
+          }
+        }
+
+        .login-button {
+          border-radius: 0.5rem;
+          font-weight: 600;
+          font-size: 1rem;
+          padding: 1rem;
+          transition: all 0.3s ease;
+          box-shadow: 0 2px 8px rgba(51, 102, 255, 0.2);
+
+          .button-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
 
             nb-icon {
               font-size: 1.25rem;
             }
           }
-        }
 
-        .error-message {
-          display: flex;
-          align-items: center;
-          gap: 0.375rem;
-          margin-top: 0.5rem;
-          font-size: 0.8125rem;
-          color: var(--color-danger-500);
+          &:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(51, 102, 255, 0.3);
+          }
 
-          nb-icon {
-            font-size: 1rem;
+          &:active:not(:disabled) {
+            transform: translateY(0);
+          }
+
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
           }
         }
       }
 
-      .form-options {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1.5rem;
-
-        nb-checkbox {
-          font-size: 0.875rem;
-          color: var(--text-hint-color);
-        }
-
-        .forgot-password {
-          font-size: 0.875rem;
-          color: var(--color-primary-600);
-          text-decoration: none;
-          font-weight: 500;
-
-          &:hover {
-            color: var(--color-primary-800);
-            text-decoration: underline;
-          }
-        }
-      }
-
-      .login-button {
-        border-radius: 0.5rem; // Même rayon
-        font-weight: 600;
-        font-size: 0.9375rem;
-        padding: 0.875rem; // Même padding que customers
-        transition: all 0.2s ease;
-        margin-bottom: 1.5rem;
-
-        .button-content {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 0.5rem;
-
-          nb-icon {
-            font-size: 1.25rem;
-          }
-        }
-
-        &:hover:not(:disabled) {
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(51, 102, 255, 0.2);
-        }
-
-        &:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
-      }
-
-      .login-footer {
-        text-align: center;
+      nb-card-footer {
+        background: var(--background-basic-color-2);
         border-top: 1px solid var(--border-basic-color-3);
-        padding-top: 1.5rem;
-        margin-top: 1.5rem;
+        padding: 1.25rem 2rem;
+        text-align: center;
 
         .footer-text {
-          font-size: 0.75rem;
+          font-size: 0.8125rem;
           color: var(--text-hint-color);
-          margin: 0 0 0.5rem 0;
-        }
-
-        .footer-version {
-          font-size: 0.7rem;
-          color: var(--text-disabled-color);
           margin: 0;
-          font-weight: 500;
+
+          a {
+            color: var(--color-primary-500);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+
+            &:hover {
+              color: var(--color-primary-600);
+              text-decoration: underline;
+            }
+          }
         }
       }
     }
   }
 }
 
-// Animations simples
-@keyframes fadeIn {
+// Animations
+@keyframes slideInRight {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateX(30px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
   }
 }
 
@@ -246,8 +424,48 @@
   animation: spin 1s linear infinite;
 }
 
-// Responsive cohérent avec customers
-@media (max-width: 768px) {
+// Responsive
+@media (max-width: 1024px) {
+  .login-container {
+    grid-template-columns: 1fr;
+
+    .login-branding {
+      display: none;
+    }
+
+    .login-form-section {
+      padding: 2rem 1.5rem;
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .login-container {
+    .login-form-section {
+      padding: 1.5rem 1rem;
+
+      .login-card {
+        nb-card-header {
+          padding: 1.5rem;
+
+          .card-header-content {
+            .card-title {
+              font-size: 1.5rem;
+            }
+          }
+        }
+
+        nb-card-body {
+          padding: 1.5rem;
+        }
+
+        nb-card-footer {
+          padding: 1rem 1.5rem;
+        }
+      }
+    }
+  }
+}
   .login-container {
     .login-card {
       border-radius: 0;
@@ -272,7 +490,6 @@
       }
     }
   }
-}
 
 @media (max-width: 576px) {
   .login-container {
