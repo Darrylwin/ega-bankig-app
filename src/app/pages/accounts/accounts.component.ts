@@ -241,6 +241,14 @@ export class AccountsComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Navigation vers l'édition
+   */
+  onEdit(event: any): void {
+    const account = event.data as Account;
+    this.router.navigate(['/pages/accounts/detail', account.id]);
+  }
+
+  /**
    * Suppression d'un compte
    */
   onDelete(event: any): void {

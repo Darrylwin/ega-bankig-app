@@ -146,8 +146,13 @@
               border-bottom: 1px solid var(--border-basic-color-3);
             }
 
-            tr:hover {
-              background: var(--background-basic-color-2);
+            tr {
+              transition: background 0.2s;
+
+              &:hover {
+                background: var(--background-basic-color-2);
+                cursor: pointer;
+              }
             }
 
             .badge {
@@ -387,6 +392,15 @@
     nb-card-footer {
       border-top: 1px solid var(--border-basic-color-3);
       padding: 1rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+
+      .footer-actions {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+      }
     }
   }
 

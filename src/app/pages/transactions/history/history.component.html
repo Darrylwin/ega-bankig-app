@@ -22,29 +22,7 @@
           </p>
         </div>
       </div>
-      <div class="header-actions">
-        <!-- Sélecteur de vue -->
-        <nb-button-group>
-          <button
-            nbButton
-            size="small"
-            [status]="viewMode === 'table' ? 'primary' : 'basic'"
-            (click)="setViewMode('table')"
-            nbTooltip="Tableau"
-          >
-            <nb-icon icon="list-outline"></nb-icon>
-          </button>
-          <button
-            nbButton
-            size="small"
-            [status]="viewMode === 'timeline' ? 'primary' : 'basic'"
-            (click)="setViewMode('timeline')"
-            nbTooltip="Chronologie"
-          >
-            <nb-icon icon="clock-outline"></nb-icon>
-          </button>
-        </nb-button-group>
-      </div>
+
     </div>
   </div>
 
@@ -291,7 +269,7 @@
     </div>
 
     <!-- VUE TABLEAU -->
-    <div *ngIf="viewMode === 'table' && filteredTransactions.length > 0">
+    <div *ngIf="filteredTransactions.length > 0">
       <nb-card class="table-card">
         <nb-card-body>
           <ng2-smart-table
@@ -352,111 +330,6 @@
           </div>
         </nb-card-body>
       </nb-card>
-    </div>
-
-    <!-- VUE TIMELINE -->
-    <div *ngIf="viewMode === 'timeline' && filteredTransactions.length > 0" class="timeline-view">
-      <nb-card>
-        <nb-card-body>
-          <div class="timeline">
-            <div *ngFor="let transaction of pagedTransactions; let i = index" class="timeline-item">
-              <div class="timeline-marker" [ngClass]="getTransactionColor(transaction.transactionType, isIncomingTransfer(transaction))">
-                <nb-icon [icon]="getTransactionIcon(transaction.transactionType)"></nb-icon>
-              </div>
-
-              <div class="timeline-content">
-                <div class="timeline-header">
-                  <div class="timeline-date">
-                    {{ formatDateTime(transaction.transactionDate) }}
-                  </div>
-                  <nb-badge
-                    [text]="getStatusLabel(transaction.status)"
-                    [status]="getStatusColor(transaction.status)"
-                    size="tiny"
-                  >
-                  </nb-badge>
-                </div>
-
-                <div class="timeline-body">
-                  <div class="timeline-type">
-                    <nb-icon [icon]="getTransactionIcon(transaction.transactionType)"></nb-icon>
-                    <strong>{{ getTransactionLabel(transaction.transactionType, isIncomingTransfer(transaction)) }}</strong>
-                  </div>
-
-                  <div class="timeline-amount" [ngClass]="{
-                    'text-success': transaction.transactionType === 'DEPOSIT' || isIncomingTransfer(transaction),
-                    'text-danger': transaction.transactionType === 'WITHDRAWAL' || 
-                      (transaction.transactionType === 'TRANSFER' && !isIncomingTransfer(transaction))
-                  }">
-                    {{ (transaction.transactionType === 'DEPOSIT' || isIncomingTransfer(transaction)) ? '+' : '-' }}
-                    {{ formatCurrency(Math.abs(transaction.amount)) }}
-                  </div>
-
-                  <div class="timeline-details">
-                    <div *ngIf="transaction.sourceAccountNumber">
-                      <small>De :</small>
-                      <span class="account-number">{{ formatAccountNumber(transaction.sourceAccountNumber) }}</span>
-                    </div>
-                    <div *ngIf="transaction.destinationAccountNumber">
-                      <small>Vers :</small>
-                      <span class="account-number">{{ formatAccountNumber(transaction.destinationAccountNumber) }}</span>
-                    </div>
-                    <div *ngIf="transaction.description">
-                      <small>Description :</small>
-                      <span>{{ transaction.description }}</span>
-                    </div>
-                  </div>
-
-                  <div class="timeline-balance">
-                    Solde après : <strong>{{ formatCurrency(getDisplayBalance(transaction, false)) }}</strong>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </nb-card-body>
-      </nb-card>
-
-      <!-- Pagination timeline -->
-      <div class="timeline-pagination" *ngIf="filteredTransactions.length > pageSize">
-        <button
-          nbButton
-          ghost
-          size="small"
-          [disabled]="currentPage === 0"
-          (click)="goToFirstPage()"
-        >
-          <nb-icon icon="arrowhead-left-outline"></nb-icon>
-        </button>
-        <button
-          nbButton
-          ghost
-          size="small"
-          [disabled]="currentPage === 0"
-          (click)="goToPreviousPage()"
-        >
-          <nb-icon icon="chevron-left-outline"></nb-icon>
-        </button>
-        <span class="page-info">Page {{ currentPageDisplay }} / {{ totalPages }}</span>
-        <button
-          nbButton
-          ghost
-          size="small"
-          [disabled]="currentPage >= totalPages - 1"
-          (click)="goToNextPage()"
-        >
-          <nb-icon icon="chevron-right-outline"></nb-icon>
-        </button>
-        <button
-          nbButton
-          ghost
-          size="small"
-          [disabled]="currentPage >= totalPages - 1"
-          (click)="goToLastPage()"
-        >
-          <nb-icon icon="arrowhead-right-outline"></nb-icon>
-        </button>
-      </div>
     </div>
 
     <!-- Message si vide -->

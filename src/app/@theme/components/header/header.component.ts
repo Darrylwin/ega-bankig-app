@@ -5,9 +5,10 @@ import {
   NbSidebarService, 
   NbThemeService 
 } from '@nebular/theme';
-import { UserData } from '../../../@core/data/users';
+import { Router } from '@angular/router';
+import { AuthApiService } from '../../../@core/data/api/auth-api.service';
 import { LayoutService } from '../../../@core/utils/layout.service';
-import { map, takeUntil } from 'rxjs/operators';
+import { map, takeUntil, filter } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 
 @Component({
@@ -27,13 +28,14 @@ export class HeaderComponent implements OnInit, OnDestroy {
   ];
 
   currentTheme = 'default';
-  userMenu = [{ title:  'Profile' }, { title:  'Log out' }];
+  userMenu = [{ title: 'Déconnexion' }];
 
   constructor(
     private sidebarService: NbSidebarService,
     private menuService: NbMenuService,
-    private themeService:  NbThemeService,
-    private userService: UserData,
+    private themeService: NbThemeService,
+    private authService: AuthApiService,
+    private router: Router,
     private layoutService: LayoutService,
     private breakpointService: NbMediaBreakpointsService
   ) {}
@@ -41,15 +43,35 @@ export class HeaderComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.currentTheme = this.themeService.currentTheme;
 
-    this.userService.getUsers()
+    // Récupérer l'utilisateur connecté
+    this.authService.currentUser$
       .pipe(takeUntil(this.destroy$))
-      .subscribe((users: any) => this.user = users. nick);
+      .subscribe((user) => {
+        if (user) {
+          this.user = {
+            name: user.username,
+            picture: 'assets/images/avatar.png'
+          };
+        }
+      });
 
-    const { xl } = this.breakpointService. getBreakpointsMap();
-    this.themeService. onMediaQueryChange()
+    // Gérer les clics sur le menu utilisateur
+    this.menuService.onItemClick()
+      .pipe(
+        filter(({ tag }) => tag === 'user-context-menu'),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((event) => {
+        if (event.item.title === 'Déconnexion') {
+          this.logout();
+        }
+      });
+
+    const { xl } = this.breakpointService.getBreakpointsMap();
+    this.themeService.onMediaQueryChange()
       .pipe(
         map(([, currentBreakpoint]) => currentBreakpoint.width < xl),
-        takeUntil(this. destroy$),
+        takeUntil(this.destroy$),
       )
       .subscribe((isLessThanXl: boolean) => this.userPictureOnly = isLessThanXl);
 
@@ -79,5 +101,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
   navigateHome() {
     this.menuService.navigateHome();
     return false;
+  }
+
+  logout() {
+    this.authService.logout();
+    this.router.navigate(['/auth/login']);
   }
 }

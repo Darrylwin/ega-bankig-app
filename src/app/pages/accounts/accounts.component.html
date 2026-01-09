@@ -92,7 +92,7 @@
     <div *ngIf="viewMode === 'table'">
       <nb-card class="table-card">
         <nb-card-body>
-          <ng2-smart-table [settings]="settings" [source]="source" (edit)="onView($event)" (delete)="onDelete($event)">
+          <ng2-smart-table [settings]="settings" [source]="source" (edit)="onView($event)" (delete)="onDelete($event)" (userRowSelect)="onView($event)">
           </ng2-smart-table>
 
           <!-- Pagination -->
@@ -196,6 +196,25 @@
               <nb-icon icon="eye-outline"></nb-icon>
               Détails
             </button>
+            <div class="footer-actions">
+              <button
+                nbButton
+                ghost
+                size="small"
+                (click)="onEdit({ data: account })"
+              >
+                <nb-icon icon="edit-outline"></nb-icon>
+              </button>
+              <button
+                nbButton
+                ghost
+                size="small"
+                status="danger"
+                (click)="onDelete({ data: account })"
+              >
+                <nb-icon icon="trash-outline"></nb-icon>
+              </button>
+            </div>
           </nb-card-footer>
         </nb-card>
       </div>
