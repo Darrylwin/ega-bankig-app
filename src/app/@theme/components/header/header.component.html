@@ -5,6 +5,7 @@
     </a>
     <a class="logo" href="#" (click)="navigateHome()">Ega-<span>Banking</span></a>
   </div>
+  <span style="margin-right: 8px;"></span>
   <nb-select [selected]="currentTheme" (selectedChange)="changeTheme($event)" status="primary">
     <nb-option *ngFor="let theme of themes" [value]="theme.value"> {{ theme.name }}</nb-option>
   </nb-select>
@@ -20,7 +21,6 @@
       <nb-user [nbContextMenu]="userMenu"
                nbContextMenuTag="user-context-menu"
                [onlyPicture]="userPictureOnly"
-               [name]="user?.name"
                [picture]="user?.picture">
       </nb-user>
     </nb-action>
