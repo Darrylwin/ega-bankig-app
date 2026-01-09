@@ -3,7 +3,7 @@ import {HttpClient} from '@angular/common/http';
 import {Observable, BehaviorSubject} from 'rxjs';
 import {tap} from 'rxjs/operators';
 import {environment} from '../../../../environments/environment';
-import {LoginRequest, LoginResponse} from '../models';
+import {LoginRequest, AuthResponse} from '../models';
 
 /**
  * Service d'authentification
@@ -22,7 +22,7 @@ export class AuthApiService {
    * BehaviorSubject pour observer l'utilisateur connecté
    * Permet aux composants de réagir aux changements d'authentification
    */
-  private currentUserSubject = new BehaviorSubject<LoginResponse | null>(this.getCurrentUser());
+  private currentUserSubject = new BehaviorSubject<AuthResponse | null>(this.getCurrentUser());
   public currentUser$ = this.currentUserSubject.asObservable();
 
   constructor(private http: HttpClient) {
@@ -44,7 +44,7 @@ export class AuthApiService {
    * 6. Le JwtInterceptor ajoute automatiquement le token à chaque requête
    *
    * @param credentials - { email: string, password: string }
-   * @returns Observable<LoginResponse> avec token, username, email, roles
+   * @returns Observable<AuthResponse> avec token, username, email, roles
    * @throws AuthenticationFailedException si email/password invalides
    *
    * Exemple d'utilisation :
@@ -61,11 +61,11 @@ export class AuthApiService {
    *   });
    * ```
    */
-  login(credentials: LoginRequest): Observable<LoginResponse> {
+  login(credentials: LoginRequest): Observable<AuthResponse> {
     console.log('🔵 Calling API:', `${this.API_URL}/login`);
     console.log('📤 Credentials:', {email: credentials.email, password: '***'});
 
-    return this.http.post<LoginResponse>(`${this.API_URL}/login`, credentials)
+    return this.http.post<AuthResponse>(`${this.API_URL}/login`, credentials)
       .pipe(
         tap(response => {
           console.log('📥 API Response:', response);
@@ -155,7 +155,7 @@ export class AuthApiService {
    *
    * @param user - Les infos utilisateur (username, email, roles)
    */
-  private saveUser(user: LoginResponse): void {
+  private saveUser(user: AuthResponse): void {
     localStorage.setItem(this.USER_KEY, JSON.stringify(user));
   }
 
@@ -164,7 +164,7 @@ export class AuthApiService {
    *
    * @returns Les infos utilisateur ou null si non connecté
    */
-  getCurrentUser(): LoginResponse | null {
+  getCurrentUser(): AuthResponse | null {
     const user = localStorage.getItem(this.USER_KEY);
     return user ? JSON.parse(user) : null;
   }
