@@ -2,24 +2,41 @@
   <nb-layout>
     <nb-layout-column>
       <div class="login-wrapper">
+        <!-- Background decorative elements -->
+        <div class="background-decoration">
+          <div class="circle circle-1"></div>
+          <div class="circle circle-2"></div>
+          <div class="circle circle-3"></div>
+        </div>
+
         <div class="login-card-wrapper">
           <nb-card class="login-card">
             <!-- Header -->
             <nb-card-header>
               <div class="logo-container">
-                <nb-icon icon="shield-outline" class="logo-icon"></nb-icon>
-                <h1 class="logo-title">EGA Bank</h1>
-                <p class="logo-subtitle">Système de gestion bancaire</p>
+                <div class="logo-icon-wrapper">
+                  <nb-icon icon="shield-outline" class="logo-icon"></nb-icon>
+                </div>
+                <div class="logo-text">
+                  <h1 class="logo-title">EGA Bank</h1>
+                  <p class="logo-subtitle">
+                    Système de gestion bancaire sécurisé
+                  </p>
+                </div>
               </div>
             </nb-card-header>
 
             <!-- Body -->
             <nb-card-body>
+              <div class="welcome-text">
+                <h2>Connexion</h2>
+              </div>
+
               <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
                 <!-- Email Field -->
                 <div class="form-group">
                   <label for="email" class="form-label">
-                    <nb-icon icon="email-outline"></nb-icon>
+                    <nb-icon icon="email-outline" class="input-icon"></nb-icon>
                     Adresse email
                   </label>
                   <input
@@ -29,20 +46,33 @@
                     fullWidth
                     formControlName="email"
                     placeholder="admin@ega-bank.com"
-                    [status]="f['email'].invalid && f['email'].touched ? 'danger' : 'basic'"
-                    [attr.aria-invalid]="f['email'].invalid && f['email'].touched"
+                    [status]="
+                      f['email'].invalid && f['email'].touched
+                        ? 'danger'
+                        : 'basic'
+                    "
+                    [attr.aria-invalid]="
+                      f['email'].invalid && f['email'].touched
+                    "
                   />
-                  <div *ngIf="f['email'].invalid && f['email'].touched" class="error-message">
+                  <div
+                    *ngIf="f['email'].invalid && f['email'].touched"
+                    class="error-message"
+                  >
                     <nb-icon icon="alert-circle-outline"></nb-icon>
-                    <span *ngIf="f['email'].errors?.['required']">L'email est requis</span>
-                    <span *ngIf="f['email'].errors?.['email']">Format d'email invalide</span>
+                    <span *ngIf="f['email'].errors?.['required']"
+                      >L'email est requis</span
+                    >
+                    <span *ngIf="f['email'].errors?.['email']"
+                      >Format d'email invalide</span
+                    >
                   </div>
                 </div>
 
                 <!-- Password Field -->
                 <div class="form-group">
                   <label for="password" class="form-label">
-                    <nb-icon icon="lock-outline"></nb-icon>
+                    <nb-icon icon="lock-outline" class="input-icon"></nb-icon>
                     Mot de passe
                   </label>
                   <div class="password-input-wrapper">
@@ -53,8 +83,14 @@
                       fullWidth
                       formControlName="password"
                       placeholder="Entrez votre mot de passe"
-                      [status]="f['password'].invalid && f['password'].touched ? 'danger' : 'basic'"
-                      [attr.aria-invalid]="f['password'].invalid && f['password'].touched"
+                      [status]="
+                        f['password'].invalid && f['password'].touched
+                          ? 'danger'
+                          : 'basic'
+                      "
+                      [attr.aria-invalid]="
+                        f['password'].invalid && f['password'].touched
+                      "
                     />
                     <button
                       nbButton
@@ -62,23 +98,31 @@
                       type="button"
                       class="password-toggle"
                       (click)="togglePasswordVisibility()"
-                      [attr.aria-label]="showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+                      [attr.aria-label]="
+                        showPassword
+                          ? 'Masquer le mot de passe'
+                          : 'Afficher le mot de passe'
+                      "
                     >
-                      <nb-icon [icon]="showPassword ? 'eye-off-outline' : 'eye-outline'"></nb-icon>
+                      <nb-icon
+                        [icon]="
+                          showPassword ? 'eye-off-outline' : 'eye-outline'
+                        "
+                      ></nb-icon>
                     </button>
                   </div>
-                  <div *ngIf="f['password'].invalid && f['password'].touched" class="error-message">
+                  <div
+                    *ngIf="f['password'].invalid && f['password'].touched"
+                    class="error-message"
+                  >
                     <nb-icon icon="alert-circle-outline"></nb-icon>
-                    <span *ngIf="f['password'].errors?.['required']">Le mot de passe est requis</span>
-                    <span *ngIf="f['password'].errors?.['minlength']">Minimum 6 caractères</span>
+                    <span *ngIf="f['password'].errors?.['required']"
+                      >Le mot de passe est requis</span
+                    >
+                    <span *ngIf="f['password'].errors?.['minlength']"
+                      >Minimum 6 caractères</span
+                    >
                   </div>
-                </div>
-
-                <!-- Remember Me -->
-                <div class="form-options">
-                  <nb-checkbox formControlName="rememberMe">
-                    Se souvenir de moi
-                  </nb-checkbox>
                 </div>
 
                 <!-- Submit Button -->
@@ -100,6 +144,26 @@
                     Connexion en cours...
                   </span>
                 </button>
+
+                <!-- Divider -->
+                <div class="divider">
+                  <span class="divider-text">ou</span>
+                </div>
+
+                <!-- Demo Credentials -->
+                <div class="demo-credentials">
+                  <p class="demo-title">Identifiants de démonstration :</p>
+                  <div class="credentials-grid">
+                    <div class="credential-item">
+                      <nb-icon icon="person-outline"></nb-icon>
+                      <span>logossoudarryl20@gmail.com</span>
+                    </div>
+                    <div class="credential-item">
+                      <nb-icon icon="key-outline"></nb-icon>
+                      <span>password</span>
+                    </div>
+                  </div>
+                </div>
               </form>
             </nb-card-body>
           </nb-card>
