@@ -2,6 +2,7 @@ import { NgModule } from "@angular/core";
 import { BrowserModule } from "@angular/platform-browser";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { HttpClientModule } from "@angular/common/http";
+import { NbEvaIconsModule } from "@nebular/eva-icons"; // <-- AJOUTEZ CE MODULE
 
 import { CoreModule } from "./@core/core.module";
 
@@ -17,7 +18,6 @@ import {
   NbUserModule,
   NbSearchModule,
 } from "@nebular/theme";
-import { NbEvaIconsModule } from "@nebular/eva-icons";
 import { NbSecurityModule, NbRoleProvider } from "@nebular/security";
 
 import { AppComponent } from "./app.component";

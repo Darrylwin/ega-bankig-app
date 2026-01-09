@@ -28,7 +28,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
   ];
 
   currentTheme = 'default';
-  userMenu = [{ title: 'Déconnexion' }];
+  userMenu = [
+    { title: 'Changer mot de passe' },
+    { title: 'Déconnexion' }
+  ];
 
   constructor(
     private sidebarService: NbSidebarService,
@@ -64,6 +67,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
       .subscribe((event) => {
         if (event.item.title === 'Déconnexion') {
           this.logout();
+        } else if (event.item.title === 'Changer mot de passe') {
+          this.changePassword();
         }
       });
 
@@ -106,5 +111,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
   logout() {
     this.authService.logout();
     this.router.navigate(['/auth/login']);
+  }
+
+  changePassword() {
+    this.router.navigate(['/auth/change-password']);
   }
 }

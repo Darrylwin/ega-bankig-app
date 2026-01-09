@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from "@angular/core";
+import { Component, OnInit, OnDestroy, ViewEncapsulation } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
 import { NbToastrService } from "@nebular/theme";
@@ -11,6 +11,7 @@ import { takeUntil } from "rxjs/operators";
   selector: "ngx-login",
   templateUrl: "./login.component.html",
   styleUrls: ["./login.component.scss"],
+  encapsulation: ViewEncapsulation.None,
 })
 export class LoginComponent implements OnInit, OnDestroy {
   loginForm: FormGroup;
