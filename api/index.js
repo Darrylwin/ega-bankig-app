@@ -23,28 +23,38 @@ export default async function handler(req, res) {
     const fetchOptions = {
       method,
       headers: {
-        'Content-Type': 'application/json',
         ...(headers.authorization && { 
           'Authorization': headers.authorization 
         })
       }
     };
-    
+
     // Ajoute le body seulement pour POST, PUT, PATCH
     if (method !== 'GET' && method !== 'HEAD' && body) {
       fetchOptions.body = JSON.stringify(body);
+      fetchOptions.headers['Content-Type'] = 'application/json';
     }
-    
+
     const response = await fetch(targetUrl, fetchOptions);
-    const data = await response.json();
-    
-    // Copie les headers de la réponse
+
+    // Propager les headers de la réponse
     response.headers.forEach((value, key) => {
       res.setHeader(key, value);
     });
-    
-    return res.status(response.status).json(data);
-    
+
+    const contentType = response.headers.get('content-type') || '';
+
+    // Si la réponse est du JSON, la parser et renvoyer en JSON
+    if (contentType.includes('application/json')) {
+      const data = await response.json();
+      return res.status(response.status).json(data);
+    }
+
+    // Pour les contenus binaires (PDF, images, etc.), renvoyer le buffer
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    return res.status(response.status).send(buffer);
+
   } catch (error) {
     console.error('❌ Proxy error:', error);
     return res.status(500).json({ 
