@@ -15,7 +15,7 @@ export default async function handler(req, res) {
   const path = url.replace('/api', '');
   
   // URL de ton API sur Skybots
-  const targetUrl = `http://89.187.7.35:25577/api${path}`;
+  const targetUrl = `http://89.187.7.29:25609/api${path}`;
   
   console.log(`🔄 Proxying ${method} ${targetUrl}`);
   
