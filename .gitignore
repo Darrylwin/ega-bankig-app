@@ -36,7 +36,3 @@ build/
 .env
 .env.local
 .env.production
-
-
-### Application Properties ###
-src/main/resources/application.properties
