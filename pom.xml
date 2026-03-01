@@ -102,6 +102,13 @@
             <version>2.6.0</version>
         </dependency>
 
+        <!-- DotEnv - chargement du fichier .env -->
+        <dependency>
+            <groupId>me.paulschwarz</groupId>
+            <artifactId>spring-dotenv</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+
         <!-- Tests -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
